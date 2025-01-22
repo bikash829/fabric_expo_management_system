@@ -9,10 +9,10 @@ def nav_data(request):
         photo_url = '#'
     # photo_url = request.user.profile_photo.url if request.user.profile_photo.url else '/media/profile/avatar/blank-profile-picturepng.png'
     nav_data={
-        'start_menu_items':[
+        'left_menu_items':[
             {
                 'name': 'Home',
-                'url': '#'
+                'url': reverse('welcome')
             },
             {
                 'name': 'Contact',
@@ -22,21 +22,47 @@ def nav_data(request):
         'end_menu_items':{
             'messages':[
                 {
-                    'divider': False,
+                    'divider': True,
                     'url': None,
-                    'user_avatar': '#',
+                    'user_avatar': '/static/assets/img/user8-128x128.jpg',
                     'avatar_alt': 'something alternet',
                     'user_name': 'John Pierce',
                     'message': 'I got your message bro',
                     'time' : '4 Hours Ago',
+                    'is_unread': True,
+                    'is_important': True,
                 },
                 {
                     'divider': True,
-                    'user_avatar': '#',
+                    'url': None,
+                    'user_avatar': '/static/assets/img/user3-128x128.jpg',
+                    'avatar_alt': 'something alternet',
+                    'user_name': 'John Pierce',
+                    'message': 'I got your message bro',
+                    'time' : '4 Hours Ago',
+                    'is_unread': False,
+                    'is_important': True,
+                },
+                {
+                    'divider': True,
+                    'url': None,
+                    'user_avatar': '/static/assets/img/user7-128x128.jpg',
+                    'avatar_alt': 'something alternet',
+                    'user_name': 'John Pierce',
+                    'message': 'I got your message bro',
+                    'time' : '4 Hours Ago',
+                    'is_unread': True,
+                    'is_important': False,
+                },
+                {
+                    'divider': True,
+                    'user_avatar': '/static/assets/img/avatar.png',
                     'avatar_alt': 'something alternet',
                     'user_name': 'Rango',
                     'message': 'Yoo! what\'s up?',
                     'time' : '10 Hours Ago',
+                    'is_unread': False,
+                    'is_important': False,
                 },
             ],
             'notifications':{
@@ -80,5 +106,8 @@ def nav_data(request):
      
     }
 
+    # Calculate the count of unread messages
+    unread_count = sum(1 for message in nav_data['end_menu_items']['messages'] if message['is_unread'])
+    nav_data['end_menu_items']['unread_message_count'] = unread_count
     return  nav_data
 

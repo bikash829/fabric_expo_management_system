@@ -6,7 +6,7 @@ def nav_data(request):
     try:
         photo_url = request.user.profile_photo.url
     except:
-        photo_url = '#'
+        photo_url = '/static/assets/img/user2-160x160.jpg'
     # photo_url = request.user.profile_photo.url if request.user.profile_photo.url else '/media/profile/avatar/blank-profile-picturepng.png'
     nav_data={
         'left_menu_items':[

@@ -41,7 +41,7 @@ class User(AbstractUser):
     phone = PhoneNumberField()
     additional_phone = PhoneNumberField(blank=True)
     date_of_birth = models.DateField(null=True)
-    profile_photo = models.ImageField(upload_to=profile_photo_directory_path,default="profile/avatar/blank-profile-picturepng.png") # f"{settings.MEDIA_URL}profile/avatar/blank-profile-picture.png"
+    profile_photo = models.ImageField(upload_to=profile_photo_directory_path,default="profile/avatar/blank-avatar.png") # f"{settings.MEDIA_URL}profile/avatar/blank-profile-picture.png"
     is_verified = models.IntegerField(choices=IS_VERIFIED,null=True)
     is_blocked= models.BooleanField(default=False)
     nationality = models.CharField(max_length=50)

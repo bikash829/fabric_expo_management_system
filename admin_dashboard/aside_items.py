@@ -1,6 +1,5 @@
 # utils.py
 from django.urls import reverse
-from django.contrib.auth.models import Group
 
 # Create sidebar items
 def mark_active_sidebar_items(items, current_path):

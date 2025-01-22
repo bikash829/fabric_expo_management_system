@@ -66,14 +66,16 @@ def nav_data(request):
                 },
             ],
             'notifications':{
-                'total_notifications': 15,
+                'total_notifications': 16,
                 'notification_list':[
                     {
                         'url': None,
                         'icon': 'bi bi-envelope',
                         'notification_count': 5,
                         'notification_from': 'new messages',
-                        'time': '3 mins'
+                        'time': '3 mins',
+                        'divider': True,
+                        'icon': 'bi bi-envelope'
 
                     },
                     {
@@ -81,7 +83,9 @@ def nav_data(request):
                         'icon': 'bi bi-people-fill',
                         'notification_count': 8,
                         'notification_from': 'friend requests',
-                        'time': '12 hour'
+                        'time': '12 hour',
+                        'divider': True,
+                        'icon': 'bi bi-file-earmark-fill',
 
                     },
                     {
@@ -89,7 +93,9 @@ def nav_data(request):
                         'icon': 'bi bi-people-fill',
                         'notification_count': 3,
                         'notification_from': 'new reports',
-                        'time': '2 days'
+                        'time': '2 days',
+                        'divider': True,
+                        'icon': 'bi bi-file-earmark-fill',
                     }
                 ]
             }
@@ -109,5 +115,8 @@ def nav_data(request):
     # Calculate the count of unread messages
     unread_count = sum(1 for message in nav_data['end_menu_items']['messages'] if message['is_unread'])
     nav_data['end_menu_items']['unread_message_count'] = unread_count
+
+    # Calculate the count of unread notifications
+
     return  nav_data
 

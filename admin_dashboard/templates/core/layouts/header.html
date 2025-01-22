@@ -11,7 +11,7 @@
         </li>
 
         {% for item in top_nav.left_menu_items %}
-            <li class="nav-item d-none d-md-block"><a href="{{item.url}}" class="nav-link">{{item.name}}</a></li>
+            <li class="nav-item d-none d-md-block"><a href="{{item.url|default_if_none:'#'}}" class="nav-link">{{item.name}}</a></li>
         {% endfor %}
       </ul>
       <!--end::Start Navbar Links-->

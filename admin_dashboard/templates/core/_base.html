@@ -59,6 +59,10 @@
       integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
       crossorigin="anonymous"
     />
+
+    <!--fontawesome-->
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}"/>
+
     {% block push_css %}{% endblock push_css %}
   </head>
   <!--end::Head-->
@@ -266,7 +270,7 @@
       </nav>
       <!--end::Header-->
       <!--begin::Sidebar-->
-      {% include 'layouts/aside.html' %}
+      {% include 'core/layouts/aside.html' %}
       <!--end::Sidebar-->
       <!--begin::App Main-->
       <main class="app-main">
@@ -539,7 +543,8 @@
       sparkline3.render();
     </script>
 
-
+    <!--fontawesome -->
+    <script src="{% static 'vendor/fontawesome-free-6.7.2-web/js/all.min.js' %}"></script>
     <!-- external js -->
     {% block push_scripts %}{% endblock push_scripts %} 
     <!--end::Script-->

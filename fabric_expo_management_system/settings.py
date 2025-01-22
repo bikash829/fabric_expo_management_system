@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'fabric_expo_management_system.context_processors.sidebar_items', # aside items 
             ],
         },
     },

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -18,7 +18,7 @@ def generate_upload_path(instance, filename, base_dir):
     return f'{base_dir}/{instance.username}/{current_date}/{unique_filename}'
     
 def profile_photo_directory_path(instance, filename):
-    return generate_upload_path(instance, filename, 'profile')
+    return generate_upload_path(instance, filename, 'profile/user_upload')
 
 
 class User(AbstractUser):

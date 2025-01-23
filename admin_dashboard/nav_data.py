@@ -107,7 +107,7 @@ def nav_data(request):
             'photo_alt': 'Admin',
             'designation': 'Web Developer',
             'member_from': 'Jan. 2025',
-            'profile_link': '#',
+            'profile_link': reverse('accounts:profile'),
         }
      
     }

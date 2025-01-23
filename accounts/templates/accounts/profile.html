@@ -60,17 +60,12 @@
                             <div class="row g-3">
                                 <div class="col-6">
                                     <label class="text-muted">Full Name: </label>
-                                    <span><strong> {{ user.full_name}}</strong></span>
-                                </div>
-
-                                <div class="col-6">
-                                    <label class="text-muted">Title </label>
-                                    <span><strong> {{ user.expert.get_doc_title_display }}</strong></span>
+                                    <span><strong> {{ user.full_name|default_if_none:''}}</strong></span>
                                 </div>
 
                                 <div class="col-md-6 col-lg-6">
                                     <label class="text-muted">Date Of Birth: </label>
-                                    <span>{{ user.date_of_birth }}</span>
+                                    <span>{{ user.date_of_birth|default_if_none:'' }}</span>
                                 </div>
                                 <div class="col-md-6 col-lg-6">
                                     <label class="text-muted">Sex: </label>
@@ -81,11 +76,6 @@
                                 <div class="col-md-6 col-lg-6">
                                     <label class="text-muted">Nationality: </label>
                                     <span>{{ user.nationality }}</span>
-                                </div>
-
-                                <div class="col-md-6 col-lg-6">
-                                    <label class="text-muted">Language Preference: </label>
-                                    <span>{{ user.language }}</span>
                                 </div>
 
                             </div>
@@ -186,25 +176,28 @@
                                 <span></span>
                             </div>
 
-                            <div class="col-md-6 col-lg-6">
-                                <label class="text-muted"></label>
-                                <span></span>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <label class="text-muted"></label>
-                                <span></span>
-                            </div>
 
-                            <div class="col-md-6 col-lg-6">
-                                <label class="text-muted"></label>
-                                <span></span>
-                            </div>
-
-                            <div class="col-md-6 col-lg-6">
-                                <label class="text-muted"></label>
-                                <span></span>
-                            </div>
-
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- settings accounts -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseFour">
+                        Account Settings
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><a href="{% url 'accounts:password_change' %}" class="link-opacity-75-hover">Change Password</a></li>
+                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change email</a></li>
+                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change username</a></li>
+                            </ul>
                         </div>
                     </div>
                 </div>

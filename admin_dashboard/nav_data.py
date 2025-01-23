@@ -12,7 +12,7 @@ def nav_data(request):
         'left_menu_items':[
             {
                 'name': 'Home',
-                'url': reverse('welcome')
+                'url': reverse('admin_dashboard:welcome')
             },
             {
                 'name': 'Contact',

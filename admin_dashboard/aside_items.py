@@ -21,7 +21,7 @@ def get_sidebar_items(request):
     sidebar_items = [
         {
             'name': 'Dashboard',
-            'url': reverse('welcome'),
+            'url': reverse('admin_dashboard:welcome'),
             'icon': 'bi bi-speedometer',
         },
         {
@@ -54,7 +54,7 @@ def get_sidebar_items(request):
             'children':[
                 {
                     'name': 'Pending Experts',
-                    'url': reverse('myview'),
+                    'url': reverse('admin_dashboard:myview'),
                     'icon': 'fa-solid fa-hourglass-end',
                 },
                 {

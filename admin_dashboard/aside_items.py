@@ -25,16 +25,16 @@ def get_sidebar_items(request):
             'icon': 'bi bi-speedometer',
         },
         {
-            'divider_header': 'Appointments',
+            'divider_header': 'Example Divider',
             'url': None,
         },
         {
-            'name': 'Active Patient Appointments',
+            'name': 'Example 1',
             'url': None,
             'icon': 'fa-solid fa-calendar-check',
         },
         {
-            'name': 'Past Appointments',
+            'name': 'Example 2',
             'url': None,
             'icon': 'fa-solid fa-hourglass-end',
         },
@@ -52,8 +52,14 @@ def get_sidebar_items(request):
             'url': None,
             'icon': 'fa-solid fa-screwdriver-wrench',
             'children':[
+                
                 {
-                    'name': 'Pending Experts',
+                    'name': 'Create Staff',
+                    'url': reverse('admin_dashboard:create_staff'),
+                    'icon': 'fa-solid fa-user-plus',
+                },
+                {
+                    'name': 'Pending Staff',
                     'url': reverse('admin_dashboard:myview'),
                     'icon': 'fa-solid fa-hourglass-end',
                 },
@@ -63,36 +69,13 @@ def get_sidebar_items(request):
                     'icon': 'fa-solid fa-ban',
                 },
                 {
-                    'name': 'Doctors',
-                    'url': None,
-                    'icon': 'fa-solid fa-user-doctor',
-                },
-                {
-                    'name': 'Counselors',
-                    'url': None,
-                    'icon': 'fa-solid fa-headset',
-                },
-                {
-                    'name': 'Patients',
-                    'url': None,
-                    'icon': 'fa-solid fa-bed-pulse',
-                },
-                {
                     'name': 'All User',
                     'url': None,
                     'icon': 'fa-solid fa-user-group',
                 },
             ]
         },
-        {
-            'divider_header': 'Doctor Schedules',
-            'url': None,
-        },
-        {
-            'name': 'Doctor Appointment Schedules',
-            'url': None,
-            'icon': 'fa-solid fa-calendar-check',
-        },
+        
         {
             'divider_header': 'Community',
             'url': None,
@@ -111,47 +94,7 @@ def get_sidebar_items(request):
             'url' : None,
             'icon': 'fa-solid fa-envelope',
         },
-        {
-            'divider_header': 'Users',
-            'url': None,
-        },
-        {
-            'name': 'Manage User',
-            'url': None,
-            'icon': 'fa-solid fa-screwdriver-wrench',
-            'children':[
-                {
-                    'name': 'Pending Experts',
-                    'url': '#',
-                    'icon': 'fa-solid fa-hourglass-end',
-                },
-                {
-                    'name': 'Blocked User',
-                    'url': None,
-                    'icon': 'fa-solid fa-ban',
-                },
-                {
-                    'name': 'Doctors',
-                    'url': None,
-                    'icon': 'fa-solid fa-user-doctor',
-                },
-                {
-                    'name': 'Counselors',
-                    'url': None,
-                    'icon': 'fa-solid fa-headset',
-                },
-                {
-                    'name': 'Patients',
-                    'url': None,
-                    'icon': 'fa-solid fa-bed-pulse',
-                },
-                {
-                    'name': 'All User',
-                    'url': None,
-                    'icon': 'fa-solid fa-user-group',
-                },
-            ]
-        },
+        
     ]
    
 

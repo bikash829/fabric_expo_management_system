@@ -1,0 +1,43 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Add New Staff{% endblock title %}
+
+{% block content %}
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="row">
+        <div class="col-sm-6"><h3 class="mb-0">Create User</h3></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-end">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create User</li>
+          </ol>
+        </div>
+      </div>
+      <!--end::Row-->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="row">
+        <!--begin::Col-->
+        {{form}}
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+{% endblock content %}

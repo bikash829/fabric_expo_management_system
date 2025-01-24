@@ -11,12 +11,6 @@ def sidebar_items(request):
     #     nav_data = {}
     # fetch data from nav_data file
     data = nav_data.nav_data(request)
-
-
     sidebar_items = get_sidebar_items(request)
-
-    print(data)
-    print("=================================")
-
     
     return {'sidebar_items': sidebar_items,'top_nav': data}

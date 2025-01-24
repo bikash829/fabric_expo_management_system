@@ -139,3 +139,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = 'admin_dashboard:welcome'
 LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# django.contrib.auth.tokens.PasswordResetTokenGenerator

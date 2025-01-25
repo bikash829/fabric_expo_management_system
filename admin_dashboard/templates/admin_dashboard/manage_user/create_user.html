@@ -38,9 +38,23 @@
           </div>
           <!--end::Header-->
           <!--begin::Form-->
-          <form class="needs-validation" novalidate>
+          <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
             <!--begin::Body-->
             <div class="card-body">
+              <!--begin::Non field errors-->
+              {% comment %} {% if form.non_field_errors|length < 2 %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{form.non_field_errors|join:','}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% elif form.non_field_errors %}
+              <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{form.non_field_errors}}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              {% endif %} {% endcomment %}
+              <!--./end::Non field errors-->
               <!--begin::Row-->
               <div class="row g-3">
                 <!--begin::Col-->
@@ -48,11 +62,12 @@
                   <label for="{{form.first_name.id_for_label}}" class="form-label">First name</label>
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                     id="{{form.first_name.id_for_label}}"
                     value="{{form.first_name.value|default_if_none:''}}"
                     name="first_name"
                     required
+
 
                   />
                   {% if form.first_name.errors %}
@@ -72,7 +87,7 @@
                   <label for="{{form.last_name.id_for_label}}" class="form-label">Last name</label>
                   <input
                     type="text"
-                    class="form-control"
+                    class="form-control  {% if form.last_name.errors %}is-invalid{% endif %}"
                     id="{{form.last_name.id_for_label}}"
                     value="{{form.last_name.value|default_if_none:''}}"
                     required
@@ -96,7 +111,7 @@
                     <span class="input-group-text" id="inputGroupPrepend">@</span>
                     <input
                       type="text"
-                      class="form-control"
+                      class="form-control  {% if form.username.errors %}is-invalid{% endif %}"
                       id="{{ form.username.id_for_label}}"
                       aria-describedby="inputGroupPrepend"
                       required
@@ -118,10 +133,10 @@
                 <!--end::Col-->
                 <!--begin::Col-->
                 <div class="col-md-6">
-                  <label for="{{form.email.id_for_label}}" class="form-label">Email</label>
+                  <label for="{{form.email.id_for_label}}" class="form-label ">Email</label>
                   <input
                     type="email"
-                    class="form-control"
+                    class="form-control  {% if form.email.errors %}is-invalid{% endif %}"
                     id="{{form.email.id_for_label}}"
                     required
                     name="email"
@@ -143,7 +158,7 @@
                   <label for="{{form.password1.id_for_label}}" class="form-label">Password</label>
                   <input
                     type="password"
-                    class="form-control"
+                    class="form-control  {% if form.password1.errors %}is-invalid{% endif %}"
                     id="{{form.password1.id_for_label}}"
                     required
                     name="password1"
@@ -164,16 +179,18 @@
                   <label for="{{form.password2.id_for_label}}" class="form-label">Confirm Password</label>
                   <input
                     type="password"
-                    class="form-control"
+                    class="form-control  {% if form.password2.errors %}is-invalid{% endif %}"
                     id="{{form.password2.id_for_label}}"
                     required
                     name="password2"
                   />
                   {% if form.password2.errors %}
                   <div class="invalid-feedback">
-                      {% for error in form.password2.errors  %}
-                          {{error}}
-                      {% endfor %}
+                    {% if form.password2.errors|length > 1 %}
+                      {{form.password2.errors}}
+                    {% else %}
+                      {{form.password2.errors|join:','}}
+                    {% endif %}
                   </div>
                   {% else %}
                     <div class="invalid-feedback">confirm your password </div>
@@ -206,10 +223,12 @@
                   <label for="{{form.date_of_birth.id_for_label}}" class="form-label">Date of Birth</label>
                   <input
                     type="date"
-                    class="form-control"
+                    class="form-control  {% if form.date_of_birth.errors %}is-invalid{% endif %}"
                     id="{{form.date_of_birth.id_for_label}}"
                     required
+                    value="{{form.date_of_birth.value}}"
                     name="date_of_birth"
+
                   />
                   {% if form.date_of_birth.errors %}
                   <div class="invalid-feedback">
@@ -227,13 +246,12 @@
                   <label for="{{form.phone.id_for_label}}" class="form-label">Phone</label>
                   <div class="input-group">
                     {{form.phone}}
-                 
                     {% if form.phone.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.phone.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
+                      <div class="error-feedback">
+                          {% for error in form.phone.errors  %}
+                              {{error}}
+                          {% endfor %}
+                      </div>
                     {% else %}
                       <div class="invalid-feedback">Enter your phone number</div>
                     {% endif %}
@@ -247,7 +265,7 @@
                     {{form.additional_phone}}
                  
                     {% if form.additional_phone.errors %}
-                    <div class="invalid-feedback">
+                    <div class="error-feedback">
                         {% for error in form.additional_phone.errors  %}
                             {{error}}
                         {% endfor %}
@@ -264,7 +282,7 @@
                       Nationality
                     </label>
                     <input
-                      class="form-control"
+                      class="form-control  {% if form.nationality.errors %}is-invalid{% endif %}"
                       type="text"
                       value="{{form.nationality.value|default_if_none:''}}"
                       id="{{form.nationality.id_for_label}}"
@@ -290,10 +308,11 @@
                     <div class="col-md-6">
                       <div class="form-check">
                         <input
-                          class="form-check-input"
+                          class="form-check-input  {% if form.is_active.errors %}is-invalid{% endif %}"
                           type="checkbox"
-                          value="{{form.is_active.value}}"
                           id="{{form.is_active.id_for_label}}"
+                          name="is_active"
+                          {% if form.is_superuser.value %}checked{% endif %}
                         />
                         <label class="form-check-label" for="{{form.is_active.id_for_label}}">
                           Is Active
@@ -314,10 +333,11 @@
                     <div class="col-md-6">
                       <div class="form-check">
                         <input
-                          class="form-check-input"
+                          class="form-check-input  {% if form.is_superuser.errors %}is-invalid{% endif %}"
                           type="checkbox"
-                          value="{{form.is_superuser.value}}"
                           id="{{form.is_superuser.id_for_label}}"
+                          name="is_superuser"
+                          {% if form.is_superuser.value %}checked{% endif %}
                         />
                         <label class="form-check-label" for="{{form.is_superuser.id_for_label}}">
                           Is Superuser
@@ -336,31 +356,13 @@
                     <!--end::Col-->
                   </div>
                 </div>
-                
-                <!--begin::Col-->
-                <div class="col-12">
-                  <div class="form-check">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      value=""
-                      id="invalidCheck"
-                      required
-                    />
-                    <label class="form-check-label" for="invalidCheck">
-                      Agree to terms and conditions
-                    </label>
-                    <div class="invalid-feedback">You must agree before submitting.</div>
-                  </div>
-                </div>
-                <!--end::Col-->
               </div>
               <!--end::Row-->
             </div>
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info" type="submit">Submit form</button>
+              <button class="btn btn-info" type="submit">Create User</button>
             </div>
             <!--end::Footer-->
           </form>
@@ -377,6 +379,26 @@
     <!--end::Container-->
   </div>
   <!--end::App Content-->
+
+  <!-- Toaster alert-->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  {% if messages %}
+  {% for message in messages %}
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header ">
+        {% comment %} <img src="..." class="rounded me-2" alt="..."> {% endcomment %}
+        <strong class="me-auto text-{{message.tags}}">{{message.tags}}</strong>
+        {% comment %} <small>11 mins ago</small> {% endcomment %}
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {{ message }}
+      </div>
+    </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
 
 {% endblock content %}
 
@@ -406,6 +428,13 @@
       );
     });
   })();
+</script>
+<script>
+  $(document).ready(function () {
+    $('.toast').toast({
+        delay: 1000*20,
+    }).toast('show')
+});
 </script>
 <!--end::JavaScript-->
 {% endblock push_scripts %}

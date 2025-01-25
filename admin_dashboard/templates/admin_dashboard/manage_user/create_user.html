@@ -28,9 +28,347 @@
     <!--begin::Container-->
     <div class="container-fluid">
       <!--begin::Row-->
-      <div class="row">
+      <div class="">
         <!--begin::Col-->
-        {{form}}
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Staff Creation Form</div>
+          </div>
+          <!--end::Header-->
+          <!--begin::Form-->
+          <form class="needs-validation" novalidate>
+            <!--begin::Body-->
+            <div class="card-body">
+              <!--begin::Row-->
+              <div class="row g-3">
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.first_name.id_for_label}}" class="form-label">First name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="{{form.first_name.id_for_label}}"
+                    value="{{form.first_name.value|default_if_none:''}}"
+                    name="first_name"
+                    required
+
+                  />
+                  {% if form.first_name.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.first_name.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="invalid-feedback">Please enter your first name.</div>
+                  {% endif %}
+
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.last_name.id_for_label}}" class="form-label">Last name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="{{form.last_name.id_for_label}}"
+                    value="{{form.last_name.value|default_if_none:''}}"
+                    required
+                    name="last_name"
+                  />
+                  {% if form.last_name.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.last_name.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="invalid-feedback">Please enter your last name.</div>
+                  {% endif %}
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{ form.username.id_for_label}}" class="form-label">Username</label>
+                  <div class="input-group has-validation">
+                    <span class="input-group-text" id="inputGroupPrepend">@</span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="{{ form.username.id_for_label}}"
+                      aria-describedby="inputGroupPrepend"
+                      required
+                      name="username"
+                      value="{{form.username.value|default_if_none:''}}"
+                    />
+                    
+                    {% if form.username.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.username.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                      <div class="invalid-feedback">Please choose a username.</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.email.id_for_label}}" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="{{form.email.id_for_label}}"
+                    required
+                    name="email"
+                    value="{{form.email.value|default_if_none:''}}"
+                  />
+                  {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="invalid-feedback">Enter email address</div>
+                  {% endif %}
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.password1.id_for_label}}" class="form-label">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="{{form.password1.id_for_label}}"
+                    required
+                    name="password1"
+                  />
+                  {% if form.password1.errors %}
+                  <div class="invalid-feedback">
+                      {% for error in form.password1.errors  %}
+                          {{error}}
+                      {% endfor %}
+                  </div>
+                  {% else %}
+                    <div class="invalid-feedback">create a new password</div>
+                  {% endif %}
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.password2.id_for_label}}" class="form-label">Confirm Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="{{form.password2.id_for_label}}"
+                    required
+                    name="password2"
+                  />
+                  {% if form.password2.errors %}
+                  <div class="invalid-feedback">
+                      {% for error in form.password2.errors  %}
+                          {{error}}
+                      {% endfor %}
+                  </div>
+                  {% else %}
+                    <div class="invalid-feedback">confirm your password </div>
+                  {% endif %}
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                  <!-- gender  -->
+                  <div class="col-md-6 ">
+                    <label for="" class="form-label">Gender</label>
+                    <div class="input-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="male" {% if form.gender.value == 'M' %}checked{% endif %}  name="gender"  value="M" required>
+                            <label class="form-check-label" for="male">Male</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" {% if form.gender.value == 'F' %}checked{% endif %} name="gender" id="female" value="F" required>
+                            <label class="form-check-label" for="female">Female</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" {% if form.gender.value == 'O' %}checked{% endif %} name="gender" id="other" value="O" required>
+                            <label class="form-check-label" for="other">Other</label>
+                        </div>
+                      </div>
+                  </div>
+                  <!-- end gender -->
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.date_of_birth.id_for_label}}" class="form-label">Date of Birth</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="{{form.date_of_birth.id_for_label}}"
+                    required
+                    name="date_of_birth"
+                  />
+                  {% if form.date_of_birth.errors %}
+                  <div class="invalid-feedback">
+                      {% for error in form.date_of_birth.errors  %}
+                          {{error}}
+                      {% endfor %}
+                  </div>
+                  {% else %}
+                    <div class="invalid-feedback">Select your date of birth</div>
+                  {% endif %}
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.phone.id_for_label}}" class="form-label">Phone</label>
+                  <div class="input-group">
+                    {{form.phone}}
+                 
+                    {% if form.phone.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.phone.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                      <div class="invalid-feedback">Enter your phone number</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                  <label for="{{form.additional_phone.id_for_label}}" class="form-label">Additional phone</label>
+                  <div class="input-group">
+                    {{form.additional_phone}}
+                 
+                    {% if form.additional_phone.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.additional_phone.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                      <div class="invalid-feedback">Enter your additional phone number</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="col-md-6">
+                    <label class="form-label" for="{{form.nationality.id_for_label}}">
+                      Nationality
+                    </label>
+                    <input
+                      class="form-control"
+                      type="text"
+                      value="{{form.nationality.value|default_if_none:''}}"
+                      id="{{form.nationality.id_for_label}}"
+                    />
+                    
+                    {% if form.nationality.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.nationality.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="invalid-feedback">Enter your nationality</div>
+                  
+                    {% endif %}
+                    
+                </div>
+                <!--end::Col-->
+                <div class="col-md-6">
+                  <label class="form-label">Account Status</label>
+                  <div class="row">
+                    <!--begin::Col-->
+                    <div class="col-md-6">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value="{{form.is_active.value}}"
+                          id="{{form.is_active.id_for_label}}"
+                        />
+                        <label class="form-check-label" for="{{form.is_active.id_for_label}}">
+                          Is Active
+                        </label>
+                        {% if form.is_active.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.is_active.errors  %}
+                                {{error}}
+                            {% endfor %}
+                        </div>
+                      
+                        {% endif %}
+                        
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                    <!--begin::Col-->
+                    <div class="col-md-6">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value="{{form.is_superuser.value}}"
+                          id="{{form.is_superuser.id_for_label}}"
+                        />
+                        <label class="form-check-label" for="{{form.is_superuser.id_for_label}}">
+                          Is Superuser
+                        </label>
+                        {% if form.is_superuser.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.is_superuser.errors  %}
+                                {{error}}
+                            {% endfor %}
+                        </div>
+                      
+                        {% endif %}
+                        
+                      </div>
+                    </div>
+                    <!--end::Col-->
+                  </div>
+                </div>
+                
+                <!--begin::Col-->
+                <div class="col-12">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      value=""
+                      id="invalidCheck"
+                      required
+                    />
+                    <label class="form-check-label" for="invalidCheck">
+                      Agree to terms and conditions
+                    </label>
+                    <div class="invalid-feedback">You must agree before submitting.</div>
+                  </div>
+                </div>
+                <!--end::Col-->
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer">
+              <button class="btn btn-info" type="submit">Submit form</button>
+            </div>
+            <!--end::Footer-->
+          </form>
+          <!--end::Form-->
+          
+        </div>
+        <!--end::Form Validation-->
+
         <!--end::Col-->
       </div>
       
@@ -41,3 +379,33 @@
   <!--end::App Content-->
 
 {% endblock content %}
+
+{% block push_scripts %}
+<!--begin::JavaScript-->
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          form.classList.add('was-validated');
+        },
+        false,
+      );
+    });
+  })();
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

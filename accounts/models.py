@@ -36,7 +36,6 @@ class User(AbstractUser):
         ]
 
     email=models.EmailField(unique=True)
-    nationality = models.CharField(max_length=50,blank=True)
     gender = models.CharField(max_length=1,choices=GENDER)
     phone = PhoneNumberField()
     additional_phone = PhoneNumberField(blank=True)
@@ -44,7 +43,7 @@ class User(AbstractUser):
     profile_photo = models.ImageField(upload_to=profile_photo_directory_path,default="profile/avatar/blank-avatar.png") # f"{settings.MEDIA_URL}profile/avatar/blank-profile-picture.png"
     is_verified = models.IntegerField(choices=IS_VERIFIED,null=True)
     is_blocked= models.BooleanField(default=False)
-    nationality = models.CharField(max_length=50)
+    nationality = models.CharField(max_length=50,blank=True)
     terms = models.BooleanField(default=0)
 
     @property

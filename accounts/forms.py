@@ -13,9 +13,6 @@ class ProfilePhotoForm(ModelForm):
         model = User
         fields = ['profile_photo']
 
-User = get_user_model()
-
-
 class CustomUserCreationForm(UserCreationForm):
     phone = SplitPhoneNumberField(
         widget=PhoneNumberPrefixWidget(
@@ -38,19 +35,10 @@ class CustomUserCreationForm(UserCreationForm):
                 ],
         )
     )
-    # additional_phone = PhoneNumberField(
-    #     required=False,  # Make the field optional
-    #     widget=PhoneNumberPrefixWidget(
-    #         widgets=[
-    #             forms.Select(attrs={'class': 'form-select w-25'}, choices=PrefixChoiceField().choices, required=False),
-    #             forms.TextInput(attrs={'class': 'form-control w-75'})
-    #         ],
-    #     )
-    # )
     class Meta:
         model = User
-        # fields = '__all__'
-        fields = ['username','first_name','last_name','is_staff','is_superuser','email','password1','password2','gender','phone','additional_phone','date_of_birth','nationality']
+        fields = '__all__'
+        # fields = ['username','first_name','last_name','is_staff','is_superuser','email','password1','password2','gender','phone','additional_phone','date_of_birth','nationality']
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }

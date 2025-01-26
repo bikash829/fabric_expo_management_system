@@ -69,8 +69,8 @@ def get_sidebar_items(request):
                     'icon': 'fa-solid fa-ban',
                 },
                 {
-                    'name': 'All User',
-                    'url': None,
+                    'name': 'All Staff',
+                    'url': reverse('admin_dashboard:staff_list'),
                     'icon': 'fa-solid fa-user-group',
                 },
             ]

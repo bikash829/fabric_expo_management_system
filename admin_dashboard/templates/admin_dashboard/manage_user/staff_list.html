@@ -1,0 +1,76 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+{% block title %}Staff List{% endblock title %}
+{% block content %}
+<!--begin::header-->
+{% include 'core/layouts/content_header.html' with page_name="Staff List" only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <table id="example" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>username</th>
+                    <th>Name</th>
+                    <th>email</th>
+                    <th>Contact</th>
+                    <th>Gender</th>
+                    <th>Role</th>
+                    <th>Date of birth</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in user_list %}
+                <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.username}}</td>
+                    <td>{{item.full_name}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.email}}</td>
+                    <td>{{item.get_gender_display}}</td>
+                    <td>{{""}}</td>
+                    <td>{{item.date_of_birth}}</td>
+                    <td>{{""}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>id</th>
+                    <th>username</th>
+                    <th>Name</th>
+                    <th>email</th>
+                    <th>Contact</th>
+                    <th>Gender</th>
+                    <th>Role</th>
+                    <th>Date of birth</th>
+                    <th>Action</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+<script>
+    $('#example').DataTable( {
+        responsive: true
+    } );
+</script>
+{% endblock push_scripts %}

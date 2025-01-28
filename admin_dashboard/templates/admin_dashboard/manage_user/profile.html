@@ -1,0 +1,212 @@
+{% extends "core/_base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+
+    <!--begin::App Content Header-->
+    {% include 'core/layouts/content_header.html' with page_name="User profile" only %}
+    <!--end::App Content Header-->
+    <!--begin::App Content-->
+    <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row mb-5">
+        <div class="col row justify-content-center">
+            <div class="col-md-3 col-lg-3">
+                <img src="{{staff.profile_photo.url}}" class="img-fluid rounded" alt="profile photo">
+                {% comment %} <p class="text-center"><a href="#" data-bs-toggle="modal" data-bs-target="#user_profile_image">Change Photo</a></p> {% endcomment %}
+            </div>
+            <h3 class="text-center mb-3"> {{staff.full_name|default_if_none:staff.username}}</h3>
+        </div>
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <h2 class="ms-3">Personal Information</h2>
+            <!-- Basic Information -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                        aria-controls="panelsStayOpen-collapseOne">
+                        Basic Information
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        <form method="POST" id="basicInfo" action="#">
+                            {% csrf_token %}
+
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="text-muted">Full Name: </label>
+                                    <span><strong> {{ staff.full_name|default_if_none:''}}</strong></span>
+                                </div>
+
+                                <div class="col-md-6 col-lg-6">
+                                    <label class="text-muted">Date Of Birth: </label>
+                                    <span>{{ staff.date_of_birth|default_if_none:'' }}</span>
+                                </div>
+                                <div class="col-md-6 col-lg-6">
+                                    <label class="text-muted">Sex: </label>
+                                    <span>{{ staff.get_gender_display }}</span>
+                                </div>
+
+
+                                <div class="col-md-6 col-lg-6">
+                                    <label class="text-muted">Nationality: </label>
+                                    <span>{{ staff.nationality }}</span>
+                                </div>
+
+                            </div>
+                            <div class="d-grid pt-2 col-6 mx-auto">
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Address Information -->
+            {% comment %} <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseTwo">
+                        Address
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Address: </label>
+                                <span>{{ $user?->address?->address }}</span>
+                            </div>
+
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Address 2: </label>
+                                <span>{{ $user?->address?->address2 }}</span>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">City :</label>
+                                <span>{{ $user?->address?->city }}</span>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">State: </label>
+                                <span>{{ $user?->address?->state }}</span>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Zip-Code: </label>
+                                <span>{{ $user->address?->zip_code }}</span>
+                            </div>
+
+
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Country: </label>
+                                <span>{{ $user->address?->country }}</span>
+                            </div>
+
+                            <div class="col-md-6 col-lg-6">
+
+                            </div>
+                        </div>
+
+
+
+                        <div class="d-grid pt-2 col-6 mx-auto">
+                        </div>
+
+                    </div>
+                </div>
+            </div> {% endcomment %}
+
+            <!-- contact information -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseThree">
+                        Contact Info
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Mobile: </label>
+                                <span>{{ staff.phone }}</span>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted">Email Address: </label>
+                                <span><a href="#" id="btnChangeEmail" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Tooltip on top">{{ staff.email }}</a> </span>
+
+                            </div>
+                            {% if staff.additional_phone %}
+                                <div class="col-md-6 col-lg-6">
+                                    <label class="text-muted">Mobile: </label>
+                                    <span>{{ staff.additional_phone}}</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="col-md-6 col-lg-6">
+                                <label class="text-muted"></label>
+                                <span></span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- settings accounts -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#panelsStayOpen-collapseFour" aria-expanded="false"
+                        aria-controls="panelsStayOpen-collapseFour">
+                        Account Settings
+                    </button>
+                </h2>
+                <div id="panelsStayOpen-collapseFour" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <div class="row g-2">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change Password</a></li>
+                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change email</a></li>
+                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change username</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+    </div>
+    <!--end::App Content-->
+
+    <!--begin:: Toaster alert -->
+    {% include 'core/components/alert/toaster.html' %}
+    <!--end:: Toaster alert-->
+
+
+
+  {% block push_scripts %}
+  <script>
+    $(document).ready(function () {
+        $('.toast').toast({
+            delay: 1000*20,
+        }).toast('show')
+
+    });
+    var toastElement = $('#toast1');
+    var toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  </script>
+  {% endblock push_scripts %}
+{% endblock content %}

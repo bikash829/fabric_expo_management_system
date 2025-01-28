@@ -59,14 +59,19 @@ def get_sidebar_items(request):
                     'icon': 'fa-solid fa-user-plus',
                 },
                 {
-                    'name': 'Pending Staff',
-                    'url': reverse('admin_dashboard:myview'),
-                    'icon': 'fa-solid fa-hourglass-end',
+                    'name': 'Inactive Accounts',
+                    'url': "#",
+                    'icon': 'fa-solid fa-ban',
                 },
                 {
-                    'name': 'Blocked User',
+                    'name': 'Active Accounts',
                     'url': None,
-                    'icon': 'fa-solid fa-ban',
+                    'icon': 'fa-solid fa-user-check',
+                },
+                {
+                    'name': 'Super Users',
+                    'url': None,
+                    'icon': 'fa-solid fa-user-shield',
                 },
                 {
                     'name': 'All Staff',

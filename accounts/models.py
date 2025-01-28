@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from phonenumber_field.modelfields import PhoneNumberField
+from django.urls import reverse
 # Create your models here.
 
 """ functions """
@@ -52,3 +53,7 @@ class User(AbstractUser):
             return None
         else:
             return f"{self.first_name} {self.last_name}"
+        
+    
+    def get_absolute_url(self):
+        return reverse("admin_dashboard:user_detail", kwargs={"pk": self.pk})

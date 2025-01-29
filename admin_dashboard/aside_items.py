@@ -60,17 +60,17 @@ def get_sidebar_items(request):
                 },
                 {
                     'name': 'Inactive Accounts',
-                    'url': "#",
+                    'url': reverse('admin_dashboard:inactive_users'),
                     'icon': 'fa-solid fa-ban',
                 },
                 {
                     'name': 'Active Accounts',
-                    'url': None,
+                    'url': reverse('admin_dashboard:active_users'),
                     'icon': 'fa-solid fa-user-check',
                 },
                 {
                     'name': 'Super Users',
-                    'url': None,
+                    'url': reverse('admin_dashboard:superusers'),
                     'icon': 'fa-solid fa-user-shield',
                 },
                 {

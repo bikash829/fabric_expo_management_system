@@ -1,4 +1,5 @@
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import get_object_or_404, render,HttpResponse,redirect
+from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -68,10 +69,76 @@ class ChangeUserView(UpdateView):
         return super().form_valid(form)
     
 
+# Delete staff 
+class DeleteStaffView(DeleteView):
+    model = get_user_model()
+    success_url = reverse_lazy("admin_dashboard:staff_list")
+    
+    # def get(self, request, *args, **kwargs):
+    #     # Override the GET method to directly delete the object without a confirmation page.
+    #     self.object = self.get_object()
+    #     self.object.delete()
+    #     return redirect(self.success_url)
+    
+### ============= Activate and deactivate user account =================
+class ToggleStaffActivationView(View):
+    is_active = None  # Set this in the subclasses
+
+    def get(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
+        user.is_active = self.is_active
+        user.save()
+
+        status = "activated" if self.is_active else "deactivated"
+        message_type = messages.SUCCESS if self.is_active else messages.WARNING
+        messages.add_message(request, message_type, f"Staff account for {user.username} has been {status}!")
+
+        return redirect(reverse_lazy("admin_dashboard:staff_list"))
+
+# Deactivate Staff View
+class DeactivateStaffView(ToggleStaffActivationView):
+    is_active = False
+
+# Activate Staff View
+class ActivateStaffView(ToggleStaffActivationView):
+    is_active = True
+
+# show active user list 
+class ActiveUserListView(ListView):
+    model = get_user_model()
+    template_name = "admin_dashboard/manage_user/staff_list.html"
+    
+    def get_queryset(self):
+        return self.model.objects.filter(is_active=True)
+
+
+# show deactivated user list 
+class DeactivatedUserListView(ListView):
+    model = get_user_model()
+    template_name = "admin_dashboard/manage_user/staff_list.html"
+    
+    def get_queryset(self):
+        return self.model.objects.filter(is_active=False)
+
+
+### ============= ./ Activate and deactivate user account =================
+
+
+# show all suepruser list
+class SuperuserListView(ListView):
+    model = get_user_model()
+    template_name = "admin_dashboard/manage_user/staff_list.html"
+    
+    def get_queryset(self):
+        return self.model.objects.filter(is_superuser=True)
+
 # Show all staff 
 class StaffListView(ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
+
+    def get_queryset(self):
+        return self.model.objects.filter(is_superuser=False)
 
 
 # show staff accounts

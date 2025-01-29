@@ -10,6 +10,12 @@ urlpatterns = [
     path('create_staff/',views.CreateUserView.as_view(),name="create_staff"),
     path('staff_details/<int:pk>/',views.StaffDetailsView.as_view(),name='user_detail'),
     path('update_staff/<int:pk>/',views.ChangeUserView.as_view(),name="update_staff"),
+    path('staff/<int:pk>/delete/',views.DeleteStaffView.as_view(),name="delete_staff"),
+    path('deactivate_staff/<int:pk>/', views.DeactivateStaffView.as_view(), name='deactivate_staff'),
+    path('activate_staff/<int:pk>/', views.ActivateStaffView.as_view(), name='activate_staff'),
+    path('active_users/', views.ActiveUserListView.as_view(), name='active_users'),
+    path('inactive_users/', views.DeactivatedUserListView.as_view(), name='inactive_users'),
+    path('superusers/', views.SuperuserListView.as_view(), name='superusers'),
     path('staff_list/',views.StaffListView.as_view(),name="staff_list"),
     
 ]

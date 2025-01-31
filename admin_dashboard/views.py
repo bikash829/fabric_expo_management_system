@@ -21,7 +21,7 @@ class MyView(TemplateView):
 
 """begin:: Manage User"""
 # Create new staff
-class CreateUserView(FormView):
+class CreateUserView(LoginRequiredMixin,FormView):
     template_name="admin_dashboard/manage_user/create_user.html"
     form_class = StaffUserCreationForm
     success_url = reverse_lazy('admin_dashboard:create_staff')
@@ -40,14 +40,14 @@ class CreateUserView(FormView):
 
 
 # show staff details 
-class StaffDetailsView(DetailView):
+class StaffDetailsView(DetailView,LoginRequiredMixin):
     model= get_user_model()
     template_name = "admin_dashboard/manage_user/profile.html"
     context_object_name = 'staff'
 
 
 # Edit staff
-class ChangeUserView(UpdateView):
+class ChangeUserView(LoginRequiredMixin,UpdateView):
     model=User
     template_name="admin_dashboard/manage_user/edit_staff.html"
     form_class = StaffChangeForm
@@ -72,7 +72,7 @@ class ChangeUserView(UpdateView):
 
 
 # manage permissions
-class ManageUserPermissionView(UpdateView):
+class ManageUserPermissionView(LoginRequiredMixin,UpdateView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/manage_permissions.html"
     form_class = UserPermissionForm
@@ -97,7 +97,7 @@ class ManageUserPermissionView(UpdateView):
     
 
 # Delete staff 
-class DeleteStaffView(DeleteView):
+class DeleteStaffView(LoginRequiredMixin,DeleteView):
     model = get_user_model()
     success_url = reverse_lazy("admin_dashboard:staff_list")
     
@@ -123,15 +123,15 @@ class ToggleStaffActivationView(View):
         return redirect(reverse_lazy("admin_dashboard:staff_list"))
 
 # Deactivate Staff View
-class DeactivateStaffView(ToggleStaffActivationView):
+class DeactivateStaffView(LoginRequiredMixin,ToggleStaffActivationView):
     is_active = False
 
 # Activate Staff View
-class ActivateStaffView(ToggleStaffActivationView):
+class ActivateStaffView(LoginRequiredMixin,ToggleStaffActivationView):
     is_active = True
 
 # show active user list 
-class ActiveUserListView(ListView):
+class ActiveUserListView(LoginRequiredMixin,ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
     
@@ -140,7 +140,7 @@ class ActiveUserListView(ListView):
 
 
 # show deactivated user list 
-class DeactivatedUserListView(ListView):
+class DeactivatedUserListView(LoginRequiredMixin,ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
     
@@ -150,7 +150,7 @@ class DeactivatedUserListView(ListView):
 
 
 # show all suepruser list
-class SuperuserListView(ListView):
+class SuperuserListView(LoginRequiredMixin,ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
     
@@ -158,7 +158,7 @@ class SuperuserListView(ListView):
         return self.model.objects.filter(is_superuser=True)
 
 # Show all staff 
-class StaffListView(ListView):
+class StaffListView(LoginRequiredMixin,ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
 

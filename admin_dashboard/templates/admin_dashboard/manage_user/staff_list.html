@@ -59,7 +59,7 @@
                               {% else %}
                                 <li><a class="dropdown-item text-success activate-deactivate-btn" data-action="activate"  data-username="{{ item.username }}"  href="{% url 'admin_dashboard:activate_staff' pk=item.id %}">Active <i class="fa-solid fa-user-check"></i></a></li>
                               {% endif %}
-                              <li><a class="dropdown-item text-secondary" href="#">Manage Permissions <i class="fa-solid fa-user-gear"></i></a></li>
+                              <li><a class="dropdown-item text-secondary" href="{% url 'admin_dashboard:edit_staff_permissions' pk=item.id%}">Manage Permissions <i class="fa-solid fa-user-gear"></i></a></li>
                             </ul>
                           </div>
                     </td>

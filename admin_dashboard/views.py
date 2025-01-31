@@ -4,10 +4,11 @@ from django.views.generic import TemplateView,FormView, ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .forms import StaffUserCreationForm,StaffChangeForm
+from .forms import StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from accounts.models import User
+from django.contrib.auth.models import Group, Permission
 # Create your views here.
 class IndexView(LoginRequiredMixin,TemplateView):
     template_name= "admin_dashboard/pages/dashboard.html"
@@ -69,6 +70,32 @@ class ChangeUserView(UpdateView):
         return super().form_valid(form)
     
 
+
+# manage permissions
+class ManageUserPermissionView(UpdateView):
+    model = get_user_model()
+    template_name = "admin_dashboard/manage_user/manage_permissions.html"
+    form_class = UserPermissionForm
+
+    # def get_success_url(self):
+    #     return reverse_lazy("admin_dashboard:user_detail", kwargs={"pk": self.object.pk})
+    success_url=reverse_lazy("admin_dashboard:user_detail")
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        selected_group = form.cleaned_data["group"]
+
+        # Clear existing groups and assign the selected one
+        user.groups.clear()
+        if selected_group:
+            group = get_object_or_404(Group, name=selected_group)
+            user.groups.add(group)
+
+        user.save()
+        messages.success(self.request, "User role and permissions updated successfully!")
+        return super().form_valid(form)
+    
+
 # Delete staff 
 class DeleteStaffView(DeleteView):
     model = get_user_model()
@@ -119,8 +146,6 @@ class DeactivatedUserListView(ListView):
     
     def get_queryset(self):
         return self.model.objects.filter(is_active=False)
-
-
 ### ============= ./ Activate and deactivate user account =================
 
 
@@ -141,7 +166,6 @@ class StaffListView(ListView):
         return self.model.objects.filter(is_superuser=False)
 
 
-# show staff accounts
 
 
 

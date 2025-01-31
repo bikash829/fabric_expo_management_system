@@ -1,10 +1,10 @@
 {% extends "core/_base.html" %}
 
-{% block title %}Edit Staff info{% endblock title %}
+{% block title %}Manage user permissions{% endblock title %}
 
 {% block content %}
   <!--begin::Header-->
-  {% include 'core/layouts/content_header.html' with page_name="Edit User" only%}
+  {% include 'core/layouts/content_header.html' with page_name="Manage Permissions" only%}
   <!--end::Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -17,28 +17,38 @@
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
           <div class="card-header">
-            <div class="card-title">Edit Staff Form</div>
+            <div class="card-title">Manage Permissions for {{ form.instance.username }}</div>
           </div>
           <!--end::Header-->
 
           <!--begin::Form-->
-          <form method="POST" class="needs-validation" novalidate>
+          <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label">Assign Role</label>
+                    {{ form.group }}
+                </div>
+
+                <div class="form-check mb-3">
+                    {{ form.is_active }} 
+                    <label class="form-check-label">Active Account</label>
+                </div>
+
+                <div class="form-check mb-3">
+                    {{ form.is_superuser }} 
+                    <label class="form-check-label">Superuser Access</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Permissions</button>
+            </form>
+        </div>
+          
+          {% comment %} <form method="POST" class="needs-validation" novalidate>
             {% csrf_token %}
             <!--begin::Body-->
             <div class="card-body">
-              <!--begin::Non field errors-->
-              {% comment %} {% if form.non_field_errors|length <div 2 %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                {{form.non_field_errors|join:','}}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-              {% elif form.non_field_errors %}
-              <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                {{form.non_field_errors}}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-              {% endif %} {% endcomment %}
-              <!--./end::Non field errors-->
               <!--begin::Row-->
               <div class="row g-3">
                 <!--begin::Col-->
@@ -250,7 +260,7 @@
               <button class="btn btn-info" type="submit">Update User</button>
             </div>
             <!--end::Footer-->
-          </form>
+          </form> {% endcomment %}
           <!--end::Form-->
           
         </div>

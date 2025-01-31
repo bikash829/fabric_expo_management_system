@@ -142,3 +142,6 @@ LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # django.contrib.auth.tokens.PasswordResetTokenGenerator
+
+# password reset link will expire in 5 mins
+PASSWORD_RESET_TIMEOUT = 300

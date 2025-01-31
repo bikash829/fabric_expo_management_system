@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
@@ -65,3 +66,21 @@ class StaffChangeForm(UserChangeForm):
         exclude=['password1','password2']
         
     
+# manage user permissions 
+class UserPermissionForm(forms.ModelForm):
+    group = forms.ModelChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+        empty_label="Select a Role",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+    is_active = forms.BooleanField(
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    is_superuser = forms.BooleanField(
+        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ["group", "is_active", "is_superuser"]

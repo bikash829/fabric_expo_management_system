@@ -20,5 +20,11 @@ urlpatterns = [
     path('inactive_users/', views.DeactivatedUserListView.as_view(), name='inactive_users'),
     path('superusers/', views.SuperuserListView.as_view(), name='superusers'),
     path('staff_list/',views.StaffListView.as_view(),name="staff_list"),
+
+    # manage groups and permissions 
+    path('group-list/',views.GroupListView.as_view(),name="group-list"),
+    # path("manage-groups/", views.GroupManageView.as_view(), name="manage_groups"),
+    path("manage-group-permissions/<int:pk>/", views.GroupPermissionUpdateView.as_view(), name="manage-group-permissions"),
+    # path("assign-user-groups/", AssignUserGroupView.as_view(), name="assign_user_groups"),
     
 ]

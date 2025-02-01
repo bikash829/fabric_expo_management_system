@@ -44,6 +44,28 @@ def get_sidebar_items(request):
             'icon': 'bi bi-speedometer',
         },
         {
+            'divider_header': 'Groups & Permissions',
+            'url': None,
+        },
+        {
+            'name': 'Manage GP',
+            'url': None,
+            'icon': 'fa-solid fa-screwdriver-wrench',
+            'children':[
+                
+                {
+                    'name': 'Create Group',
+                    'url': '#',
+                    'icon': 'fa-solid fa-user-plus',
+                },
+                {
+                    'name': 'All Groups',
+                    'url': reverse('admin_dashboard:group-list'),
+                    'icon': 'fa-solid fa-list-ul',
+                },
+            ]
+        },
+        {
             'divider_header': 'Users',
             'url': None,
         },

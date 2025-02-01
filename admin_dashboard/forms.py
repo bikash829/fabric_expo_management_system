@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
@@ -84,3 +84,20 @@ class UserPermissionForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["group", "is_active", "is_superuser"]
+
+
+class GroupForm(forms.ModelForm):
+    permissions = forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        widget=forms.CheckboxSelectMultiple,  # Use checkboxes instead of multi-select
+        required=False
+    )
+
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']
+
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:  # If editing an existing group
+            self.fields['permissions'].initial = self.instance.permissions.all()

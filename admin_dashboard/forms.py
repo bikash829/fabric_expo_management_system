@@ -68,11 +68,15 @@ class StaffChangeForm(UserChangeForm):
     
 # manage user permissions 
 class UserPermissionForm(forms.ModelForm):
-    group = forms.ModelChoiceField(
+    groups  = forms.ModelMultipleChoiceField(
         queryset=Group.objects.all(),
         required=False,
-        empty_label="Select a Role",
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "form-control"}),
+    )
+    user_permissions= forms.ModelMultipleChoiceField(
+        queryset=Permission.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple(attrs={"class":"form-control"}),
     )
     is_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
@@ -83,7 +87,7 @@ class UserPermissionForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ["group", "is_active", "is_superuser"]
+        fields = ["groups", "user_permissions", "is_active", "is_superuser"]
 
 
 # class GroupForm(forms.ModelForm):
@@ -108,7 +112,7 @@ class UserPermissionForm(forms.ModelForm):
 class GroupForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(),
-        widget=forms.CheckboxSelectMultiple(), # ✅ Widget should be set here
+        widget=forms.CheckboxSelectMultiple(), # Widget should be set here
         required=False
     )
 

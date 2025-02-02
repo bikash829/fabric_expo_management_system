@@ -81,20 +81,15 @@ class ManageUserPermissionView(LoginRequiredMixin,UpdateView):
 
     # def get_success_url(self):
     #     return reverse_lazy("admin_dashboard:user_detail", kwargs={"pk": self.object.pk})
-    success_url=reverse_lazy("admin_dashboard:user_detail")
+    
+    def get_success_url(self):
+        """
+        Redirects to the referring page if available; otherwise, reloads the form page.
+        """
+        return self.request.META.get("HTTP_REFERER") or reverse_lazy("admin_dashboard:user_detail", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
-        user = form.save(commit=False)
-        selected_group = form.cleaned_data["group"]
-
-        # Clear existing groups and assign the selected one
-        user.groups.clear()
-        if selected_group:
-            group = get_object_or_404(Group, name=selected_group)
-            user.groups.add(group)
-
-        user.save()
-        messages.success(self.request, "User role and permissions updated successfully!")
+        messages.success(self.request, "Permissions have been updated successfully!")
         return super().form_valid(form)
     
 

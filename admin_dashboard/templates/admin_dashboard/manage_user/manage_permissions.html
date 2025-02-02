@@ -10,9 +10,6 @@
   <div class="app-content">
     <!--begin::Container-->
     <div class="container-fluid">
-      <!--begin::Row-->
-      <div class="">
-        <!--begin::Col-->
         <!--begin::Form Validation-->
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
@@ -22,254 +19,81 @@
           <!--end::Header-->
 
           <!--begin::Form-->
-          <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    <label class="form-label">Assign Role</label>
-                    {{ form.group }}
-                </div>
-
-                <div class="form-check mb-3">
-                    {{ form.is_active }} 
-                    <label class="form-check-label">Active Account</label>
-                </div>
-
-                <div class="form-check mb-3">
-                    {{ form.is_superuser }} 
-                    <label class="form-check-label">Superuser Access</label>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Update Permissions</button>
-            </form>
-        </div>
-          
-          {% comment %} <form method="POST" class="needs-validation" novalidate>
-            {% csrf_token %}
-            <!--begin::Body-->
+          <form method="POST">
+              {% csrf_token %}
             <div class="card-body">
-              <!--begin::Row-->
-              <div class="row g-3">
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.first_name.id_for_label}}" class="form-label">First name</label>
-                  <input
-                    type="text"
-                    class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
-                    id="{{form.first_name.id_for_label}}"
-                    value="{{form.first_name.value|default_if_none:''}}"
-                    name="first_name"
-                    required
-
-
-                  />
-                  {% if form.first_name.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.first_name.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                  {% else %}
-                    <div class="invalid-feedback">Please enter your first name.</div>
-                  {% endif %}
-
-                </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.last_name.id_for_label}}" class="form-label">Last name</label>
-                  <input
-                    type="text"
-                    class="form-control  {% if form.last_name.errors %}is-invalid{% endif %}"
-                    id="{{form.last_name.id_for_label}}"
-                    value="{{form.last_name.value|default_if_none:''}}"
-                    required
-                    name="last_name"
-                  />
-                  {% if form.last_name.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.last_name.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                  {% else %}
-                    <div class="invalid-feedback">Please enter your last name.</div>
-                  {% endif %}
-                </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{ form.username.id_for_label}}" class="form-label">Username</label>
-                  <div class="input-group has-validation">
-                    <span class="input-group-text" id="inputGroupPrepend">@</span>
-                    <input
-                      type="text"
-                      class="form-control  {% if form.username.errors %}is-invalid{% endif %}"
-                      id="{{ form.username.id_for_label}}"
-                      aria-describedby="inputGroupPrepend"
-                      required
-                      name="username"
-                      value="{{form.username.value|default_if_none:''}}"
-                    />
-                    
-                    {% if form.username.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.username.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                      <div class="invalid-feedback">Please choose a username.</div>
+              <div class="row g-3">                
+                <!-- begin::Permissions Checkboxes -->
+                <div class="form-group">
+                  <h3>Mange Permissions:</h3>
+                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
+                    {% for permission in form.user_permissions.field.queryset %}
+                    {% if permission.content_type.model not in "logentry session contenttype" %}  
+                        <div class="form-check">
+                            <input class="form-check-input" 
+                                  name="{{ form.user_permissions.html_name }}" 
+                                  type="checkbox" 
+                                  value="{{ permission.id }}"  
+                                  {% if permission.id in form.user_permissions.value %}checked{% endif %} 
+                                  id="perm_{{ permission.id }}">
+                            <label class="form-check-label" for="perm_{{ permission.id }}">
+                                {{ permission.content_type.model|title }} | {{ permission.name }} 
+                            </label>
+                        </div>
                     {% endif %}
+                    {% endfor %}
                   </div>
                 </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.email.id_for_label}}" class="form-label ">Email</label>
-                  <input
-                    type="email"
-                    class="form-control  {% if form.email.errors %}is-invalid{% endif %}"
-                    id="{{form.email.id_for_label}}"
-                    required
-                    name="email"
-                    value="{{form.email.value|default_if_none:''}}"
-                  />
-                  {% if form.email.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                  {% else %}
-                    <div class="invalid-feedback">Enter email address</div>
-                  {% endif %}
-                </div>
-                <!--end::Col-->
-
-                <!--begin::Col-->
-                  <!-- gender  -->
-                  <div class="col-md-6 ">
-                    <label for="" class="form-label">Gender</label>
-                    <div class="input-group">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="male" {% if form.gender.value == 'M' %}checked{% endif %}  name="gender"  value="M" required>
-                            <label class="form-check-label" for="male">Male</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" {% if form.gender.value == 'F' %}checked{% endif %} name="gender" id="female" value="F" required>
-                            <label class="form-check-label" for="female">Female</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" {% if form.gender.value == 'O' %}checked{% endif %} name="gender" id="other" value="O" required>
-                            <label class="form-check-label" for="other">Other</label>
-                        </div>
+                <!--end::Permissions Checkboxes-->
+                <!-- begin:: Manage Groups -->
+                <div class="form-group">
+                  <h3>Manage Groups:</h3>
+                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
+                    {% for item in form.groups.field.choices %}
+                      <div class="form-check">
+                        <input class="form-check-input" 
+                        name="{{ form.groups.html_name }}" 
+                        type="checkbox" 
+                        value="{{ item.0 }}"  
+                        {% if item.0 in form.groups.value %}checked{% endif %} 
+                        id="group_{{ item.0 }}">
+                        <label class="form-check-label" for="group_{{ item.0 }}">
+                          {{ item.1 }} 
+                        </label>
                       </div>
-                  </div>
-                  <!-- end gender -->
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.date_of_birth.id_for_label}}" class="form-label">Date of Birth</label>
-                  <input
-                    type="date"
-                    class="form-control {% if form.date_of_birth.errors %}is-invalid{% endif %}"
-                    id="{{ form.date_of_birth.id_for_label }}"
-                    {% if form.date_of_birth.field.required %}required{% endif %}
-                    value="{{ form.date_of_birth.value }}"
-                    name="{{ form.date_of_birth.name }}"
-                  />
-                  {% if form.date_of_birth.errors %}
-                  <div class="invalid-feedback">
-                      {% for error in form.date_of_birth.errors  %}
-                          {{error}}
-                      {% endfor %}
-                  </div>
-                  {% else %}
-                    <div class="invalid-feedback">Select your date of birth</div>
-                  {% endif %}
-                </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.phone.id_for_label}}" class="form-label">Phone</label>
-                  <div class="input-group">
-                    {{form.phone}}
-                    {% if form.phone.errors %}
-                      <div class="error-feedback">
-                          {% for error in form.phone.errors  %}
-                              {{error}}
-                          {% endfor %}
-                      </div>
-                    {% else %}
-                      <div class="invalid-feedback">Enter your phone number</div>
-                    {% endif %}
+                    {% endfor %}
                   </div>
                 </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.additional_phone.id_for_label}}" class="form-label">Additional phone</label>
-                  <div class="input-group">
-                    {{form.additional_phone}}
-                 
-                    {% if form.additional_phone.errors %}
-                    <div class="error-feedback">
-                        {% for error in form.additional_phone.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                      <div class="invalid-feedback">Enter your additional phone number</div>
-                    {% endif %}
+                <!-- end:: Manage Groups-->
+                
+                <div class="form-group">
+                  <div class="form-check">
+                    {{ form.is_active }} 
+                    <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active Account</label>
                   </div>
                 </div>
-                <!--end::Col-->
-                <!--begin::Col-->
-                <div class="col-md-6">
-                    <label class="form-label" for="{{form.nationality.id_for_label}}">
-                      Nationality
-                    </label>
-                    <input
-                      name="nationality"
-                      class="form-control  {% if form.nationality.errors %}is-invalid{% endif %}"
-                      type="text"
-                      value="{{form.nationality.value|default_if_none:''}}"
-                      id="{{form.nationality.id_for_label}}"
-                    />
-                    
-                    {% if form.nationality.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.nationality.errors  %}
-                            {{error}}
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="invalid-feedback">Enter your nationality</div>
-                  
-                    {% endif %}
-                    
+                
+
+                <div class="form-group">
+                  <div class="form-check mb-3">
+                    {{ form.is_superuser }} 
+                    <label class="form-check-label" for="{{form.is_superuser.id_for_label}}">Superuser Access</label>
+                  </div>
                 </div>
-                <!--end::Col-->
+
               </div>
             </div>
-            <!--end::Body-->
-            <!--begin::Footer-->
+
             <div class="card-footer">
-              <button class="btn btn-info" type="submit">Update User</button>
+              <button type="submit" class="btn btn-primary">Update Permissions</button>
+
             </div>
-            <!--end::Footer-->
-          </form> {% endcomment %}
-          <!--end::Form-->
+          </form>
+          <!--end::form-->
+          
           
         </div>
         <!--end::Form Validation-->
-
-        <!--end::Col-->
-      </div>
-      
-      <!-- /.row (main row) -->
     </div>
     <!--end::Container-->
   </div>

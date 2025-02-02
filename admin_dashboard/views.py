@@ -20,6 +20,7 @@ class MyView(TemplateView):
     template_name= "admin_dashboard/pages/dashboard.html"
 
 
+
 """begin:: Manage User"""
 # Create new staff
 class CreateUserView(LoginRequiredMixin,FormView):
@@ -180,5 +181,28 @@ class CreateGroupView(LoginRequiredMixin,CreateView):
     model = Group
     form_class=GroupForm
     template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
+    success_url = reverse_lazy("admin_dashboard:group-list")
+    def form_valid(self,form):
+        messages.success(self.request, f"Group {form.cleaned_data['name']} created successfully!")
+        return super().form_valid(form)
 
+    
+
+
+class UpdateGroupPermission(LoginRequiredMixin,UpdateView):
+    model = Group
+    form_class = GroupForm
+    template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
+    success_url = reverse_lazy("admin_dashboard:group-list")
+
+    
+    def form_valid(self,form):
+        messages.success(self.request, f"Group permissions of {form.cleaned_data['name']}  has been updated successfully!")
+        return super().form_valid(form)
+
+
+class DeleteGroupView(LoginRequiredMixin,DeleteView):
+    model = Group
+    success_url = reverse_lazy("admin_dashboard:group-list")
 """end:: Groups and Permissions"""
+

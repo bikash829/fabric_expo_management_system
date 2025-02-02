@@ -2,6 +2,12 @@
 {% load static %}
 {% block title %}Group List{% endblock title %}
 
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+
+
 {% block content %}
 <!--begin::header-->
 {% include 'core/layouts/content_header.html' with page_name="Groups" only%}
@@ -35,10 +41,10 @@
                               >
                               </button>
                               <ul class="dropdown-menu">
-                                  <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
-                                  <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.name }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
-                                  <li><hr class="dropdown-divider" /></li>
-                                  <li><a class="dropdown-item text-warning" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li>
+                                  {% comment %} <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li> {% endcomment %}
+                                  <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li>
+                                  <li><a class="dropdown-item text-danger  delete-group" href="{% url 'admin_dashboard:delete-group' pk=item.id %}" data-groupname="{{ item.name }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
+                                  {% comment %} <li><hr class="dropdown-divider" /></li> {% endcomment %}
                                   {% comment %} <li><a class="dropdown-item text-warning" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li> {% endcomment %}
                               </ul>
                             </div>
@@ -81,42 +87,19 @@
         $('.toast').toast({
           delay: 1000*20,
         }).toast('show')
+        
         // Datatable 
         $('#groups').DataTable( {
             responsive: true
         } );
 
-        // activate and deactivate user account 
-        $(".activate-deactivate-btn").click(function (event) {
-          event.preventDefault();
-    
-          const url = $(this).attr('href');
-          const action = $(this).data("action");
-          const username = $(this).data("username");
-    
-          Swal.fire({
-            title: `Are you sure you want to ${action} ${username}?`,
-            text: `This action will ${action} the staff account.`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: action === "deactivate" ? "#d33" : "#28a745",
-            cancelButtonColor: "#6c757d",
-            confirmButtonText: `Yes, ${action} it!`
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = url;
-            }
-          });
-        });
-
-
-        // delete staff 
-        $('.delete-staff').on('click', function(e) {
+        // delete group 
+        $('.delete-group').on('click', function(e) {
           e.preventDefault();
             // select element
             const url = $(this).attr('href');
             const row = $(this).closest('tr');
-            const username = $(this).data('username');
+            const username = $(this).data('groupname');
 
             // popup alert 
             Swal.fire({
@@ -140,8 +123,10 @@
                         'Deleted!',
                         `The staff member  ${username} has been deleted.`,
                         'success'
-                      );
-                      row.remove();
+                      ).then(() => {
+                        location.reload(); // Reload the page
+                    });
+
 
                     },
                     error: function(xhr, status, error) {

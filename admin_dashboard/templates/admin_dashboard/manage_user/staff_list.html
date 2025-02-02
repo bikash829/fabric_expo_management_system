@@ -52,7 +52,7 @@
                             <ul class="dropdown-menu">
                               <li><a class="dropdown-item text-info" href="{% url 'admin_dashboard:user_detail' pk=item.id %}">View <i class="fa-regular fa-eye"></i></a></li>
                               <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
-                              {% comment %} <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.username }}">Delete <i class="fa-solid fa-user-minus"></i></a></li> {% endcomment %}
+                              <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.username }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
                               <li><hr class="dropdown-divider" /></li>
                               {% if item.is_active %}
                                 <li><a class="dropdown-item text-warning activate-deactivate-btn" data-action="deactivate"  data-username="{{ item.username }}" href="{% url 'admin_dashboard:deactivate_staff' pk=item.id %}">Deactivate <i class="fa-solid fa-user-lock"></i></a></li>
@@ -164,8 +164,10 @@
                         'Deleted!',
                         `The staff member  ${username} has been deleted.`,
                         'success'
-                      );
-                      row.remove();
+                      ).then(() => {
+                        location.reload(); // Reload the page
+                      });
+                      // row.remove();
 
                     },
                     error: function(xhr, status, error) {

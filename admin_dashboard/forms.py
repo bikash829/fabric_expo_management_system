@@ -108,7 +108,7 @@ class UserPermissionForm(forms.ModelForm):
 class GroupForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-select', 'size': '8'}), # ✅ Widget should be set here
+        widget=forms.CheckboxSelectMultiple(), # ✅ Widget should be set here
         required=False
     )
 
@@ -117,5 +117,4 @@ class GroupForm(forms.ModelForm):
         fields = ['name', 'permissions']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter group name'}),
-            'permissions': forms.SelectMultiple(attrs={'class': 'form-select', 'size': '8'})
         }

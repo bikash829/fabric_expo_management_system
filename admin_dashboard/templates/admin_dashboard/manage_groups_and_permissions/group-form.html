@@ -33,12 +33,21 @@
                 </div>
 
                 <!-- Permissions Checkboxes -->
-                <h3>Select Permissions:</h3>
-                <div class="row">
-                    <div id="allPermissions" class="col-md-6">
-                        {{form.permissions}}
+                <h3>Mange Permissions:</h3>
+                <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
+                  {% for permission in form.permissions.field.queryset %}
+                  {% if permission.content_type.model not in "logentry session contenttype" %}  
+                    <div class="form-group ">
+                        <div class="form-check">
+                            <input class="form-check-input" name="permissions" type="checkbox" value="{{ permission.id }}"  {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
+                            <label class="form-check-label" for="id_{{ permission.id }}">
+                            {{ permission.content_type.model }} | {{ permission.name }} 
+                            </label>
+                        </div>
                     </div>
-                </div>
+                  {% endif %}
+                  {% endfor %}
+              </div>
             </div>
             <!--end::Body-->
             <!--begin::Footer-->

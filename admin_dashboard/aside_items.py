@@ -55,7 +55,7 @@ def get_sidebar_items(request):
                 
                 {
                     'name': 'Create Group',
-                    'url': '#',
+                    'url': reverse('admin_dashboard:create-group'),
                     'icon': 'fa-solid fa-user-plus',
                 },
                 {

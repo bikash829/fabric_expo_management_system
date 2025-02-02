@@ -23,8 +23,7 @@ urlpatterns = [
 
     # manage groups and permissions 
     path('group-list/',views.GroupListView.as_view(),name="group-list"),
-    # path("manage-groups/", views.GroupManageView.as_view(), name="manage_groups"),
-    path("manage-group-permissions/<int:pk>/", views.GroupPermissionUpdateView.as_view(), name="manage-group-permissions"),
-    # path("assign-user-groups/", AssignUserGroupView.as_view(), name="assign_user_groups"),
+    path('create-group/',views.CreateGroupView.as_view(),name="create-group"),
+    
     
 ]

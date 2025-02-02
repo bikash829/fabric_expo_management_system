@@ -86,18 +86,36 @@ class UserPermissionForm(forms.ModelForm):
         fields = ["group", "is_active", "is_superuser"]
 
 
+# class GroupForm(forms.ModelForm):
+#     permissions = forms.ModelMultipleChoiceField(
+#         queryset=Permission.objects.all(),
+#         widget=forms.CheckboxSelectMultiple,  # Use checkboxes instead of multi-select
+#         required=False
+#     )
+
+#     class Meta:
+#         model = Group
+#         fields = ['name', 'permissions']
+
+#     def __init__(self, *args, **kwargs):
+#         super(GroupForm, self).__init__(*args, **kwargs)
+#         if self.instance.pk:  # If editing an existing group
+#             self.fields['permissions'].initial = self.instance.permissions.all()
+
+
+
+
 class GroupForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
         queryset=Permission.objects.all(),
-        widget=forms.CheckboxSelectMultiple,  # Use checkboxes instead of multi-select
+        widget=forms.SelectMultiple(attrs={'class': 'form-select', 'size': '8'}), # ✅ Widget should be set here
         required=False
     )
 
     class Meta:
         model = Group
         fields = ['name', 'permissions']
-
-    def __init__(self, *args, **kwargs):
-        super(GroupForm, self).__init__(*args, **kwargs)
-        if self.instance.pk:  # If editing an existing group
-            self.fields['permissions'].initial = self.instance.permissions.all()
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter group name'}),
+            'permissions': forms.SelectMultiple(attrs={'class': 'form-select', 'size': '8'})
+        }

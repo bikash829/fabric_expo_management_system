@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render,HttpResponse,redirect
 from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
@@ -175,84 +176,9 @@ class GroupListView(LoginRequiredMixin,ListView):
     template_name = "admin_dashboard/manage_groups_and_permissions/group-list.html"
 
 
-# class ManageGroupsView(LoginRequiredMixin,FormView, ListView):
-#     template_name = "admin_dashboard/manage_groups_and_permissions/create-group.html"
-#     form_class = GroupForm
-#     success_url = reverse_lazy("admin:dashboard:group-list")
-#     model = Group
-#     # context_object_name = "groups"
-
-#     def form_valid(self, form):
-#         group, created = Group.objects.get_or_create(name=form.cleaned_data["name"])
-#         print(group)
-#         print(created)
-#         # group.permissions.set(form.cleaned_data["permissions"])  # Assign multiple permissions
-#         return super().form_valid(form)
-    
-
-# class AssignUserGroupsView(FormView):
-#     template_name = "assign_user_groups.html"
-#     form_class = UserGroupForm
-#     success_url = reverse_lazy("assign_user_groups")
-
-#     def form_valid(self, form):
-#         user = form.cleaned_data["user"]
-#         print(user)
-#         # print(created)
-#         # user.groups.set(form.cleaned_data["groups"])  # Assign multiple groups
-#         return super().form_valid(form)
-    
-
-# class GroupManageView(FormView,LoginRequiredMixin):
-#     template_name = "admin_dashboard/manage_groups_and_permissions/create-group.html"
-#     form_class = GroupForm
-#     model = Group
-
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-
-#     def form_valid(self, form):
-#         group_name = form.cleaned_data["group_name"]
-#         permissions = form.cleaned_data["permissions"]
-        
-#         # Create or update the group
-#         group, created = Group.objects.get_or_create(name=group_name)
-#         group.permissions.set(permissions)
-
-#         return redirect("admin_dashboard:group-list")
-
-#     # def get_context_data(self, **kwargs):
-#     #     context = super().get_context_data(**kwargs)
-#     #     context["groups"] = Group.objects.all()
-#     #     return context
-    
-
-# class GroupPermissionUpdateView(UpdateView,LoginRequiredMixin):
-#     model = Group
-#     template_name = "admin_dashboard/manage_groups_and_permissions/create-group.html"
-#     form_class = GroupForm
-#     success_url = reverse_lazy('admin_dashboard:group-list')
-
-#     def form_valid(self, form):
-#         # Save the form and update the group permissions
-#         group = form.save(commit=False)
-#         group.save()
-#         form.save_m2m()  # Save the many-to-many data for the form
-#         return super().form_valid(form)
-class GroupPermissionUpdateView(LoginRequiredMixin, UpdateView):
+class CreateGroupView(LoginRequiredMixin,CreateView):
     model = Group
-    template_name = "admin_dashboard/manage_groups_and_permissions/create-group.html"
-    form_class = GroupForm
-    # success_url = reverse_lazy('admin_dashboard:group-list')
-    def get_success_url(self):
-        # Redirect to the previous page if available, otherwise to the form page
-        return self.request.META.get('HTTP_REFERER', reverse_lazy('admin_dashboard:group_update', kwargs={'pk': self.object.pk}))
-
-    def form_valid(self, form):
-        group = form.save(commit=False)
-        group.save()
-        group.permissions.set(form.cleaned_data.get('permissions', []))  # Assign permissions
-        return super().form_valid(form)
-
+    form_class=GroupForm
+    template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
 
 """end:: Groups and Permissions"""

@@ -39,6 +39,7 @@
                                   <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.name }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
                                   <li><hr class="dropdown-divider" /></li>
                                   <li><a class="dropdown-item text-warning" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li>
+                                  {% comment %} <li><a class="dropdown-item text-warning" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li> {% endcomment %}
                               </ul>
                             </div>
                       </td>

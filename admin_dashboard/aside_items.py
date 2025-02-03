@@ -21,43 +21,44 @@ def get_sidebar_items(request):
     sidebar_items = [
         {
             'name': 'Dashboard',
+            'code_name': '',
             'url': reverse('admin_dashboard:welcome'),
             'icon': 'bi bi-speedometer',
         },
         {
             'divider_header': 'Example Divider',
+            'code_name': '',
             'url': None,
         },
         {
             'name': 'Example 1',
+            'code_name': '',
             'url': None,
             'icon': 'fa-solid fa-calendar-check',
         },
         {
             'name': 'Example 2',
+            'code_name': '',
             'url': None,
             'icon': 'fa-solid fa-hourglass-end',
         },
         {
             'name': 'Noboard',
+            'code_name': '',
             'url': "#",
             'icon': 'bi bi-speedometer',
         },
         {
             'divider_header': 'Groups & Permissions',
+            'code_name': '',
             'url': None,
         },
         {
             'name': 'Manage GP',
+            'code_name': 'manage_group',
             'url': None,
             'icon': 'fa-solid fa-screwdriver-wrench',
             'children':[
-                
-                {
-                    'name': 'Create Group',
-                    'url': reverse('admin_dashboard:create-group'),
-                    'icon': 'fa-solid fa-user-plus',
-                },
                 {
                     'name': 'All Groups',
                     'url': reverse('admin_dashboard:group-list'),
@@ -66,11 +67,13 @@ def get_sidebar_items(request):
             ]
         },
         {
+            'code_name': '',
             'divider_header': 'Users',
             'url': None,
         },
         {
             'name': 'Manage User',
+            'code_name': 'manage_user',
             'url': None,
             'icon': 'fa-solid fa-screwdriver-wrench',
             'children':[
@@ -105,25 +108,53 @@ def get_sidebar_items(request):
         
         {
             'divider_header': 'Community',
+            'code_name': '',
             'url': None,
         },
         {
             'name': 'Community Forum',
+            'code_name': '',
             'url': None,
             'icon': 'fa-solid fa-users'
         },
         {
             'divider_header': 'Notifications and Messages',
+            'code_name': '',
             'url': None,
         },
         {
             'name': 'Contact Us Query',
+            'code_name': '',
             'url' : None,
             'icon': 'fa-solid fa-envelope',
         },
         
     ]
-   
+
+    for index,item in enumerate(sidebar_items):
+        print(item.get('name'))
+        print("permission close=======================")
+
+        if request.user.has_perm('auth.add_group'):
+            if item.get('code_name') == 'manage_group':
+                print("permission granted=======================7")
+                # sidebar_items[item]['children'].append({
+                #     'name': 'Create Group',
+                #     'url': reverse('admin_dashboard:create-group'),
+                #     'icon': 'fa-solid fa-user-plus',
+                # })
+
+                sidebar_items[index]['children'].insert(
+                    0,
+                    {
+                        'name': 'Create Group',
+                        'url': reverse('admin_dashboard:create-group'),
+                        'icon': 'fa-solid fa-user-plus',
+                    }
+                )
+                
+
+                print(sidebar_items[index])
 
     # if request.user.groups.filter(name='doctor').exists():
     #     sidebar_items, _ = mark_active_sidebar_items(doctor_sidebar_items, request.path)

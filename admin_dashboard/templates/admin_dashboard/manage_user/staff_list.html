@@ -23,6 +23,7 @@
                     <th>Contact</th>
                     <th>Gender</th>
                     <th>Role</th>
+                    <th>Is Superuser</th>
                     <th>Date of birth</th>
                     <th>Account Status</th>
                     <th>Action</th>
@@ -38,6 +39,7 @@
                     <td>{{item.email}}</td>
                     <td>{{item.get_gender_display}}</td>
                     <td>{{""}}</td>
+                    <td>{{item.is_superuser}}</td>
                     <td>{{item.date_of_birth}}</td>
                     <td>{% if item.is_active %}Active {% else %}Inactive{% endif %}</td>
                     <td>
@@ -50,16 +52,28 @@
                             >
                             </button>
                             <ul class="dropdown-menu">
-                              <li><a class="dropdown-item text-info" href="{% url 'admin_dashboard:user_detail' pk=item.id %}">View <i class="fa-regular fa-eye"></i></a></li>
-                              <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
-                              <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.username }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
-                              <li><hr class="dropdown-divider" /></li>
-                              {% if item.is_active %}
-                                <li><a class="dropdown-item text-warning activate-deactivate-btn" data-action="deactivate"  data-username="{{ item.username }}" href="{% url 'admin_dashboard:deactivate_staff' pk=item.id %}">Deactivate <i class="fa-solid fa-user-lock"></i></a></li>
-                              {% else %}
-                                <li><a class="dropdown-item text-success activate-deactivate-btn" data-action="activate"  data-username="{{ item.username }}"  href="{% url 'admin_dashboard:activate_staff' pk=item.id %}">Active <i class="fa-solid fa-user-check"></i></a></li>
+                              {% if perms.accounts.view_user %}
+                                <li><a class="dropdown-item text-info" href="{% url 'admin_dashboard:user_detail' pk=item.id %}">View <i class="fa-regular fa-eye"></i></a></li>
                               {% endif %}
-                              <li><a class="dropdown-item text-secondary" href="{% url 'admin_dashboard:edit_staff_permissions' pk=item.id%}">Manage Permissions <i class="fa-solid fa-user-gear"></i></a></li>
+
+                              {% if perms.accounts.change_user %}
+                                <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
+                              {% endif %}
+                              {% if perms.accounts.delete_user %}
+                                <li><a class="dropdown-item text-danger  delete-staff" href="{% url 'admin_dashboard:delete_staff' pk=item.id %}" data-username="{{ item.username }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
+                              {% endif %}
+                              <li><hr class="dropdown-divider" /></li>
+                              {% comment %} {% if user.has_perm('accounts.can_activate_deactivate_account') %} {% endcomment %}
+                              {% if perms.accounts.can_activate_deactivate_account %}
+                                {% if item.is_active %}
+                                  <li><a class="dropdown-item text-warning activate-deactivate-btn" data-action="deactivate"  data-username="{{ item.username }}" href="{% url 'admin_dashboard:deactivate_staff' pk=item.id %}">Deactivate <i class="fa-solid fa-user-lock"></i></a></li>
+                                {% else %}
+                                  <li><a class="dropdown-item text-success activate-deactivate-btn" data-action="activate"  data-username="{{ item.username }}"  href="{% url 'admin_dashboard:activate_staff' pk=item.id %}">Active <i class="fa-solid fa-user-check"></i></a></li>
+                                {% endif %}
+                              {% endif %}
+                              {% if perms.auth.change_group or perms.auth.change_permission %}
+                                <li><a class="dropdown-item text-secondary" href="{% url 'admin_dashboard:edit_staff_permissions' pk=item.id%}">Manage Permissions <i class="fa-solid fa-user-gear"></i></a></li>
+                              {% endif %}
                             </ul>
                           </div>
                     </td>
@@ -75,6 +89,7 @@
                     <th>Contact</th>
                     <th>Gender</th>
                     <th>Role</th>
+                    <th>Is Superuser</th>
                     <th>Date of birth</th>
                     <th>Account Status</th>
                     <th>Action</th>

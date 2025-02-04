@@ -42,8 +42,12 @@
                               </button>
                               <ul class="dropdown-menu">
                                   {% comment %} <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:update_staff' pk=item.id %}">Edit <i class="fa-solid fa-user-pen"></i></a></li> {% endcomment %}
-                                  <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li>
-                                  <li><a class="dropdown-item text-danger  delete-group" href="{% url 'admin_dashboard:delete-group' pk=item.id %}" data-groupname="{{ item.name }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
+                                  {% if perms.auth.change_permission or perms.auth.change_group%}
+                                    <li><a class="dropdown-item text-primary" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li>
+                                  {% endif %}
+                                  {% if perms.auth.delete_group %}
+                                    <li><a class="dropdown-item text-danger  delete-group" href="{% url 'admin_dashboard:delete-group' pk=item.id %}" data-groupname="{{ item.name }}">Delete <i class="fa-solid fa-user-minus"></i></a></li>
+                                  {% endif %}
                                   {% comment %} <li><hr class="dropdown-divider" /></li> {% endcomment %}
                                   {% comment %} <li><a class="dropdown-item text-warning" href="{% url 'admin_dashboard:manage-group-permissions' pk=item.id %}">Manage Permissions  <i class="fa-solid fa-user-gear"></i></a></li> {% endcomment %}
                               </ul>

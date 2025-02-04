@@ -26,28 +26,32 @@
             <!--begin::Body-->
             <div class="card-body">
                 <!-- Group Name Input -->
+                {% if perms.auth.change_group %}
                 <div class="mb-3">
                     {% comment %} <label for="id_name" class="form-label">Group Name</label>
                     <input type="text" name="name" class="form-control" id="id_name" value="{{ form.name.value|default_if_none:'' }}"> {% endcomment %}
                     {{form.name}}
                 </div>
+                {% endif %}
 
                 <!-- Permissions Checkboxes -->
-                <h3>Mange Permissions:</h3>
-                <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
-                  {% for permission in form.permissions.field.queryset %}
-                  {% if permission.content_type.model not in "logentry session contenttype" %}  
-                    <div class="form-group ">
-                        <div class="form-check">
-                            <input class="form-check-input" name="permissions" type="checkbox" value="{{ permission.id }}"  {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
-                            <label class="form-check-label" for="id_{{ permission.id }}">
-                            {{ permission.content_type.model }} | {{ permission.name }} 
-                            </label>
-                        </div>
-                    </div>
-                  {% endif %}
-                  {% endfor %}
-              </div>
+                {% if perms.auth.change_permission %}
+                  <h3>Mange Permissions:</h3>
+                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
+                    {% for permission in form.permissions.field.queryset %}
+                    {% if permission.content_type.model not in "logentry session contenttype" %}  
+                      <div class="form-group ">
+                          <div class="form-check">
+                              <input class="form-check-input" name="permissions" type="checkbox" value="{{ permission.id }}"  {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
+                              <label class="form-check-label" for="id_{{ permission.id }}">
+                              {{ permission.content_type.model }} | {{ permission.name }} 
+                              </label>
+                          </div>
+                      </div>
+                    {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
             </div>
             <!--end::Body-->
             <!--begin::Footer-->

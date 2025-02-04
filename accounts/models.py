@@ -57,3 +57,9 @@ class User(AbstractUser):
     
     def get_absolute_url(self):
         return reverse("admin_dashboard:user_detail", kwargs={"pk": self.pk})
+
+    class Meta:
+        permissions = [
+            ("can_activate_deactivate_account", "Can activate/deactivate user"),
+            ("can_view_active_inactive_users", "Can view active/inactive users"),
+        ]

@@ -122,10 +122,10 @@ def get_sidebar_items(request):
                 )
     """begin:: manage group """
 
+    
     """begin: Manage Users"""
     # create divider and parent group extender if any permission is available
     if request.user.has_perm('accounts.add_user') or request.user.has_perm('accounts.view_user'):
-    # if request.user.has_perm('auth.add_user') or request.user.has_perm('auth.view_user'):
         sidebar_items.insert(
             3,
             {
@@ -159,8 +159,10 @@ def get_sidebar_items(request):
                             'icon': 'fa-solid fa-user-plus',
                         },
                     )
-            # view group 
-            if request.user.has_perm('accounts.view_user'):
+
+        
+            # can_view_active_inactive_users 
+            if request.user.has_perm('accounts.can_view_active_inactive_users'):
                 if item.get('code_name') == 'manage_user':
                     user_nav_list = [
                         {
@@ -172,19 +174,23 @@ def get_sidebar_items(request):
                             'name': 'Active Accounts',
                             'url': reverse('admin_dashboard:active_users'),
                             'icon': 'fa-solid fa-user-check',
-                        },
-                        # {
-                        #     'name': 'Super Users',
-                        #     'url': reverse('admin_dashboard:superusers'),
-                        #     'icon': 'fa-solid fa-user-shield',
-                        # },
+                        }
+                    ]
+                    sidebar_items[index]['children'].extend(user_nav_list)
+
+
+            # view group 
+            if request.user.has_perm('accounts.view_user'):
+                if item.get('code_name') == 'manage_user':
+                    sidebar_items[index]['children'].append(
                         {
                             'name': 'All Staff',
                             'url': reverse('admin_dashboard:staff_list'),
                             'icon': 'fa-solid fa-user-group',
                         },
-                    ]
-                    sidebar_items[index]['children'].extend(user_nav_list)
+                    )
+            
+            
     
     """end: Manage Users"""
 

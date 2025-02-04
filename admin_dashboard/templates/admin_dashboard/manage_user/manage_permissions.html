@@ -14,7 +14,7 @@
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
           <div class="card-header">
-            <div class="card-title">Manage Permissions for {{ form.instance.username }}</div>
+            <div class="card-title">Manage Permissions for <strong>{{ form.instance.username }}</strong></div>
           </div>
           <!--end::Header-->
 
@@ -24,6 +24,7 @@
             <div class="card-body">
               <div class="row g-3">                
                 <!-- begin::Permissions Checkboxes -->
+                {% if perms.auth.change_permission %}
                 <div class="form-group">
                   <h3>Mange Permissions:</h3>
                   <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
@@ -44,8 +45,10 @@
                     {% endfor %}
                   </div>
                 </div>
+                {% endif %}
                 <!--end::Permissions Checkboxes-->
                 <!-- begin:: Manage Groups -->
+                {% if perms.auth.change_group %}
                 <div class="form-group">
                   <h3>Manage Groups:</h3>
                   <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
@@ -64,22 +67,17 @@
                     {% endfor %}
                   </div>
                 </div>
+                {% endif %}
                 <!-- end:: Manage Groups-->
-                
+                {% if perms.auth.change_permission %}
                 <div class="form-group">
                   <div class="form-check">
                     {{ form.is_active }} 
                     <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active Account</label>
                   </div>
                 </div>
+                {% endif %}
                 
-
-                <div class="form-group">
-                  <div class="form-check mb-3">
-                    {{ form.is_superuser }} 
-                    <label class="form-check-label" for="{{form.is_superuser.id_for_label}}">Superuser Access</label>
-                  </div>
-                </div>
 
               </div>
             </div>

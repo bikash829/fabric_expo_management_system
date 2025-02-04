@@ -37,6 +37,7 @@
                 <!-- Permissions Checkboxes -->
                 {% if perms.auth.change_permission %}
                   <h3>Mange Permissions:</h3>
+                  <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
                   <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
                     {% for permission in form.permissions.field.queryset %}
                     {% if permission.content_type.model not in "logentry session contenttype" %}  
@@ -126,12 +127,17 @@
     });
   })();
 </script>
+
 <script>
-  $(document).ready(function () {
-    $('.toast').toast({
-        delay: 1000*20,
-    }).toast('show')
-});
+  $(document).ready(function() {
+    $("#permissionSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $(".form-group").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
 </script>
+
 <!--end::JavaScript-->
 {% endblock push_scripts %}

@@ -18,3 +18,7 @@
     color: rgb(220, 53, 69);
     font-size: small;
 }
+
+.img-circle {
+    border-radius: 50%;
+  }

@@ -25,12 +25,12 @@
               <div class="row g-3">                
                 <!-- begin::Permissions Checkboxes -->
                 {% if perms.auth.change_permission %}
-                <div class="form-group">
-                  <h3>Mange Permissions:</h3>
+                <h3>Mange Permissions:</h3>
+                <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
                   <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
                     {% for permission in form.user_permissions.field.queryset %}
                     {% if permission.content_type.model not in "logentry session contenttype" %}  
-                        <div class="form-check">
+                        <div class="form-check permission-element">
                             <input class="form-check-input" 
                                   name="{{ form.user_permissions.html_name }}" 
                                   type="checkbox" 
@@ -44,16 +44,17 @@
                     {% endif %}
                     {% endfor %}
                   </div>
-                </div>
                 {% endif %}
                 <!--end::Permissions Checkboxes-->
                 <!-- begin:: Manage Groups -->
                 {% if perms.auth.change_group %}
                 <div class="form-group">
                   <h3>Manage Groups:</h3>
+                  <input type="text" id="groupSearch" class="form-control mb-2" placeholder="Search groups...">
+
                   <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
                     {% for item in form.groups.field.choices %}
-                      <div class="form-check">
+                      <div class="form-check group-element">
                         <input class="form-check-input" 
                         name="{{ form.groups.html_name }}" 
                         type="checkbox" 
@@ -168,7 +169,30 @@
     // Set the min and max attributes
     ageGuard.attr('max', minDate.toISOString().split('T')[0]);
     ageGuard.attr('min', maxDate.toISOString().split('T')[0]);
+    //--eng:: Date validation--// 
 });
 </script>
+
+
+<!-- search permission-->
+<script>
+  $(document).ready(function() {
+    $("#permissionSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $(".permission-element").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+
+    // search groups
+    $("#groupSearch").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $(".group-element").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+    });
+  });
+</script>
+
 <!--end::JavaScript-->
 {% endblock push_scripts %}

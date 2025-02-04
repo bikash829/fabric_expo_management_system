@@ -8,6 +8,12 @@ def nav_data(request):
     except:
         photo_url = '/static/assets/img/user2-160x160.jpg'
     # photo_url = request.user.profile_photo.url if request.user.profile_photo.url else '/media/profile/avatar/blank-profile-picturepng.png'
+    try:
+        user_name = request.user.full_name
+        if user_name is None:
+            user_name = request.user.username
+    except:
+        user_name = request.username
     nav_data={
         'left_menu_items':[
             {
@@ -101,12 +107,12 @@ def nav_data(request):
             }
         },
         'self_info':{
-            'name': 'Likin Park',
+            'name': user_name,
             # 'photo': 'dashboard/assets/img/user2-160x160.jpg',
             'photo': photo_url,
             'photo_alt': 'Admin',
             'designation': 'Web Developer',
-            'member_from': 'Jan. 2025',
+            'member_from': request.user.date_joined,
             'profile_link': reverse('accounts:profile'),
         }
      

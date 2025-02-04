@@ -23,7 +23,8 @@ class LoginView(auth_views.LoginView):
 
 class ProfileView(LoginRequiredMixin,TemplateView):
     # model = User
-    template_name = 'accounts/profile.html'
+    template_name = 'accounts/profile1.html'
+    
     # context_object_name = 'user_info'
 
 @login_required

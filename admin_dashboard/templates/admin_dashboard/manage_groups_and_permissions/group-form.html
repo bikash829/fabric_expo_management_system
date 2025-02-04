@@ -1,10 +1,10 @@
 {% extends "core/_base.html" %}
 
-{% block title %}Create New Group{% endblock title %}
+{% block title %}{{title}}{% endblock title %}
 
 {% block content %}
   <!--begin::Header-->
-  {% include 'core/layouts/content_header.html' with page_name="Create Group" only%}
+  {% include 'core/layouts/content_header.html' with page_name=page_title only%}
   <!--end::Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -17,7 +17,7 @@
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
           <div class="card-header">
-            <div class="card-title">Group Creation Form</div>
+            <div class="card-title">{{form_title}}</div>
           </div>
           <!--end::Header-->
           <!--begin::Form-->

@@ -49,64 +49,6 @@ def get_sidebar_items(request):
             'icon': 'bi bi-speedometer',
         },
         {
-            'divider_header': 'Groups & Permissions',
-            'code_name': '',
-            'url': None,
-        },
-        {
-            'name': 'Manage GP',
-            'code_name': 'manage_group',
-            'url': None,
-            'icon': 'fa-solid fa-screwdriver-wrench',
-            'children':[
-                {
-                    'name': 'All Groups',
-                    'url': reverse('admin_dashboard:group-list'),
-                    'icon': 'fa-solid fa-list-ul',
-                },
-            ]
-        },
-        {
-            'code_name': '',
-            'divider_header': 'Users',
-            'url': None,
-        },
-        {
-            'name': 'Manage User',
-            'code_name': 'manage_user',
-            'url': None,
-            'icon': 'fa-solid fa-screwdriver-wrench',
-            'children':[
-                
-                {
-                    'name': 'Create Staff',
-                    'url': reverse('admin_dashboard:create_staff'),
-                    'icon': 'fa-solid fa-user-plus',
-                },
-                {
-                    'name': 'Inactive Accounts',
-                    'url': reverse('admin_dashboard:inactive_users'),
-                    'icon': 'fa-solid fa-ban',
-                },
-                {
-                    'name': 'Active Accounts',
-                    'url': reverse('admin_dashboard:active_users'),
-                    'icon': 'fa-solid fa-user-check',
-                },
-                {
-                    'name': 'Super Users',
-                    'url': reverse('admin_dashboard:superusers'),
-                    'icon': 'fa-solid fa-user-shield',
-                },
-                {
-                    'name': 'All Staff',
-                    'url': reverse('admin_dashboard:staff_list'),
-                    'icon': 'fa-solid fa-user-group',
-                },
-            ]
-        },
-        
-        {
             'divider_header': 'Community',
             'code_name': '',
             'url': None,
@@ -131,19 +73,34 @@ def get_sidebar_items(request):
         
     ]
 
-    for index,item in enumerate(sidebar_items):
-        print(item.get('name'))
-        print("permission close=======================")
 
+    """begin:: manage group """
+    # create divider and parent group extender if any permission is available
+    if request.user.has_perm('auth.add_group') or request.user.has_perm('auth.view_group'):
+        sidebar_items.insert(
+            1,
+            {
+                'divider_header': 'Groups & Permissions',
+                'code_name': '',
+                'url': None,
+            }
+        )
+        sidebar_items.insert(
+            2,
+            {
+                'name': 'Manage GP',
+                'code_name': 'manage_group',
+                'url': None,
+                'icon': 'fa-solid fa-screwdriver-wrench',
+                'children':[]
+            }
+        )
+    
+    # create nav menu if permission available 
+    for index,item in enumerate(sidebar_items):
+        # add group permission
         if request.user.has_perm('auth.add_group'):
             if item.get('code_name') == 'manage_group':
-                print("permission granted=======================7")
-                # sidebar_items[item]['children'].append({
-                #     'name': 'Create Group',
-                #     'url': reverse('admin_dashboard:create-group'),
-                #     'icon': 'fa-solid fa-user-plus',
-                # })
-
                 sidebar_items[index]['children'].insert(
                     0,
                     {
@@ -152,9 +109,84 @@ def get_sidebar_items(request):
                         'icon': 'fa-solid fa-user-plus',
                     }
                 )
-                
+        # view group 
+        if request.user.has_perm('auth.view_group'):
+            if item.get('code_name') == 'manage_group':
+                sidebar_items[index]['children'].insert(
+                    1,
+                    {
+                        'name': 'All Groups',
+                        'url': reverse('admin_dashboard:group-list'),
+                        'icon': 'fa-solid fa-list-ul',
+                    },
+                )
+    """begin:: manage group """
 
-                print(sidebar_items[index])
+    """begin: Manage Users"""
+    # create divider and parent group extender if any permission is available
+    if request.user.has_perm('accounts.add_user') or request.user.has_perm('accounts.view_user'):
+    # if request.user.has_perm('auth.add_user') or request.user.has_perm('auth.view_user'):
+        sidebar_items.insert(
+            3,
+            {
+                'code_name': '',
+                'divider_header': 'Users',
+                'url': None,
+            },
+        )
+        sidebar_items.insert(
+            4,
+            {
+                'name': 'Manage User',
+                'code_name': 'manage_user',
+                'url': None,
+                'icon': 'fa-solid fa-screwdriver-wrench',
+                'children':[]
+            }
+        )
+
+
+        # create nav menu if permission available 
+        for index,item in enumerate(sidebar_items):
+            # add group permission
+            if request.user.has_perm('accounts.add_user'):
+                if item.get('code_name') == 'manage_user':
+                    sidebar_items[index]['children'].insert(
+                        0,
+                        {
+                            'name': 'Create Staff',
+                            'url': reverse('admin_dashboard:create_staff'),
+                            'icon': 'fa-solid fa-user-plus',
+                        },
+                    )
+            # view group 
+            if request.user.has_perm('accounts.view_user'):
+                if item.get('code_name') == 'manage_user':
+                    user_nav_list = [
+                        {
+                            'name': 'Inactive Accounts',
+                            'url': reverse('admin_dashboard:inactive_users'),
+                            'icon': 'fa-solid fa-ban',
+                        },
+                        {
+                            'name': 'Active Accounts',
+                            'url': reverse('admin_dashboard:active_users'),
+                            'icon': 'fa-solid fa-user-check',
+                        },
+                        # {
+                        #     'name': 'Super Users',
+                        #     'url': reverse('admin_dashboard:superusers'),
+                        #     'icon': 'fa-solid fa-user-shield',
+                        # },
+                        {
+                            'name': 'All Staff',
+                            'url': reverse('admin_dashboard:staff_list'),
+                            'icon': 'fa-solid fa-user-group',
+                        },
+                    ]
+                    sidebar_items[index]['children'].extend(user_nav_list)
+    
+    """end: Manage Users"""
 
     # if request.user.groups.filter(name='doctor').exists():
     #     sidebar_items, _ = mark_active_sidebar_items(doctor_sidebar_items, request.path)

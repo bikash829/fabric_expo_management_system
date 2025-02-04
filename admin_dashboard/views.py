@@ -177,6 +177,17 @@ class CreateGroupView(LoginRequiredMixin,CreateView):
     form_class=GroupForm
     template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
     success_url = reverse_lazy("admin_dashboard:group-list")
+    
+    
+    # custom context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Create Group'
+        context['page_title'] = 'Create New Group'
+        context['form_title'] = 'Group Creation Form'
+        return context
+    
+    
     def form_valid(self,form):
         messages.success(self.request, f"Group {form.cleaned_data['name']} created successfully!")
         return super().form_valid(form)
@@ -188,7 +199,21 @@ class UpdateGroupPermission(LoginRequiredMixin,UpdateView):
     model = Group
     form_class = GroupForm
     template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
-    success_url = reverse_lazy("admin_dashboard:group-list")
+    # success_url = reverse_lazy("admin_dashboard:group-list")
+
+    # custom context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Update Group'
+        context['page_title'] = 'Change Group'
+        context['form_title'] = 'Group Change Form'
+        return context
+
+    def get_success_url(self):
+        """
+        Redirects to the referring page if available; otherwise, reloads the form page.
+        """
+        return self.request.META.get("HTTP_REFERER")
 
     
     def form_valid(self,form):

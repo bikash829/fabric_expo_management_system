@@ -1,5 +1,5 @@
 {% extends "core/_base.html" %}
-
+{% load admin_dashboard_extras %}
 {% block title %}{{title}}{% endblock title %}
 
 {% block content %}
@@ -38,9 +38,8 @@
                 {% if perms.auth.change_permission %}
                   <h3>Mange Permissions:</h3>
                   <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
-                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
-                    {% for permission in form.permissions.field.queryset %}
-                    {% if permission.content_type.model not in "logentry session contenttype" %}  
+                  <div class="scroll-check">
+                    {% for permission in form.permissions.field.queryset|filter_permissions %}
                       <div class="form-group ">
                           <div class="form-check">
                               <input class="form-check-input" name="permissions" type="checkbox" value="{{ permission.id }}"  {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
@@ -49,7 +48,6 @@
                               </label>
                           </div>
                       </div>
-                    {% endif %}
                     {% endfor %}
                   </div>
                 {% endif %}

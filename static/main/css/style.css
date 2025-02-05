@@ -22,3 +22,12 @@
 .img-circle {
     border-radius: 50%;
   }
+
+
+.scroll-check{
+    max-height: 198px; 
+    overflow-y: auto; 
+    border: 1px solid #ccc; 
+    padding: 10px; 
+    border-radius:6px
+}

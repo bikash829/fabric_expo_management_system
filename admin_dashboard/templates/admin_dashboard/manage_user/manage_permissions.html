@@ -1,7 +1,7 @@
 {% extends "core/_base.html" %}
 
 {% block title %}Manage user permissions{% endblock title %}
-
+{% load admin_dashboard_extras %}
 {% block content %}
   <!--begin::Header-->
   {% include 'core/layouts/content_header.html' with page_name="Manage Permissions" only%}
@@ -22,37 +22,26 @@
           <form method="POST">
               {% csrf_token %}
             <div class="card-body">
-              <div class="row g-3">                
-                <!-- begin::Permissions Checkboxes -->
+              <div class="row g-3">          
+                
                 {% if perms.auth.change_permission %}
-                <h3>Mange Permissions:</h3>
-                <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
-                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
-                    {% for permission in form.user_permissions.field.queryset %}
-                    {% if permission.content_type.model not in "logentry session contenttype" %}  
-                        <div class="form-check permission-element">
-                            <input class="form-check-input" 
-                                  name="{{ form.user_permissions.html_name }}" 
-                                  type="checkbox" 
-                                  value="{{ permission.id }}"  
-                                  {% if permission.id in form.user_permissions.value %}checked{% endif %} 
-                                  id="perm_{{ permission.id }}">
-                            <label class="form-check-label" for="perm_{{ permission.id }}">
-                                {{ permission.content_type.model|title }} | {{ permission.name }} 
-                            </label>
-                        </div>
-                    {% endif %}
-                    {% endfor %}
+                <div class="form-group">
+                  <label class="form-label">Account Status</label>
+
+                  <div class="form-check">
+                    {{ form.is_active }} 
+                    <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active Account</label>
                   </div>
+                </div>
                 {% endif %}
-                <!--end::Permissions Checkboxes-->
                 <!-- begin:: Manage Groups -->
                 {% if perms.auth.change_group %}
-                <div class="form-group">
-                  <h3>Manage Groups:</h3>
+                <div class="form-group col-md-6">
+                  {% comment %} <h3>Manage Groups:</h3> {% endcomment %}
+                  <label class="form-label">Manage Groups</label>
                   <input type="text" id="groupSearch" class="form-control mb-2" placeholder="Search groups...">
 
-                  <div class="" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius:6px">
+                  <div class="scroll-check" >
                     {% for item in form.groups.field.choices %}
                       <div class="form-check group-element">
                         <input class="form-check-input" 
@@ -70,16 +59,49 @@
                 </div>
                 {% endif %}
                 <!-- end:: Manage Groups-->
+                
+                <!-- begin::Permissions Checkboxes -->
                 {% if perms.auth.change_permission %}
-                <div class="form-group">
-                  <div class="form-check">
-                    {{ form.is_active }} 
-                    <label class="form-check-label" for="{{form.is_active.id_for_label}}">Active Account</label>
+                <div class="form-group col-md-6">
+                  {% comment %} <h3>Mange Permissions:</h3> {% endcomment %}
+                  <label class="form-label">Manage Permissions</label>
+
+                  <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
+                  <div class="scroll-check">
+                    {% comment %} {% for permission in form.user_permissions.field.queryset %}
+                    {% if permission.content_type.model not in "logentry session contenttype" %}  
+                    {% if permission.content_type.model == 'permission' and permission.content_type not in "add_permission delete_permission" %}
+                        <div class="form-check permission-element">
+                            <input class="form-check-input" 
+                                  name="{{ form.user_permissions.html_name }}" 
+                                  type="checkbox" 
+                                  value="{{ permission.id }}"  
+                                  {% if permission.id in form.user_permissions.value %}checked{% endif %} 
+                                  id="perm_{{ permission.id }}">
+                            <label class="form-check-label" for="perm_{{ permission.id }}">
+                                {{ permission.content_type.model|title }} | {{ permission.name }} 
+                            </label>
+                        </div>
+                      {% endif %}
+                    {% endif %}
+                    {% endfor %} {% endcomment %}
+                    {% for permission in form.user_permissions.field.queryset|filter_permissions %}
+                        <div class="form-check permission-element">
+                            <input class="form-check-input" 
+                                  name="{{ form.user_permissions.html_name }}" 
+                                  type="checkbox" 
+                                  value="{{ permission.id }}"  
+                                  {% if permission.id in form.user_permissions.value %}checked{% endif %} 
+                                  id="perm_{{ permission.id }}">
+                            <label class="form-check-label" for="perm_{{ permission.id }}">
+                                {{ permission.content_type.model|title }} | {{ permission.name }} 
+                            </label>
+                        </div>
+                    {% endfor %}
                   </div>
                 </div>
                 {% endif %}
-                
-
+                <!--end::Permissions Checkboxes-->
               </div>
             </div>
 

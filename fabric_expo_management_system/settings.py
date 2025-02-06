@@ -14,6 +14,7 @@ from pathlib import Path
 
 import dj_database_url
 import os
+from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,14 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = "django-insecure-8ksu95hb05$z1i@dszn@&kpe4l%j22n&ws*^o4(+8v*un8p4cr"
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = os.environ.get("DEBUG","False").lower() == "True"
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -93,8 +94,11 @@ DATABASES = {
 
 # postgresql://fabric_expo_management_db_user:7FtblnkgWS7G23wgZ7inN0CnlKtJ7MUC@dpg-cui25lij1k6c73ao70q0-a.oregon-postgres.render.com/fabric_expo_management_db
 # DATABASES['default'] = dj_database_url.parse("postgresql://fabric_expo_management_db_user:7FtblnkgWS7G23wgZ7inN0CnlKtJ7MUC@dpg-cui25lij1k6c73ao70q0-a.oregon-postgres.render.com/fabric_expo_management_db")
-database_url = os.environ.get("DATABASE_URL")
-DATABASES['default'] = dj_database_url.parse(database_url)
+
+# Database
+DATABASES = {
+    'default': dj_database_url.parse(config('DATABASE_URL'))
+}
 
 
 # Password validation
@@ -146,6 +150,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
     # ...
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'OPTIONS': {
+            'location': MEDIA_ROOT,
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },

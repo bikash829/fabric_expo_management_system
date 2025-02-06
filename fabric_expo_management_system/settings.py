@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 
 import dj_database_url
-import os
 from decouple import config, Csv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -145,7 +144,7 @@ MEDIA_ROOT = BASE_DIR/'media'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
+# production storage 
 STORAGES = {
     # ...
     'default': {

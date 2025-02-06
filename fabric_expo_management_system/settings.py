@@ -92,8 +92,6 @@ DATABASES = {
     }
 }
 
-# postgresql://fabric_expo_management_db_user:7FtblnkgWS7G23wgZ7inN0CnlKtJ7MUC@dpg-cui25lij1k6c73ao70q0-a.oregon-postgres.render.com/fabric_expo_management_db
-# DATABASES['default'] = dj_database_url.parse("postgresql://fabric_expo_management_db_user:7FtblnkgWS7G23wgZ7inN0CnlKtJ7MUC@dpg-cui25lij1k6c73ao70q0-a.oregon-postgres.render.com/fabric_expo_management_db")
 
 # Database
 DATABASES = {

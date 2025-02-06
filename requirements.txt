@@ -3,6 +3,8 @@ babel==2.16.0
 dj-database-url==2.3.0
 Django==5.1.5
 django-phonenumber-field==8.0.0
+gunicorn==23.0.0
+packaging==24.2
 phonenumbers==8.13.53
 pillow==11.1.0
 psycopg2-binary==2.9.10

@@ -77,23 +77,10 @@
   <!--end::App Content-->
 
   <!-- Toaster alert-->
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  {% if messages %}
-  {% for message in messages %}
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header ">
-        {% comment %} <img src="..." class="rounded me-2" alt="..."> {% endcomment %}
-        <strong class="me-auto text-{{message.tags}}">{{message.tags}}</strong>
-        {% comment %} <small>11 mins ago</small> {% endcomment %}
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        {{ message }}
-      </div>
-    </div>
-  {% endfor %}
-  {% endif %}
-</div>
+  
+  <!--begin:: Toaster alert -->
+  {% include 'core/components/alert/toaster.html' %}
+  <!--end:: Toaster alert-->
 
 
 {% endblock content %}
@@ -128,6 +115,13 @@
 
 <script>
   $(document).ready(function() {
+    // toast alert
+    $('.toast').toast({
+      delay: 1000*20,
+    }).toast('show')
+  });
+
+  $(document).ready(function() {
     $("#permissionSearch").on("keyup", function() {
       var value = $(this).val().toLowerCase();
       $(".form-group").filter(function() {
@@ -135,6 +129,9 @@
       });
     });
   });
+
+  
+  
 </script>
 
 <!--end::JavaScript-->

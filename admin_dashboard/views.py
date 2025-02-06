@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render,HttpResponse,redirect
 from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from accounts.models import User
 from django.contrib.auth.models import Group, Permission
+
 # Create your views here.
 class IndexView(LoginRequiredMixin,TemplateView):
     template_name= "admin_dashboard/pages/dashboard.html"
@@ -30,12 +31,8 @@ class CreateUserView(LoginRequiredMixin,FormView):
     
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
-        # It should return an HttpResponse.
-        print(self.request.POST)
-        print(form.cleaned_data)
         obj = form.save(commit=False)
         obj.is_staff = True
-        print(obj)
         obj.save()
         messages.success(self.request, 'New staff created successfully!')
         return super().form_valid(form)
@@ -209,17 +206,18 @@ class UpdateGroupPermission(LoginRequiredMixin,UpdateView):
         context['form_title'] = 'Group Change Form'
         return context
 
+
     def get_success_url(self):
         """
         Redirects to the referring page if available; otherwise, reloads the form page.
         """
-        return self.request.META.get("HTTP_REFERER")
-
+        # group_name = self.object.name
+        # messages.success(self.request, f"Group permissions of {group_name} have been updated successfully!")
+        return self.request.META.get('HTTP_REFERER', self.success_url)
     
     def form_valid(self,form):
-        messages.success(self.request, f"Group permissions of {form.cleaned_data['name']}  has been updated successfully!")
+        messages.success(self.request, "Group permissions updated successfully.")
         return super().form_valid(form)
-
 
 class DeleteGroupView(LoginRequiredMixin,DeleteView):
     model = Group

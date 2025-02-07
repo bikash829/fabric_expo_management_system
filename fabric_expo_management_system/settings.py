@@ -92,9 +92,9 @@ DATABASES = {
 
 
 # Database
-DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'))
-}
+# DATABASES = {
+#     'default': dj_database_url.parse(config('DATABASE_URL'))
+# }
 
 
 # Password validation
@@ -167,8 +167,19 @@ AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = 'admin_dashboard:welcome'
 LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+""""console backend"""
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config("EMAIL")
+EMAIL_HOST_PASSWORD = config("EMAIL_PASS")
+
+
+
 # django.contrib.auth.tokens.PasswordResetTokenGenerator
 
 # password reset link will expire in 5 mins
 PASSWORD_RESET_TIMEOUT = 300
+

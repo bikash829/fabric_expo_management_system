@@ -20,6 +20,9 @@ urlpatterns = [
     # user info
     path('profile/',views.ProfileView.as_view(),name="profile"),
     path('change_profile_photo/<int:pk>/',views.change_profile_photo,name='change_profile_photo'),
+    path('change_email/<int:pk>/',views.EmailChangeView.as_view(),name='change_email'),
+    path('change-username/<int:pk>/',views.UsernameChangeView.as_view(),name='change_username'),
+    path('update-profile/<int:pk>/',views.UpdateProfileView.as_view(),name='update_profile'),
 
 
 

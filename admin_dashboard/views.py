@@ -104,6 +104,7 @@ class DeleteStaffView(LoginRequiredMixin,DeleteView):
 ### ============= Activate and deactivate user account =================
 class ToggleStaffActivationView(View):
     is_active = None  # Set this in the subclasses
+    success_url = reverse_lazy("admin_dashboard:staff_list")  # Default success URL
 
     def get(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=self.kwargs["pk"])
@@ -114,15 +115,21 @@ class ToggleStaffActivationView(View):
         message_type = messages.SUCCESS if self.is_active else messages.WARNING
         messages.add_message(request, message_type, f"Staff account for {user.username} has been {status}!")
 
-        return redirect(reverse_lazy("admin_dashboard:staff_list"))
+        return self.handle_success_url(request)
+
+    def handle_success_url(self, request):
+        return redirect(self.success_url)
+    
 
 # Deactivate Staff View
 class DeactivateStaffView(LoginRequiredMixin,ToggleStaffActivationView):
     is_active = False
+    success_url = reverse_lazy("admin_dashboard:inactive_users")
 
 # Activate Staff View
 class ActivateStaffView(LoginRequiredMixin,ToggleStaffActivationView):
     is_active = True
+    success_url = reverse_lazy("admin_dashboard:active_users")  # Custom success URL
 
 # show active user list 
 class ActiveUserListView(LoginRequiredMixin,ListView):

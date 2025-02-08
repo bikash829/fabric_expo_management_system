@@ -197,7 +197,7 @@
                         <div class="row g-2">
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item"><a href="{% url 'accounts:password_change' %}" class="link-opacity-75-hover">Change Password</a></li>
-                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change email</a></li>
+                                <li class="list-group-item"><a href="{% url 'accounts:change_email' user.pk %}" class="link-opacity-75-hover">Change email</a></li>
                                 <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change username</a></li>
                                 <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Edit Profile</a></li>
                             </ul>
@@ -215,12 +215,26 @@
 
   {% include 'accounts/components/modals/change_photo.html' %}
 
+    <!--begin:: Toaster alert -->
+    {% include 'core/components/alert/toaster.html' %}
+    <!--end:: Toaster alert-->
+
+
 
   {% block push_scripts %}
   <script>
     var toastElement = $('#toast1');
     var toast = new bootstrap.Toast(toastElement);
     toast.show();
+  </script>
+
+  <script>
+    $(document).ready(function () {
+        $('.toast').toast({
+            delay: 1000*20,
+        }).toast('show')
+
+    });
   </script>
   {% endblock push_scripts %}
 {% endblock content %}

@@ -2,18 +2,20 @@ from django.shortcuts import get_object_or_404, render, redirect
 
 # Create your views here.
 from django.contrib.auth import views as auth_views
+from django.contrib.auth import authenticate
 from django.urls import reverse_lazy
 from fabric_expo_management_system.decorators import redirect_authenticated_user
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView,TemplateView
+from django.views.generic import DetailView,TemplateView,UpdateView
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # get user model
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # import forms 
-from .forms import ProfilePhotoForm
+from .forms import ProfilePhotoForm, UserEmailUpdateForm
 
 @method_decorator(redirect_authenticated_user, name='dispatch')
 class LoginView(auth_views.LoginView):
@@ -38,3 +40,39 @@ def change_profile_photo(request, pk):
     else:
         form = ProfilePhotoForm(instance=user)
     return render(request, 'accounts/profile.html', {'change_photo_form': form})
+
+
+
+class EmailChangeView(UpdateView):
+    model = User
+    # fields=['email']
+    # template_name = "accounts/manage_account/change_email.html"
+    success_url=reverse_lazy("accounts:profile")
+    form_class = UserEmailUpdateForm
+
+    def form_valid(self, form):
+        """Validate the password before updating the email."""
+        password = self.request.POST.get("password")
+        # if not authenticate(username=self.request.user.username, password=password):
+        #     form.add_error("password", "Incorrect password.")
+        #     return self.form_invalid(form)
+        
+        if not self.request.user.check_password(password):
+            form.add_error("password", "Incorrect password.")
+            return self.form_invalid(form)
+        
+        # email validation 
+        if self.request.user.email == form.cleaned_data.get("email"):
+            form.add_error("email","The new email address cannot be the same as the current email address")
+            return self.form_invalid(form)
+
+        messages.success(self.request, "Your email has been updated successfully.")
+        return super().form_valid(form)
+
+
+class UsernameChangeView(UpdateView):
+    pass 
+
+
+class UpdateProfileView(UpdateView):
+    pass 

@@ -46,3 +46,16 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = '__all__'
+
+
+class UserEmailUpdateForm(forms.ModelForm):
+    """Extends User model form to include password verification"""
+    password = forms.CharField(
+        label="Current Password", 
+        widget=forms.PasswordInput(), 
+        required=True
+    )
+
+    class Meta:
+        model = User
+        fields = ["email"]

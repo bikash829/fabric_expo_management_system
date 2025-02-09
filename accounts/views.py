@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # import forms 
-from .forms import ProfilePhotoForm, UserEmailUpdateForm
+from .forms import CustomUserChangeForm, ProfilePhotoForm, UserEmailUpdateForm
 
 @method_decorator(redirect_authenticated_user, name='dispatch')
 class LoginView(auth_views.LoginView):
@@ -64,5 +64,14 @@ class UsernameChangeView(UpdateView):
     pass 
 
 
-class UpdateProfileView(UpdateView):
-    pass 
+
+class UpdateProfileView(UpdateView,LoginRequiredMixin):
+    model = User
+    form_class = CustomUserChangeForm
+    template_name = "accounts/manage_account/change_profile.html"
+    success_url = reverse_lazy('accounts:profile')
+
+
+    def form_valid(self,form):
+        messages.success(self.request,"Your profile has been updated successfully")
+        return super().form_valid(form)

@@ -10,23 +10,8 @@
 {% endif %}
 
 <!--begin::App Content Header-->
-<div class="app-content-header">
-    <!--begin::Container-->
-    <div class="container-fluid">
-      <!--begin::Row-->
-      <div class="row">
-        <div class="col-sm-6"><h3 class="mb-0">Profile</h3></div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-end">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Profile</li>
-          </ol>
-        </div>
-      </div>
-      <!--end::Row-->
-    </div>
-    <!--end::Container-->
-  </div>
+{% include 'core/layouts/content_header.html' with page_name="Profile" only%}
+
   <!--end::App Content Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -199,7 +184,7 @@
                                 <li class="list-group-item"><a href="{% url 'accounts:password_change' %}" class="link-opacity-75-hover">Change Password</a></li>
                                 <li class="list-group-item"><a href="{% url 'accounts:change_email' user.pk %}" class="link-opacity-75-hover">Change email</a></li>
                                 <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Change username</a></li>
-                                <li class="list-group-item"><a href="#" class="link-opacity-75-hover">Edit Profile</a></li>
+                                <li class="list-group-item"><a href="{% url 'accounts:update_profile' user.pk %}" class="link-opacity-75-hover">Edit Profile</a></li>
                             </ul>
                         </div>
                     </div>

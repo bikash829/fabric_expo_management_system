@@ -51,9 +51,38 @@ class CustomUserCreationForm(UserCreationForm):
 
 """ Update user info form """
 class CustomUserChangeForm(UserChangeForm):
+    template_name = "accounts/form_template/user_form.html"
+    password = None
+    phone = SplitPhoneNumberField(
+        widget=PhoneNumberPrefixWidget(
+            widgets=[
+                forms.Select(attrs={'class': 'form-select w-25'}, choices=PrefixChoiceField().choices),
+                forms.TextInput(attrs={'class': 'form-control w-75'})
+            ],
+        )
+    )
+    additional_phone = SplitPhoneNumberField(
+        required=False,
+        widget=PhoneNumberPrefixWidget(
+            widgets=[
+                forms.Select(attrs={'class': 'form-select w-25'}, choices=PrefixChoiceField().choices),
+                forms.TextInput(attrs={'class': 'form-control w-75'})
+            ],
+        )
+    )
+
     class Meta:
-        model = User
-        fields = '__all__'
+        model = get_user_model()
+        fields = [ 'first_name', 'last_name', 'gender', 'date_of_birth', 'phone', 'additional_phone', 'nationality']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'required': 'true'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'required': 'true'}),
+            'gender': forms.Select(attrs={'class': 'form-select'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'additional_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'nationality': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
 
 """ Email update form """

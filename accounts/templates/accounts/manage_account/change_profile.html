@@ -1,0 +1,106 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Update Basic Info{% endblock title %}
+
+{% block content %}
+  <!--begin::Header-->
+  {% include 'core/layouts/content_header.html' with page_name="Update Profile" only%}
+  <!--end::Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Update Profile Form</div>
+          </div>
+          <!--end::Header-->
+          <!--begin::Form-->
+          <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <!--begin::Body-->
+            <div class="card-body">
+              <!--begin::Row-->
+              <div class="row g-3">
+                {{form}}
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer">
+              <button class="btn btn-info" type="submit">Update Profile</button>
+              <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
+            </div>
+            <!--end::Footer-->
+          </form>
+          <!--end::Form-->
+          
+        </div>
+        <!--end::Form Validation-->
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!--begin::JavaScript-->
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          form.classList.add('was-validated');
+        },
+        false,
+      );
+    });
+  })();
+</script>
+<script>
+    $(document).ready(function () {
+        //--begin::Date validation--// 
+        const ageGuard = $('#id_date_of_birth');
+        const currentDate = new Date();
+    
+        // Calculate the minimum date (e.g., 18 years old)
+        const minDate = new Date(currentDate);
+        minDate.setFullYear(minDate.getFullYear() - 18);
+    
+        // Calculate the maximum date (e.g., 65 years old)
+        const maxDate = new Date(currentDate);
+        maxDate.setFullYear(maxDate.getFullYear() - 100);
+    
+        // Set the min and max attributes
+        ageGuard.attr('max', minDate.toISOString().split('T')[0]);
+        ageGuard.attr('min', maxDate.toISOString().split('T')[0]);
+    });
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

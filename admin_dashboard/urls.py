@@ -11,12 +11,14 @@ urlpatterns = [
     path('staff_details/<int:pk>/',views.StaffDetailsView.as_view(),name='user_detail'),
     path('update_staff/<int:pk>/',views.ChangeUserView.as_view(),name="update_staff"),
     path('staff/<int:pk>/delete/',views.DeleteStaffView.as_view(),name="delete_staff"),
-    # manage user permissions and groups 
-    path("edit-permissions/<int:pk>/", views.ManageUserPermissionView.as_view(), name="edit_staff_permissions"),
     
     # control staff account
     path('deactivate_staff/<int:pk>/', views.DeactivateStaffView.as_view(), name='deactivate_staff'),
     path('activate_staff/<int:pk>/', views.ActivateStaffView.as_view(), name='activate_staff'),
+
+    # manage user permissions and groups 
+    path("edit-permissions/<int:pk>/", views.ManageUserPermissionView.as_view(), name="edit_staff_permissions"),
+    
     # show users 
     path('active_users/', views.ActiveUserListView.as_view(), name='active_users'),
     path('inactive_users/', views.DeactivatedUserListView.as_view(), name='inactive_users'),

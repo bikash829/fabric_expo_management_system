@@ -1,0 +1,33 @@
+/* ==================== universal code ========================= */
+.text-error{
+    color: rgb(220, 53, 69) !important; 
+}
+/* 
+.errorlist{
+    display: none;
+} */
+
+.error-feedback{
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.helptext{
+    color: rgb(220, 53, 69);
+    font-size: small;
+}
+
+.img-circle {
+    border-radius: 50%;
+  }
+
+
+.scroll-check{
+    max-height: 198px; 
+    overflow-y: auto; 
+    border: 1px solid #ccc; 
+    padding: 10px; 
+    border-radius:6px
+}

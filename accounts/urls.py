@@ -12,7 +12,7 @@ urlpatterns = [
         ), name="password_change"
     ),
     path('password_reset/', auth_views.PasswordResetView.as_view(
-        success_url=reverse_lazy('accounts:password_reset_done')), name='password_reset'), # must maintain orde
+        success_url=reverse_lazy('accounts:password_reset_done')), name='password_reset'), # must maintain order
     path("", include("django.contrib.auth.urls")),
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
         success_url=reverse_lazy('accounts:password_reset_complete')), name='password_reset_confirm'),
@@ -20,6 +20,9 @@ urlpatterns = [
     # user info
     path('profile/',views.ProfileView.as_view(),name="profile"),
     path('change_profile_photo/<int:pk>/',views.change_profile_photo,name='change_profile_photo'),
+    path('change_email/<int:pk>/',views.EmailChangeView.as_view(),name='change_email'),
+    path('change-username/<int:pk>/',views.UsernameChangeView.as_view(),name='change_username'),
+    path('update-profile/<int:pk>/',views.UpdateProfileView.as_view(),name='update_profile'),
 
 
 

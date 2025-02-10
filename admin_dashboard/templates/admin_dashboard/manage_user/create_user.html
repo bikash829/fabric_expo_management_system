@@ -347,6 +347,8 @@
             <!--begin::Footer-->
             <div class="card-footer">
               <button class="btn btn-info" type="submit">Create User</button>
+              <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
+
             </div>
             <!--end::Footer-->
           </form>
@@ -415,9 +417,26 @@
 </script>
 <script>
   $(document).ready(function () {
-    $('.toast').toast({
-        delay: 1000*20,
-    }).toast('show')
+      $('.toast').toast({
+          delay: 1000*20,
+      }).toast('show')
+  });
+  $(document).ready(function () {
+    //--begin::Date validation--// 
+    const ageGuard = $('#id_date_of_birth');
+    const currentDate = new Date();
+
+    // Calculate the minimum date (e.g., 18 years old)
+    const minDate = new Date(currentDate);
+    minDate.setFullYear(minDate.getFullYear() - 18);
+
+    // Calculate the maximum date (e.g., 65 years old)
+    const maxDate = new Date(currentDate);
+    maxDate.setFullYear(maxDate.getFullYear() - 100);
+
+    // Set the min and max attributes
+    ageGuard.attr('max', minDate.toISOString().split('T')[0]);
+    ageGuard.attr('min', maxDate.toISOString().split('T')[0]);
 });
 </script>
 <!--end::JavaScript-->

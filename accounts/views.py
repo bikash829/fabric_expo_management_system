@@ -42,9 +42,9 @@ def change_profile_photo(request, pk):
 
 
 
-class EmailChangeView(UpdateView):
+class EmailChangeView(UpdateView,LoginRequiredMixin):
     model = User
-    # template_name = "accounts/manage_account/change_email.html"
+    template_name = "accounts/manage_account/change_email.html"
     success_url=reverse_lazy("accounts:profile")
     form_class = UserEmailUpdateForm
 

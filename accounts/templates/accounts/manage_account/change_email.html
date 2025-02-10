@@ -11,8 +11,9 @@
     <!--begin::Container-->
     <div class="container-fluid">
       <!--begin::Row-->
-      <div class="">
+      <div class="row justify-content-center">
         <!--begin::Col-->
+        <div class="col-md-6">
         <!--begin::Form Validation-->
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
@@ -28,17 +29,14 @@
               <!--begin::Row-->
               <div class="row g-3">
                 <!--begin::Col-->
-                <div class="col-md-6">
-                  <label for="{{form.email.id_for_label}}" class="form-label">New Email</label>
+                <div class="">
+                  <label for="current_email_{{form.email.id_for_label}}" class="form-label">Current Email</label>
                   <input
                     type="email"
-                    class="form-control {% if form.email.errors %}is-invalid{% endif %}"
-                    id="{{form.email.id_for_label}}"
-                    value="{{form.email.value|default_if_none:''}}"
-                    name="email"
-                    required
-
-
+                    class="form-control"
+                    id="current_email_{{form.email.id_for_label}}"
+                    value="{{request.user.email|default_if_none:''}}"
+                    disabled
                   />
                   {% if form.email.errors %}
                     <div class="invalid-feedback">
@@ -53,13 +51,35 @@
                 </div>
                 <!--end::Col-->
                 <!--begin::Col-->
-                <div class="col-md-6">
+                <div class="">
+                  <label for="{{form.email.id_for_label}}" class="form-label">New Email</label>
+                  <input
+                    type="email"
+                    class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                    id="{{form.email.id_for_label}}"
+                    value="{{form.email.value|default_if_none:''}}"
+                    name="email"
+                    required
+                  />
+                  {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors  %}
+                            {{error}}
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    <div class="invalid-feedback">Please enter valid email address.</div>
+                  {% endif %}
+
+                </div>
+                <!--end::Col-->
+                <!--begin::Col-->
+                <div class="">
                   <label for="{{form.password.id_for_label}}" class="form-label">Current password</label>
                   <input
                     type="password"
                     class="form-control  {% if form.password.errors %}is-invalid{% endif %}"
                     id="{{form.password.id_for_label}}"
-                    value="{{form.password.value|default_if_none:''}}"
                     required
                     name="password"
                   />
@@ -80,9 +100,10 @@
             </div>
             <!--end::Body-->
             <!--begin::Footer-->
-            <div class="card-footer">
-              <button class="btn btn-info" type="submit">Update Email</button>
+            <div class="card-footer text-center">
               <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
+              <button class="btn btn-info" type="submit">Update Email</button>
+
             </div>
             <!--end::Footer-->
           </form>
@@ -90,6 +111,7 @@
           
         </div>
         <!--end::Form Validation-->
+      </div>
 
         <!--end::Col-->
       </div>

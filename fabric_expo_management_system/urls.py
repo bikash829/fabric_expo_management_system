@@ -28,6 +28,7 @@ urlpatterns = [
     path('bulk_email/',include('bulk_email.urls')),
     path('bulk_wechat/',include('bulk_wechat.urls')),
     path('bulk_whatsapp/',include('bulk_whatsapp.urls')),
+    path('bulk_core/',include('bulk_core.urls')),
     # """end::bulk messaging"""
     path('', RedirectView.as_view(url='/dashboard/', permanent=True)),  # make the dashboard root url
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

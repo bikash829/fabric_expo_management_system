@@ -1,0 +1,146 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}Recipient's Category List{% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+
+
+{% block content %}
+<!--begin::header-->
+{% include 'core/layouts/content_header.html' with page_name="Recipient's Category List" only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+            <table id="groups" class="table table-striped" style="width:100%">
+              <thead>
+                  <tr>
+                      <th>id</th>
+                      <th>Category name</th>
+                      <th>Description</th>
+                      <th>Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for item in recipientcategory_list %}
+                  <tr>
+                      <td>{{item.id}}</td>
+                      <td>{{item.name}}</td>
+                      <td>{{item.description}}</td>
+                      <td>
+                          <div class="btn-group">
+                              <button
+                                type="button"
+                                class="btn btn-primary dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                              >
+                              </button>
+                              <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item text-primary" href="{% url 'bulk_core:update_category' pk=item.pk %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
+                                  <li><a class="dropdown-item text-danger delete-category" data-categoryname="{{ item.name }}" href="{% url 'bulk_core:delete_category' pk=item.pk %}">Delete <i class="fa-solid fa-trash"></i></a></li>
+                              </ul>
+                            </div>
+                      </td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+              <tfoot>
+                  <tr>
+                      <th>id</th>
+                      <th>Category name</th>
+                      <th>Description</th>
+                      <th>Action</th>
+                  </tr>
+              </tfoot>
+            </table>
+        </div>
+      </div>
+        
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+
+<!--begin:: Toaster alert -->
+{% include 'core/components/alert/toaster.html' %}
+<!--end:: Toaster alert-->
+
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+<script>
+    // sweet alert
+    $('document').ready(function(){
+        // toast alert
+        $('.toast').toast({
+          delay: 1000*20,
+        }).toast('show')
+        
+        // Datatable 
+        $('#groups').DataTable( {
+            responsive: true
+        } );
+
+        // delete group 
+        $('.delete-category').on('click', function(e) {
+          e.preventDefault();
+            // select element
+            const url = $(this).attr('href');
+            const row = $(this).closest('tr');
+            const category = $(this).data('categoryname');
+
+            // popup alert 
+            Swal.fire({
+              title: 'Are you sure?',
+              text: "You won't be able to revert this!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                      csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                      Swal.fire(
+                        'Deleted!',
+                        `The recipient category  "${category}" has been deleted.`,
+                        'success'
+                      ).then(() => {
+                        location.reload(); // Reload the page
+                    });
+
+
+                    },
+                    error: function(xhr, status, error) {
+                      Swal.fire(
+                        'Error!',
+                        'An error occurred while deleting the recipient category.',
+                        'error'
+                      );
+                    }
+                  });
+              }
+            });
+          });
+    });
+    
+</script>
+{% endblock push_scripts %}

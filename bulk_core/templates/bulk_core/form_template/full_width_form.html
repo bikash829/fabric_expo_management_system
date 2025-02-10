@@ -1,0 +1,59 @@
+
+{% for field, errors in fields %}
+  {% if field.widget_type == 'phonenumberprefix' %}
+    <div class="">
+      <label class="form-label" for="{{field.id_for_label}}">{{field.label}}</label>
+      <div class="input-group">
+        {{ field }}
+      </div>
+      {% if field.errors %}
+        <div class="error-feedback">
+            {% for error in field.errors  %}
+            {{error}}
+            {% endfor %}
+        </div>
+      {% endif %}
+     
+      {% if forloop.last %}
+        {% for field in hidden_fields %}{{ field }}{% endfor %}
+      {% endif %}
+    </div>
+  {% else %}
+    <div  class="">
+        {% comment %} {{ field.as_field_group }} {% endcomment %}
+        {% if field.use_fieldset %}
+            <fieldset {% if field.help_text and field.auto_id and "aria-describedby" not in field.field.widget.attrs %} aria-describedby="{{ field.auto_id }}_helptext"{% endif %}>
+                {% if field.label %}{{ field.legend_tag }}{% endif %}
+        {% else %}
+                {% if field.label %}
+                <label class="form-label" for="{{field.id_for_label}}">{{field.label}}</label>
+                {% endif %}
+        {% endif %}
+        {% if field.help_text %}
+        <div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>
+            {{ field.help_text|safe }}
+        </div>
+        {% endif %}
+          {{ field }}
+      {% if field.use_fieldset %}
+        </fieldset>
+      {% endif %}
+      {% comment %} {{ field.errors }} {% endcomment %}
+      {% if field.errors %}
+        <div class="error-feedback">
+            {% for error in field.errors  %}
+            {{error}}
+            {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if forloop.last %}
+        {% for field in hidden_fields %}{{ field }}{% endfor %}
+      {% endif %}
+    </div>
+  {% endif %}
+{% endfor %}
+
+{% if not fields and not errors %}
+  {% for field in hidden_fields %}{{ field }}{% endfor %}
+{% endif %}

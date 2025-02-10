@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'bulk_email.apps.BulkEmailConfig',
     'bulk_wechat.apps.BulkWechatConfig',
     'bulk_whatsapp.apps.BulkWhatsappConfig',
+    'bulk_core.apps.BulkCoreConfig',
     'admin_dashboard.apps.AdminDashboardConfig',
     'accounts.apps.AccountsConfig',
     'django.contrib.admin',

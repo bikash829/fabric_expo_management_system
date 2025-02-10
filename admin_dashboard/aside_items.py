@@ -26,6 +26,31 @@ def get_sidebar_items(request):
             'icon': 'bi bi-speedometer',
         },
         {
+            'divider_header': 'Bulk Messaging',
+            'code_name': '',
+            'url': None,
+        },
+        {
+            'name': 'Manage Category',
+            'code_name': 'manage_category',
+            'url': None,
+            'icon': 'fa-solid fa-layer-group',
+            'children':[
+                {
+                    'name': 'Create Category',
+                    'code_name': 'create_category',
+                    'url': reverse('bulk_core:create_category'),
+                    'icon': "fa-solid fa-plus",
+                },
+                {
+                    'name': 'Category List',
+                    'code_name': 'category_list',
+                    'url': reverse('bulk_core:category_list'),
+                    'icon': "fa-solid fa-list-ol",
+                },
+            ]
+        },
+        {
             'divider_header': 'Example Divider',
             'code_name': '',
             'url': None,
@@ -190,8 +215,6 @@ def get_sidebar_items(request):
                         },
                     )
             
-            
-    
     """end: Manage Users"""
 
     # if request.user.groups.filter(name='doctor').exists():

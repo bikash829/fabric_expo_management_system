@@ -15,8 +15,9 @@
       <li class="nav-item {% if item.children and item.is_active %}menu-open{% endif %}">
         {% comment %} <a href="{% if item.children %}#{% else %}{{item.url}}{% endif %}" class="nav-link {% if item.is_active %}active{% endif %}"> {% endcomment %}
         <a href="{{item.url|default_if_none:'#'}}" class="nav-link {% if item.is_active %}active{% endif %}">
-          <i class="nav-icon {{item.icon}}"></i>
+          
           <p>
+            <i class="{{item.icon}}"></i>&nbsp; 
             {{item.name}}
             {% if item.children %}
             <i class="nav-arrow bi bi-chevron-right"></i>

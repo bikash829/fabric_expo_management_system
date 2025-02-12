@@ -51,6 +51,32 @@ def get_sidebar_items(request):
             ]
         },
         {
+            'name': 'Import Recipients',
+            'code_name': 'import_recipients',
+            'url': None,
+            'icon': 'fa-solid fa-file-circle-plus',
+            'children':[
+                {
+                    'name': 'Import Email CSV',
+                    'code_name': 'import_email',
+                    'url': reverse('bulk_email:import_recipients'),
+                    'icon': "fa-solid fa-at",
+                },
+                {
+                    'name': 'Import Whatsapp CSV',
+                    'code_name': 'import_whatsapp',
+                    'url': None,
+                    'icon': "fa-solid fa-address-book",
+                },
+                {
+                    'name': 'Import WeChat CSV',
+                    'code_name': 'import_wechat',
+                    'url': None,
+                    'icon': "fa-brands fa-weixin",
+                },
+            ]
+        },
+        {
             'divider_header': 'Example Divider',
             'code_name': '',
             'url': None,

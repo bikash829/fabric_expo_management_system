@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
-from .models import RecipientCategory
+
+from bulk_email.forms import EmailRecipientImportForm
+from .models import RecipientCategory, RecipientDataSheet
 from .forms import CategoryCreateForm
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
@@ -60,3 +62,9 @@ class CategoryDeleteView(DeleteView,LoginRequiredMixin,PermissionRequiredMixin):
     permission_required = 'bulk_core.delete_recipientcategory'
     model = RecipientCategory
     success_url = reverse_lazy('bulk_core:category_list')
+
+
+# import email 
+class ImportEmailView(CreateView):
+    model = RecipientDataSheet
+    from_class = EmailRecipientImportForm 

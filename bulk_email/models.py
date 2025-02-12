@@ -4,11 +4,12 @@ from bulk_core.models import RecipientCategory
 # Create your models here.
 
 class EmailRecipient(models.Model):
+    name = models.CharField(max_length=50,null=True)
     email = models.EmailField(unique=True)
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.email
+        return f"Email: {self.email}, Category: {self.category}"
 
 
 class SentEmail(models.Model):

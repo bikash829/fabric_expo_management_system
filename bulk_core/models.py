@@ -24,16 +24,6 @@ PLATFORM_CHOICE = [
         ("email","Email"),
     ]
 
-class RecipientDataSheet(models.Model):
-    data_sheet = models.FileField(upload_to=bulk_recipient_directory_path) # f"{settings.MEDIA_URL}profile/avatar/blank-profile-picture.png"
-    description = models.CharField(max_length=50,null=True,blank=True)
-    uploaded_at = models.DateTimeField(auto_now=True)
-    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICE)
-
-    def __str__(self):
-        return f"Platform: {self.platform}|Upload date: {self.uploaded_at}|sheet name: {self.data_sheet}"
-    
-
 class RecipientCategory(models.Model):
     name = models.CharField(max_length=50,unique=True)
     description = models.CharField(max_length=100)
@@ -41,6 +31,22 @@ class RecipientCategory(models.Model):
 
     def get_absolute_url(self):
         return reverse("bulk_core:category_details", kwargs={"pk": self.pk})
+    
+    def __str__(self):
+        return self.name
+    
+class RecipientDataSheet(models.Model):
+    data_sheet = models.FileField(upload_to=bulk_recipient_directory_path) # f"{settings.MEDIA_URL}profile/avatar/blank-profile-picture.png"
+    description = models.CharField(max_length=50,null=True,blank=True)
+    uploaded_at = models.DateTimeField(auto_now=True)
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICE)
+    category= models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Platform: {self.platform}|Upload date: {self.uploaded_at}|sheet name: {self.data_sheet}"
+    
+
+
 
 
 # class MessageLog(models.Model):

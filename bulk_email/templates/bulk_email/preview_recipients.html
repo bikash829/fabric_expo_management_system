@@ -1,0 +1,171 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Import Recipients {% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+
+
+{% block content %}
+  <!--begin::Header-->
+    {% comment %} {% with page_title="Imported Recipients Preview for "|add:category_id %}
+        {% include 'core/layouts/content_header.html' with page_name=page_title only %}
+    {% endwith %} {% endcomment %}
+  {% include 'core/layouts/content_header.html' with page_name="Imported Recipients Preview " only%}
+  <!--end::Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Preview Recipients</div>
+          </div>
+          <!--end::Header-->
+          <div class="p-3">
+            <div class="pb-3">
+              <h4>Data sheet Info</h4>
+              <ul class="list-group">
+                <li class="list-group-item"><a href="{{data_sheet.data_sheet.url}}">Download Sheet</a></li>
+                <li class="list-group-item">Uploaded at: {{data_sheet.uploaded_at}}</li>
+                <li class="list-group-item">Platform: {{data_sheet.get_platform_display}}</li>
+                <li class="list-group-item">Recipient Category: {{data_sheet.category}}</li>
+                <li class="list-group-item">Description: {{data_sheet.description}}</li>
+              </ul>
+            </div>
+                <table id="email_recipients" class="table table-striped" style="width:100%">
+                  <thead>
+                      <tr>
+                          <th>id</th>
+                          <th>Recipient Name</th>
+                          <th>Email Address</th>
+                          {% comment %} <th>Action</th> {% endcomment %}
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in recipients %}
+                      <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>{{item.name}}</td>
+                          <td>{{item.email}}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <th>id</th>
+                          <th>Category name</th>
+                          <th>Description</th>
+
+                      </tr>
+                  </tfoot>
+                </table>
+                <!--begin::Form-->
+                
+                <form id="confirm" method="post" action="{% url 'bulk_email:confirm_recipients' %}">
+                  {% csrf_token %}
+                </form>
+                <form id="cancel" method="post" action="{% url 'bulk_email:delete_datasheet' pk=data_sheet.id %}">
+                  {% csrf_token %}
+                </form>
+                <div class="text-center">
+                  <button form="confirm" class="btn btn-success" type="submit">Confirm and Save</button>
+                  <button form="cancel" class="btn btn-secondary" type="submit">Cancel</button>
+                </div>
+          </div>
+            
+          {% comment %} <form method="POST" class="needs-validation" enctype="multipart/form-data"  novalidate>
+            {% csrf_token %}
+            <!--begin::Body-->
+            <div class="card-body">
+              <!--begin::Row-->
+              <div class="row g-3">
+                {{form}}
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer">
+              <button class="btn btn-info" type="submit">Import Recipients</button>
+            </div>
+            <!--end::Footer-->
+          </form> {% endcomment %}
+          <!--end::Form-->
+          
+        </div>
+        <!--end::Form Validation-->
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+<!--begin::JavaScript-->
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          form.classList.add('was-validated');
+        },
+        false,
+      );
+    });
+  })();
+</script>
+<script>
+    $(document).ready(function () {
+        $('#email_recipients').DataTable( {
+            responsive: true
+        } );
+    });
+
+    // delete group 
+    $('#data-sheet-cancel').on('click', function(e) {
+      e.preventDefault();
+        // select element
+        const url = $(this).attr('href');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                }
+        });
+      });
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

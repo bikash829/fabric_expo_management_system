@@ -187,3 +187,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # password reset link will expire in 5 mins
 PASSWORD_RESET_TIMEOUT = 300
 
+
+# Redis as Celery Broker
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'

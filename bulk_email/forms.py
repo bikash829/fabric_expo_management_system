@@ -1,14 +1,14 @@
 from django import forms
 from django.forms import ModelForm
 from .models import RecipientCategory
-from bulk_core.models import RecipientDataSheet,RecipientCategory
+from bulk_core.models import RecipientDataSheet,RecipientCategory,TempRecipientDataSheet
 
 
-class EmailRecipientImportForm(ModelForm):
+class TempEmailRecipientImportForm(ModelForm):
 
 
     class Meta:
-        model = RecipientDataSheet
+        model = TempRecipientDataSheet
         fields= ['data_sheet','description','platform','category']
 
         widgets = {

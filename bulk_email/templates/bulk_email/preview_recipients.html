@@ -40,7 +40,10 @@
                 <li class="list-group-item">Description: {{data_sheet.description}}</li>
               </ul>
             </div>
-                <table id="email_recipients" class="table table-striped" style="width:100%">
+            <form id="confirm" method="post" action="{% url 'bulk_email:confirm_recipients' datasheet_id=data_sheet.id %}">
+              {% csrf_token %}
+
+            <table id="email_recipients" class="table table-striped" style="width:100%">
                   <thead>
                       <tr>
                           <th>id</th>
@@ -55,6 +58,7 @@
                           <td>{{forloop.counter}}</td>
                           <td>{{item.name}}</td>
                           <td>{{item.email}}</td>
+                          <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}">
                       </tr>
                       {% endfor %}
                   </tbody>
@@ -67,12 +71,12 @@
                       </tr>
                   </tfoot>
                 </table>
+              </form>
+
                 <!--begin::Form-->
                 
-                <form id="confirm" method="post" action="{% url 'bulk_email:confirm_recipients' %}">
-                  {% csrf_token %}
-                </form>
-                <form id="cancel" method="post" action="{% url 'bulk_email:delete_datasheet' pk=data_sheet.id %}">
+                
+                <form id="cancel" method="post" action="#">
                   {% csrf_token %}
                 </form>
                 <div class="text-center">

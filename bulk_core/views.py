@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
 
-from bulk_email.forms import EmailRecipientImportForm
+# from bulk_email.forms import EmailRecipientImportForm
 from .models import RecipientCategory, RecipientDataSheet
 from .forms import CategoryCreateForm
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
@@ -65,6 +65,6 @@ class CategoryDeleteView(DeleteView,LoginRequiredMixin,PermissionRequiredMixin):
 
 
 # import email 
-class ImportEmailView(CreateView):
-    model = RecipientDataSheet
-    from_class = EmailRecipientImportForm 
+# class ImportEmailView(CreateView):
+#     model = RecipientDataSheet
+#     from_class = EmailRecipientImportForm 

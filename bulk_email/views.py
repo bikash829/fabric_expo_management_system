@@ -1,4 +1,5 @@
 import uuid
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib import messages
@@ -182,3 +183,28 @@ class ConfirmEmailRecipientsView(View):
 # class DataSheetDeleteView(DeleteView):
 #     model = TempRecipientDataSheet
 #     success_url = reverse_lazy("bulk_email:import_recipients")
+
+class DataSheetDeleteView(View):
+    print("here you are")
+    def post(self, request, datasheet_id, *args, **kwargs):
+        
+        try:
+            # Get datasheet
+            datasheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
+
+            # Get recipient IDs from form data
+            recipients_temp_id = request.POST.getlist('recipient_ids')
+
+            print(f"entered {recipients_temp_id}")
+            # Delete selected recipients
+            if recipients_temp_id:
+                TempEmailRecipient.objects.filter(temp_id__in=recipients_temp_id).delete()
+
+
+            # Delete datasheet
+            datasheet.delete()
+
+            return JsonResponse({'success': True, 'message': 'Datasheet deleted successfully'})
+            # return redirect('bulk_email:import_recipients')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)

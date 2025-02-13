@@ -74,35 +74,11 @@
               </form>
 
                 <!--begin::Form-->
-                
-                
-                <form id="cancel" method="post" action="#">
-                  {% csrf_token %}
-                </form>
                 <div class="text-center">
                   <button form="confirm" class="btn btn-success" type="submit">Confirm and Save</button>
-                  <button form="cancel" class="btn btn-secondary" type="submit">Cancel</button>
+                  <button id="data-sheet-cancel" class="btn btn-secondary" type="submit">Cancel</button>
                 </div>
           </div>
-            
-          {% comment %} <form method="POST" class="needs-validation" enctype="multipart/form-data"  novalidate>
-            {% csrf_token %}
-            <!--begin::Body-->
-            <div class="card-body">
-              <!--begin::Row-->
-              <div class="row g-3">
-                {{form}}
-              </div>
-              <!--end::Row-->
-            </div>
-            <!--end::Body-->
-            <!--begin::Footer-->
-            <div class="card-footer">
-              <button class="btn btn-info" type="submit">Import Recipients</button>
-            </div>
-            <!--end::Footer-->
-          </form> {% endcomment %}
-          <!--end::Form-->
           
         </div>
         <!--end::Form Validation-->
@@ -160,16 +136,31 @@
     $('#data-sheet-cancel').on('click', function(e) {
       e.preventDefault();
         // select element
-        const url = $(this).attr('href');
+        const url = "{% url 'bulk_email:delete_datasheet' datasheet_id=data_sheet.id %}";
+        let form = $("#confirm")
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: {
-                  csrfmiddlewaretoken: '{{ csrf_token }}'
-                }
-        });
+        let formData = form.serialize();
+        // Include CSRF token
+        let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+        console.log("CSRF Token:", csrfToken);  // Debugging step
+        $.ajax({
+          url: url,
+          type: 'POST',  // Use POST since Django doesn't handle DELETE via forms easily
+          data: formData,
+          headers: { "X-CSRFToken": csrfToken },  // CSRF protection
+          success: function(response) {
+              if (response.success) {
+                  window.location.href="{% url 'bulk_email:import_recipients' %}"
+              }
+          },
+          error: function(xhr, status, error) {
+            window.location.href="{% url 'bulk_email:import_recipients' %}"
+
+          }
       });
+        
+        
+    });
 </script>
 <!--end::JavaScript-->
 {% endblock push_scripts %}

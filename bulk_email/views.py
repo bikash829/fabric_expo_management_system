@@ -1,12 +1,14 @@
+from django.utils import timezone
 import uuid
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_email.forms import TempEmailRecipientImportForm
-from .models import EmailRecipient,TempEmailRecipient
+from bulk_email.forms import EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
+from fabric_expo_management_system import settings
+from .models import EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
 from django.urls import reverse_lazy, reverse
@@ -14,9 +16,28 @@ from django.contrib import messages
 import csv
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
-
+from django.core.mail import EmailMessage
 # from bulk_email.tasks import process_csv_file
+
+"""begin::import email """
+class GenerateCSV(View):
+    def get(self, request, *args, **kwargs):
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_email_recipients.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow(["name", "email",])
+        writer.writerow(['John Doe','example@example.com', ])
+
+        return response
+        
+
+
 
 class EmailRecipientCreateView(CreateView):
     model = TempRecipientDataSheet
@@ -72,7 +93,7 @@ class PreviewEmailRecipientsView(View):
         })
     
 
-from django.db import transaction
+
 """without checking duplicate errors"""
 # class ConfirmEmailRecipientsView(View):
 #     @transaction.atomic
@@ -179,13 +200,8 @@ class ConfirmEmailRecipientsView(View):
         return redirect('bulk_email:import_recipients')
 
 
-
-# class DataSheetDeleteView(DeleteView):
-#     model = TempRecipientDataSheet
-#     success_url = reverse_lazy("bulk_email:import_recipients")
-
+# Delete Datasheet/Temporary Datasheet
 class DataSheetDeleteView(View):
-    print("here you are")
     def post(self, request, datasheet_id, *args, **kwargs):
         
         try:
@@ -195,7 +211,6 @@ class DataSheetDeleteView(View):
             # Get recipient IDs from form data
             recipients_temp_id = request.POST.getlist('recipient_ids')
 
-            print(f"entered {recipients_temp_id}")
             # Delete selected recipients
             if recipients_temp_id:
                 TempEmailRecipient.objects.filter(temp_id__in=recipients_temp_id).delete()
@@ -208,3 +223,142 @@ class DataSheetDeleteView(View):
             # return redirect('bulk_email:import_recipients')
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        
+
+
+# email categories 
+class EmailCategories(ListView):
+    model = RecipientCategory
+    template_name = 'bulk_email/category.html'
+
+
+# Recipient list based on categories 
+class EmailCategoriesRecipientList(ListView):
+    model = EmailRecipient
+    template_name = "bulk_email/recipient_list.html"
+    context_object_name = "recipients"  # Name for template access
+
+    def get_queryset(self):
+        category_id = self.kwargs.get('pk')  # Assuming pk refers to category
+        return EmailRecipient.objects.filter(category_id=category_id)
+    
+"""end::import email """
+
+"""begin::writing email """
+class CreateEmail(CreateView):
+    template_name = "bulk_email/create_email.html" 
+    form_class = EmailCreationForm 
+    success_url = reverse_lazy('bulk_email:draft_list')
+
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user 
+        return super().form_valid(form)
+    
+
+class EmailDraftListView(ListView):
+    model = EmailTemplate
+    template_name = "bulk_email/email_draft.html"
+
+    def get_queryset(self):
+        return self.model.objects.filter(delete_status=False)  # Only active drafts
+
+# Update email draft form 
+class EmailChangeView(UpdateView):
+    model = EmailTemplate
+    template_name = "bulk_email/open_draft.html"
+    form_class = EmailChangeForm
+    success_url = reverse_lazy('bulk_email:draft_list')
+
+
+# soft delete email draft  
+class DeleteEmailDraftView(UpdateView):
+    model = EmailTemplate
+    fields = ['delete_status']
+    success_url = reverse_lazy('bulk_email:draft_list')
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete_status = True  # Mark as deleted
+        self.object.save()
+        messages.success(request, f"Draft '{self.object.name}' has been deleted.")  # Fixed message
+       
+        return redirect(self.success_url)
+     
+"""end::writing email"""
+    
+
+"""begin::sending email"""
+class SelectRecipientsView(View):
+    template_name = "bulk_email/recipient_list.html"
+
+    def get(self, request, *args, **kwargs):
+        email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+        recipients = EmailRecipient.objects.all()
+        return render(request, self.template_name, {
+            'recipients': recipients,
+            'email_content': email_content
+        })
+
+
+class SendEmailView(View):
+    # template_name = 
+    def post(self,request,*args,**kwargs):
+        email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+        recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+        recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
+        session_id = str(uuid.uuid4())
+        sender = request.user
+
+
+        # Track success and failure
+        success_count = 0
+        failure_count = 0
+
+        for recipient in recipients:
+            try:
+                # Create email message
+                email = EmailMessage(
+                    subject=email_content.subject,
+                    body=email_content.body,
+                    from_email=settings.EMAIL_HOST_USER,  # Set your sender email
+                    to=[recipient.email],  # Send individually (no CC or BCC)
+                )
+
+                # Attach files
+                # for attachment in attachments:
+                #     email.attach_file(attachment.attachment.path)
+
+                # Send email
+                email.send()
+                success_count += 1
+
+                # Log successful email
+                SentMail.objects.create(
+                    recipient_to=recipient,
+                    email=email_content,
+                    sent_by=sender,
+                    sent_at=timezone.now(),  # Set current time
+                    session_id=session_id,  # Generate unique ID
+                    status=True,
+                )
+            except Exception as e:
+                failure_count += 1
+
+                # Log failed email
+                SentMail.objects.create(
+                    email=email_content,
+                    recipient_to=recipient,
+                    sent_by=sender,
+                    sent_at=timezone.now(),  # Set current time
+                    session_id=session_id,  # Generate unique ID
+                    error_message=str(e),
+                    status=False,
+                )
+
+        # Add success message
+        messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
+
+        return JsonResponse({"success_count": success_count, "failure_count": failure_count})
+        
+"""end::sending email"""

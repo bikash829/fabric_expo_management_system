@@ -1,10 +1,10 @@
 {% extends "core/_base.html" %}
 
-{% block title %}Import Recipients {% endblock title %}
+{% block title %}Draft View{% endblock title %}
 
 {% block content %}
   <!--begin::Header-->
-  {% include 'core/layouts/content_header.html' with page_name="Import Recipients From CSV" only%}
+  {% include 'core/layouts/content_header.html' with page_name="Draft View" only%}
   <!--end::Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -14,36 +14,29 @@
       <div class="">
         <!--begin::Col-->
         <!--begin::Form Validation-->
-        <div class="card card-info card-outline col-lg-8 mb-4">
+        <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
-          <div class="card-header ">
-            <div class="row">
-              <div class="col-6">
-                <div class="card-title">Import Recipients From CSV Form</div>
-              </div>
-              <div class="col-6 text-end">
-                <a href="{% url 'bulk_email:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
-              </div>
-            </div>
-
+          <div class="card-header">
+            <div class="card-title">{{form.name.value}}</div>
           </div>
           <!--end::Header-->
           <!--begin::Form-->
-          <form method="POST" class="needs-validation" enctype="multipart/form-data"  novalidate>
+          <form method="POST" class="needs-validation" novalidate>
             {% csrf_token %}
             <!--begin::Body-->
             <div class="card-body">
               <!--begin::Row-->
-                <div class="row g-3">
-                  {{form}}
-                </div>
+              <div class="row g-3">
+                {{form}}
+              </div>
               <!--end::Row-->
             </div>
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info text-white" type="submit">Import Recipients</button>
-              {% comment %} <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button> {% endcomment %}
+              <button class="btn btn-warning" type="submit">Save Email</button>
+              <button class="btn btn-success" onclick="window.location.href='{% url 'bulk_email:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
+              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'">Cancel</button>
             </div>
             <!--end::Footer-->
           </form>
@@ -61,9 +54,7 @@
   </div>
   <!--end::App Content-->
 
-<!--begin:: Toaster alert -->
-{% include 'core/components/alert/toaster.html' %}
-<!--end:: Toaster alert-->
+
 {% endblock content %}
 
 {% block push_scripts %}
@@ -95,11 +86,6 @@
 </script>
 <script>
     $(document).ready(function () {
-      // toast alert
-      $('.toast').toast({
-        delay: 1000*20,
-      }).toast('show')
-      
     });
 </script>
 <!--end::JavaScript-->

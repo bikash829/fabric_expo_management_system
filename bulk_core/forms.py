@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from .models import RecipientCategory
 
 class CategoryCreateForm(ModelForm):
-    template_name = "bulk_core/form_template/full_width_form.html"
+    template_name = "form_template/full_width_form.html"
 
     class Meta:
         model = RecipientCategory

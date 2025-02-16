@@ -1,0 +1,50 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}Email Recipient Category{% endblock title %}
+
+
+{% block content %}
+<!--begin::header-->
+{% include 'core/layouts/content_header.html' with page_name="Recipient's Category" only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="">
+            <div class="list-group">
+              {% if not recipientcategory_list %}
+                No data 
+              
+              {% else %}
+                <div class="list-group-item list-group-item-action active fs-5 " aria-current="true">
+                  Select the category
+                </div> 
+                {% for item in recipientcategory_list %}
+                <a href="{% url 'bulk_email:category_recipients' pk=item.pk %}" class="list-group-item list-group-item-action">{{item.name}}</a>
+                {% endfor %}
+              {% endif %}
+
+                
+            </div>
+        </div>
+      </div>
+        
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<script>
+    // sweet alert
+    $('document').ready(function(){
+       
+    });
+    
+</script>
+{% endblock push_scripts %}

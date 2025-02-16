@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.timezone import now, timedelta
 import threading
 from bulk_core.models import RecipientCategory, RecipientDataSheet
+from django.contrib.auth import get_user_model
 # Create your models here.
 
 class EmailRecipient(models.Model):
@@ -38,20 +39,62 @@ class TempEmailRecipient(models.Model):
             entry.delete()
 
 
+# class SentEmail(models.Model):
+#     subject = models.CharField(max_length=255)
+#     body = models.TextField()
+#     sent_at = models.DateTimeField(null=True)
+#     created_at = models.DateTimeField(auto_now=True)
+#     is_draft = models.BooleanField(default=True)
+#     is_sent = models.BooleanField(default=False)
+#     recipients = models.ManyToManyField(EmailRecipient, related_name='sent_emails')
 
-class SentEmail(models.Model):
+#     def __str__(self):
+#         return self.subject
+    
+
+# class EmailAttachment(models.Model):
+#     attachment = models.FileField(blank=True,upload_to="bulk_messages_data/email_attachments")
+#     sent_email = models.ForeignKey(SentEmail,on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return self.sent_email
+
+
+class EmailTemplate(models.Model):
+    name = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
     body = models.TextField()
-    sent_at = models.DateTimeField(auto_now=True)
-    recipients = models.ManyToManyField(EmailRecipient, related_name='sent_emails')
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    # changed_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    # edited_by = models.ForeignKey()
+    delete_status =  models.BooleanField(default=False)
+    is_saved = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.subject
+        return self.name
 
 
 class EmailAttachment(models.Model):
-    attachment = models.FileField(blank=True,upload_to="bulk_messages_data/email_attachments")
-    sent_email = models.ForeignKey(SentEmail,on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to="bulk_messages_data/email_attachments")
+    template = models.ForeignKey(EmailTemplate,on_delete=models.CASCADE,related_name='attachments')
 
     def __str__(self):
-        return self.sent_email
+        return self.template
+
+
+
+class SentMail(models.Model):
+    email = models.ForeignKey(EmailTemplate,on_delete=models.CASCADE)
+    recipient_to = models.ForeignKey(EmailRecipient,on_delete=models.CASCADE)
+    sent_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    sent_at = models.DateTimeField(auto_now=True)
+    session_id = models.CharField(max_length=255)
+    error_message = models.TextField(blank=True,null=True)
+    status = models.BooleanField(default=False)
+
+
+    
+
+    def __str__(self):
+        return self.email

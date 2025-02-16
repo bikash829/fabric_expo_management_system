@@ -14,18 +14,10 @@
       <div class="">
         <!--begin::Col-->
         <!--begin::Form Validation-->
-        <div class="card card-info card-outline col-lg-8 mb-4">
+        <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
-          <div class="card-header ">
-            <div class="row">
-              <div class="col-6">
-                <div class="card-title">Import Recipients From CSV Form</div>
-              </div>
-              <div class="col-6 text-end">
-                <a href="{% url 'bulk_email:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
-              </div>
-            </div>
-
+          <div class="card-header">
+            <div class="card-title">Import Recipients From CSV Form</div>
           </div>
           <!--end::Header-->
           <!--begin::Form-->
@@ -34,15 +26,15 @@
             <!--begin::Body-->
             <div class="card-body">
               <!--begin::Row-->
-                <div class="row g-3">
-                  {{form}}
-                </div>
+              <div class="row g-3">
+                {{form}}
+              </div>
               <!--end::Row-->
             </div>
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info text-white" type="submit">Import Recipients</button>
+              <button class="btn btn-info" type="submit">Import Recipients</button>
               {% comment %} <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button> {% endcomment %}
             </div>
             <!--end::Footer-->

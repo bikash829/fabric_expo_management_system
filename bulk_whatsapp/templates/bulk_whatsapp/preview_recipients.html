@@ -34,20 +34,21 @@
               <h4>Data sheet Info</h4>
               <ul class="list-group">
                 <li class="list-group-item"><a href="{{data_sheet.data_sheet.url}}">Download Sheet</a></li>
-                <li class="list-group-item"><strong>Uploaded at:</strong> {{data_sheet.uploaded_at}}</li>
-                <li class="list-group-item"><strong>Platform:</strong> {{data_sheet.get_platform_display}}</li>
-                <li class="list-group-item"><strong>Recipient Category:</strong> {{data_sheet.category}}</li>
-                <li class="list-group-item"><strong>Description:</strong> {{data_sheet.description}}</li>
-              </ul> 
+                <li class="list-group-item">Uploaded at: {{data_sheet.uploaded_at}}</li>
+                <li class="list-group-item">Platform: {{data_sheet.get_platform_display}}</li>
+                <li class="list-group-item">Recipient Category: {{data_sheet.category}}</li>
+                <li class="list-group-item">Description: {{data_sheet.description}}</li>
+              </ul>
             </div>
             <form id="confirm" method="post" action="{% url 'bulk_email:confirm_recipients' datasheet_id=data_sheet.id %}">
               {% csrf_token %}
+
             <table id="email_recipients" class="table table-striped" style="width:100%">
                   <thead>
                       <tr>
                           <th>id</th>
                           <th>Recipient Name</th>
-                          <th>Email Address</th>
+                          <th>Whatsapp Id</th>
                           {% comment %} <th>Action</th> {% endcomment %}
                       </tr>
                   </thead>
@@ -64,9 +65,8 @@
                   <tfoot>
                       <tr>
                           <th>id</th>
-                          <th>Category name</th>
-                          <th>Description</th>
-
+                          <th>Recipient Name</th>
+                          <th>Whatsapp Id</th>
                       </tr>
                   </tfoot>
                 </table>

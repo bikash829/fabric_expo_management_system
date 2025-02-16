@@ -77,6 +77,47 @@ def get_sidebar_items(request):
             ]
         },
         {
+            'name': 'Send Bulk Message',
+            'code_name': 'send_bulk_message',
+            'url': None,
+            'icon': 'fa-solid fa-paper-plane',
+            'children':[
+                {
+                    'name': 'Send Mail',
+                    'code_name': 'send_mail',
+                    # 'url': reverse('bulk_email:email_category'),
+                    'url': None,
+                    'icon': "fa-solid fa-envelope",
+                    'children':[
+                        {
+                            'name': 'Create Email',
+                            'code_name': 'create_email',
+                            'url': reverse('bulk_email:create_email'),
+                            'icon': "fa-solid fa-pen-to-square",
+                        },
+                        {
+                            'name': 'Email Drafts',
+                            'code_name': 'select_email_draft',
+                            'url': reverse('bulk_email:draft_list'),
+                            'icon': "fa-regular fa-folder-open",
+                        },
+                    ]
+                },
+                {
+                    'name': 'Send Whatsapp Message',
+                    'code_name': 'send_wh_msg',
+                    'url': None,
+                    'icon': "fa-solid fa-message",
+                },
+                {
+                    'name': 'Send WeChat Message',
+                    'code_name': 'send_wechat_msg',
+                    'url': None,
+                    'icon': "fa-solid fa-comments",
+                },
+            ]
+        },
+        {
             'divider_header': 'Example Divider',
             'code_name': '',
             'url': None,

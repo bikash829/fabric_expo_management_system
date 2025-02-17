@@ -26,6 +26,9 @@
         <button id="button" class="btn btn-info" disabled>Row count</button>
         <button id="send-data" class="btn btn-success">Send</button>
         <button onclick="window.history.back();" class="btn btn-secondary">Back</button>
+        <div class="progress  mt-3" role="progressbar" aria-label="Animated striped example" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="display: none;">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+        </div>
 
       </div>
       {% comment %} <div class="progress mt-3" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="display: none;">
@@ -158,12 +161,20 @@
         }).then((result) => {
           /* Read more about isConfirmed, isDenied below */
           if (result.isConfirmed) {
+            // Show progress bar & reset progress
+            $(".progress").show();
+            $(".progress-bar").css("width", "0%").attr("aria-valuenow", 0);
+
             $.ajax({
               url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",  // Replace with your backend endpoint
               type: 'POST',
               data: {
                 selectedRecipientIds: selectedRecipientIds,
                 csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
+              },
+
+              beforeSend: function() {
+                checkEmailProgress();  // Start polling progress
               },
               success: function(response) {
                 Swal.fire({
@@ -174,6 +185,7 @@
                   showConfirmButton: false,
                   timer: 5000,
                 });
+                $(".progress-bar").css("width", "100%").attr("aria-valuenow", 100);  // progress end 
               },
               error: function(xhr, status, error) {
                 Swal.fire({
@@ -181,9 +193,27 @@
                   title: "Oops...",
                   text: "Something went wrong!",
                 });
+                $(".progress").hide(); // progress hide
               }
             });
 
+            // Function to check email sending progress
+            function checkEmailProgress() {
+              let interval = setInterval(function() {
+                  $.ajax({
+                      url: "{% url 'bulk_email:email_progress' %}",  // New view to get progress
+                      type: "GET",
+                      success: function(data) {
+                          $(".progress-bar").css("width", data.progress + "%").attr("aria-valuenow", data.progress);
+
+                          if (data.progress >= 100) {
+                              clearInterval(interval);  // Stop checking
+                              $(".progress").hide();  // Hide progress bar
+                          }
+                      }
+                  });
+              }, 500);  // Check every 2 seconds
+            }
           } else if (result.isDenied) {
             Swal.fire("Canceled", "", "info"); 
           }

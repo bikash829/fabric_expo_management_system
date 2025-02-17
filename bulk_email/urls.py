@@ -20,5 +20,8 @@ urlpatterns = [
     path('open_draft/<int:pk>/',views.EmailChangeView.as_view(),name='open_draft'),
     path('delete_draft/<int:pk>/',views.DeleteEmailDraftView.as_view(),name='delete_draft'),
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name='select_recipients'),
-    path('send_email/<int:draft_id>/',views.SendEmailView.as_view(),name='send_email')
+    path('send_email/<int:draft_id>/',views.SendEmailView.as_view(),name='send_email'),
+    path('sent_email_session/',views.SenTEmailSessionListView.as_view(),name='sent_email_session'),
+
+    # path('email_progress/',views.email_progress,name='email_progress'),
 ]

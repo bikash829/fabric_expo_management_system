@@ -21,7 +21,7 @@
           </div>
           <!--end::Header-->
           <!--begin::Form-->
-          <form method="POST" class="needs-validation" novalidate>
+          <form method="POST" id="formDraft" class="needs-validation" novalidate>
             {% csrf_token %}
             <!--begin::Body-->
             <div class="card-body">
@@ -86,6 +86,26 @@
 </script>
 <script>
     $(document).ready(function () {
+      // Attach event listener to all inputs, selects, and textareas within the form
+      $("#formDraft").on("change", "input, textarea", function () {
+        var formData = $("#formDraft").serialize(); // Serialize form data
+
+        $.ajax({
+            url: "{% url 'bulk_email:open_draft' pk=form.instance.pk %}", // Change this to your actual endpoint
+            type: "POST",
+            data: formData,
+            dataType: "json",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}" // Ensure CSRF token is included
+            },
+            success: function (response) {
+                console.log("Data updated successfully:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error updating data:", error);
+            }
+        });
+      });
     });
 </script>
 <!--end::JavaScript-->

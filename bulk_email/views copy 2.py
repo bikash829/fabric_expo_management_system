@@ -272,22 +272,6 @@ class EmailChangeView(UpdateView):
     success_url = reverse_lazy('bulk_email:draft_list')
 
 
-
-    def form_valid(self, form):
-        response = super().form_valid(form)  # Correct method call
-
-        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 'message': 'Draft Updated'})
-
-        return response  # Return normal response for non-AJAX requests
-    
-    
-    def form_invalid(self, form):
-        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
-
-        return super().form_invalid(form)
-
 # soft delete email draft  
 class DeleteEmailDraftView(UpdateView):
     model = EmailTemplate
@@ -316,6 +300,73 @@ class SelectRecipientsView(View):
             'recipients': recipients,
             'email_content': email_content
         })
+
+
+# class SendEmailView(View):
+#     # template_name = 
+#     def post(self,request,*args,**kwargs):
+#         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+#         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+#         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
+#         session_id = str(uuid.uuid4())
+#         sender = request.user
+
+
+#         # Track success and failure
+#         success_count = 0
+#         failure_count = 0
+
+#         for recipient in recipients:
+#             try:
+#                 # Create email message
+#                 email = EmailMessage(
+#                     subject=email_content.subject,
+#                     body=email_content.body,
+#                     from_email=settings.EMAIL_HOST_USER,  # Set your sender email
+#                     to=[recipient.email],  # Send individually (no CC or BCC)
+#                 )
+
+#                 # Attach files
+#                 # for attachment in attachments:
+#                 #     email.attach_file(attachment.attachment.path)
+
+#                 # Send email
+#                 email.send()
+#                 success_count += 1
+
+#                 # Log successful email
+#                 SentMail.objects.create(
+#                     recipient_to=recipient,
+#                     email=email_content,
+#                     sent_by=sender,
+#                     sent_at=timezone.now(),  # Set current time
+#                     session_id=session_id,  # Generate unique ID
+#                     status=True,
+#                 )
+#             except Exception as e:
+#                 failure_count += 1
+
+#                 # Log failed email
+#                 SentMail.objects.create(
+#                     email=email_content,
+#                     recipient_to=recipient,
+#                     sent_by=sender,
+#                     sent_at=timezone.now(),  # Set current time
+#                     session_id=session_id,  # Generate unique ID
+#                     error_message=str(e),
+#                     status=False,
+#                 )
+
+#         # Add success message
+#         messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
+
+#         return JsonResponse({"success_count": success_count, "failure_count": failure_count})
+# 
+### progress update function 
+# from django.core.cache import cache
+# def email_progress(request):
+#     progress = cache.get("email_progress", 0)  # Retrieve progress from cache
+#     return JsonResponse({"progress": progress})
 
 import os
 from django.core.mail import EmailMultiAlternatives, get_connection
@@ -352,10 +403,14 @@ class SendEmailView(View):
         success_count = 0
         failure_count = 0
 
+        # process count
+        # total_recipients = len(recipient_ids)
+        # processed_count = 0
+
         # Loop through each recipient
         for recipient in recipients:
             # Plain text fallback
-            text_body = f"""Dear {recipient.name},\n
+            text_body = f"""Dear {recipient.name}\n\n,
 
                             {email_content.body}\n\n
 
@@ -388,6 +443,15 @@ class SendEmailView(View):
             # Attach HTML version for better formatting
             email_message.attach_alternative(html_body, "text/html")
 
+            # Attach multiple files with validation
+            # for file in attachments:
+            #     try:
+            #         validate_attachment(file)  # Validate file size
+            #         with open(file, "rb") as f:
+            #             email_message.attach(os.path.basename(file), f.read())  # Attach file
+            #     except ValidationError as e:
+            #         print(f"Skipping {file}: {e}")  # Log validation error and continue
+
             # Send the email
             try:
                 email_message.send()
@@ -415,26 +479,19 @@ class SendEmailView(View):
                     status=False,
                 )
             
-           
+            # Simulate delay & update progress
+            # processed_count += 1
+            # progress = (processed_count / total_recipients) * 100
+            # cache.set("email_progress", progress, timeout=60)
+
+            time.sleep(1)  # Simulate processing time
 
         # Close the connection after all emails are sent
         connection.close()
-        
+
+        # cache.set("email_progress", 100, timeout=60)  # Ensure 100% completion
         # Add success message
         # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
         return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
         
 """end::sending email"""
-
-
-"""begin::sent email"""
-class SenTEmailSessionListView(ListView):
-    model = SentMail
-    template_name = "bulk_email/sent_email_session_list.html"
-
-    def get_queryset(self):
-        return super().get_queryset().order_by('-id')
-
- 
-
-"""end::sent email"""

@@ -1,0 +1,81 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}Email Session List{% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+
+{% endblock push_css %}
+      
+{% block content %}
+<!--begin::header-->
+{% comment %} {% url 'bulk_email:email_category' as email_category_url %} {% endcomment %}
+{% include 'core/layouts/content_header.html' with page_name="Session List"  only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div>
+        <table id="sessions" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  <th>#id</th>
+                  <th>session id</th>
+                  <th>status</th>
+                  <th>email</th>
+                  <th>recipient</th>
+                  <th>sent by</th>
+                  <th>sent at</th>
+                  <th>errors</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in sentmail_list %}
+              <tr>
+                  <td>{{item.id}}</td>
+                  <td>{{item.session_id}}</td>
+                  <td>{% if item.status %}success {% else %}failed{% endif %}</td>
+                  <td>{{item.email}}</td>
+                  <td>{{item.recipient_to.email}}</td>
+                  <td>{{item.sent_by}}</td>
+                  <td>{{item.sent_at}}</td>
+                  <td>{{item.error_message}}</td>
+                </tr>
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                <th>#id</th>
+                <th>session id</th>
+                <th>status</th>
+                <th>email</th>
+                <th>recipient</th>
+                <th>sent by</th>
+                <th>sent at</th>
+                <th>errors</th>
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+<script>
+    // Datatable 
+    const table = $('#sessions').DataTable({
+      responsive: true,
+      // select: true,
+      "order": [[0, "desc"]]
+    });
+</script>
+{% endblock push_scripts %}

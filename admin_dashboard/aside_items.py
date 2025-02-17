@@ -101,6 +101,12 @@ def get_sidebar_items(request):
                             'url': reverse('bulk_email:draft_list'),
                             'icon': "fa-regular fa-folder-open",
                         },
+                        {
+                            'name': 'Sent Records',
+                            'code_name': 'sent_records',
+                            'url': reverse('bulk_email:sent_email_session'),
+                            'icon': "fa-regular fa-folder-open",
+                        },
                     ]
                 },
                 {

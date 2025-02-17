@@ -34,8 +34,8 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-warning" type="submit">Save Email</button>
-              <button class="btn btn-success" type="button">Sent Email</button>
+              <button class="btn btn-success" type="submit">Save Email</button>
+              {% comment %} <button class="btn btn-success" type="button">Select Recipients</button> {% endcomment %}
               <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'">Cancel</button>
             </div>
             <!--end::Footer-->

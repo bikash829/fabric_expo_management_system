@@ -4,6 +4,8 @@ from .models import RecipientCategory, EmailTemplate, EmailAttachment
 from bulk_core.models import RecipientDataSheet,RecipientCategory,TempRecipientDataSheet
 
 
+
+    
 class TempEmailRecipientImportForm(ModelForm):
     template_name = "form_template/full_width_form.html"
 
@@ -48,13 +50,9 @@ class EmailCreationForm(ModelForm):
 
 class EmailChangeForm(ModelForm):
     template_name = "form_template/full_width_form.html"
-    # attachment = forms.FileField(
-    #     widget=forms.ClearableFileInput(attrs={"multiple": True}),
-    #     required=False,
-    # )
     class Meta:
         model = EmailTemplate
-        fields = ['name', 'subject', 'body',]
+        fields = ['name', 'subject', 'body']
 
         widgets = {
             'name': forms.HiddenInput(attrs={'class': 'form-control',}),
@@ -62,17 +60,24 @@ class EmailChangeForm(ModelForm):
             'body': forms.Textarea(attrs={'class':'form-control','rows':3}),
         }
 
-    
-    # def clean_attachment(self):
-    #     """
-    #     Validate total size of uploaded attachments
-    #     """
-    #     uploaded_files = self.files.getlist("attachment")
-    #     total_size = sum(file.size for file in uploaded_files)
 
-    #     max_size = 25 * 1024 * 1024  # 25MB in bytes
 
-    #     if total_size > max_size:
-    #         raise forms.ValidationError("Total attachment size cannot exceed 25MB.")
-        
-    #     return uploaded_files
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
+class FileFieldForm(forms.Form):
+    file_field = MultipleFileField(required=False)

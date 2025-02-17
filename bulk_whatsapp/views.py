@@ -109,42 +109,63 @@ class PreviewRecipientsView(View):
             'recipient_ids': recipient_ids,
         })
 
-
-class ConfirmEmailRecipientsView(View):
+# Function to normalize phone numbers to E.164 format (without default region)
+import phonenumbers
+def normalize_phone_number(number):
+    try:
+        parsed_number = phonenumbers.parse(number, None)  # Parse without region
+        if not phonenumbers.is_valid_number(parsed_number):  # Check if valid
+            return None
+        return phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)  # Convert to E.164
+    except phonenumbers.NumberParseException:
+        return None  # Return None if invalid
+class ConfirmWhatsappRecipientsView(View):
     @transaction.atomic
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
-        temp_ids = request.POST.getlist('recipient_ids')
+        temp_ids = request.POST.getlist('recipient_ids[]')
 
         if not temp_ids:
             messages.error(request, 'No recipients selected for confirmation.')
-            return redirect('bulk_email:preview_recipients', datasheet_id=datasheet_id)
+            return redirect('bulk_whatsapp:preview_recipients', datasheet_id=datasheet_id)
 
         temp_recipients = list(TempRecipient.objects.filter(temp_id__in=temp_ids))
 
         if not temp_recipients:
             messages.error(request, 'No valid recipients found.')
-            return redirect('bulk_email:preview_recipients', datasheet_id=datasheet_id)
+            return redirect('bulk_whatsapp:preview_recipients', datasheet_id=datasheet_id)
 
-        existing_emails = {
-            recipient.email: recipient for recipient in WhatsappRecipient.objects.filter(
-                email__in=[tr.email for tr in temp_recipients]
+        # existing_recipients = {
+        #     recipient.recipient_number: recipient for recipient in WhatsappRecipient.objects.filter(
+        #         recipient_number__in=[normalize_phone_number(tr.recipient_id) for tr in temp_recipients]
+        #     )
+        # }
+                # Normalize phone numbers and filter out None values
+        normalized_numbers = [normalize_phone_number(tr.recipient_id) for tr in temp_recipients]
+        normalized_numbers = [num for num in normalized_numbers if num is not None]
+        print(normalized_numbers)
+
+        existing_recipients = {
+            recipient.recipient_number: recipient for recipient in WhatsappRecipient.objects.filter(
+                recipient_number__in=normalized_numbers
             )
         }
+
+        print(existing_recipients)
 
         new_recipients = []
         update_recipients = []
 
         for tr in temp_recipients:
-            if tr.email in existing_emails:
-                existing_recipient = existing_emails[tr.email]
+            if normalize_phone_number(tr.recipient_id) in existing_recipients:
+                existing_recipient = existing_recipients[normalize_phone_number(tr.recipient_id)]
                 if existing_recipient.category != tr.category:
                     existing_recipient.category = tr.category  # Update category
                     update_recipients.append(existing_recipient)
             else:
                 new_recipients.append(WhatsappRecipient(
                     name=tr.name,
-                    email=tr.email,
+                    recipient_number=tr.recipient_id,
                     category=tr.category
                 ))
 
@@ -166,8 +187,10 @@ class ConfirmEmailRecipientsView(View):
         TempRecipient.objects.filter(temp_id__in=temp_ids).delete()
         temp_data_sheet.delete()
 
-        messages.success(request, 'Email recipients confirmed and saved successfully!')
-        return redirect('bulk_email:import_recipients')
+        messages.success(request, 'Whatsapp recipients confirmed and saved successfully!')
+        return JsonResponse({'success': True, 'message': 'Whatsapp recipients confirmed and saved successfully!'})
+    
+    
 
 
 # Delete Datasheet/Temporary Datasheet

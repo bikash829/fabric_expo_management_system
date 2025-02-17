@@ -65,7 +65,7 @@ def get_sidebar_items(request):
                 {
                     'name': 'Import Whatsapp CSV',
                     'code_name': 'import_whatsapp',
-                    'url': None,
+                    'url': reverse('bulk_whatsapp:import_recipients'),
                     'icon': "fa-solid fa-address-book",
                 },
                 {

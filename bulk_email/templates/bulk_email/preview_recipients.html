@@ -131,14 +131,18 @@
         } );
     });
 
+    // Collect all recipient IDs from Django context
+    const recipientIds = {{ recipient_ids|safe }};
+
     // delete group 
     $('#data-sheet-cancel').on('click', function(e) {
       e.preventDefault();
         // select element
         const url = "{% url 'bulk_email:delete_datasheet' datasheet_id=data_sheet.id %}";
         let form = $("#confirm")
-
-        let formData = form.serialize();
+        let formData = {
+          'recipient_ids':recipientIds,
+        }
         // Include CSRF token
         let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
         console.log("CSRF Token:", csrfToken);  // Debugging step
@@ -149,12 +153,11 @@
           headers: { "X-CSRFToken": csrfToken },  // CSRF protection
           success: function(response) {
               if (response.success) {
-                  window.location.href="{% url 'bulk_email:import_recipients' %}"
+                window.location.href="{% url 'bulk_email:import_recipients' %}"
               }
           },
           error: function(xhr, status, error) {
             window.location.href="{% url 'bulk_email:import_recipients' %}"
-
           }
       });
         

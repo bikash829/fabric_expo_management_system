@@ -87,10 +87,12 @@ class PreviewEmailRecipientsView(View):
             ))
 
         temporary_recipients = TempEmailRecipient.objects.bulk_create(temp_recipients)
+        recipient_ids = [str(item.temp_id) for item in temporary_recipients]
 
         return render(request, self.template_name, {
             'recipients': temporary_recipients,
-            'data_sheet': data_sheet
+            'data_sheet': data_sheet,
+            'recipient_ids': recipient_ids,
         })
     
 
@@ -210,7 +212,7 @@ class DataSheetDeleteView(View):
             datasheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
 
             # Get recipient IDs from form data
-            recipients_temp_id = request.POST.getlist('recipient_ids')
+            recipients_temp_id = request.POST.getlist('recipient_ids[]')
 
             # Delete selected recipients
             if recipients_temp_id:

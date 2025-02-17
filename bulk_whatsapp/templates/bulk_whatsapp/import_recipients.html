@@ -17,7 +17,14 @@
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
           <div class="card-header">
-            <div class="card-title">Import Recipients From CSV Form</div>
+            <div class="row">
+              <div class="col-6">
+                <div class="card-title">Import Recipients From CSV Form(<span class="text-danger">***Number should have prefix</span>)</div>
+              </div>
+              <div class="col-6 text-end">
+                <a href="{% url 'bulk_whatsapp:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
+              </div>
+            </div>
           </div>
           <!--end::Header-->
           <!--begin::Form-->

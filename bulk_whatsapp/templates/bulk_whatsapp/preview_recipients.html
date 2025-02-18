@@ -121,11 +121,12 @@
           icon: "warning"
         });
         return
-      }else{
-        const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
-        const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
       }
-
+      const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
+      const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+      
+      console.log(url)
+      console.log(csrf_token)
       /*** begin:: ajax code ***/ 
       $.ajax({
         url: url,

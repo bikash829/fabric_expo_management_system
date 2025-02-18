@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "phonenumber_field",
+    'django_twilio',
 ]
 
 MIDDLEWARE = [
@@ -192,3 +193,8 @@ PASSWORD_RESET_TIMEOUT = 300
 # CELERY_BROKER_URL = 'redis://localhost:6379/0'
 # CELERY_ACCEPT_CONTENT = ['json']
 # CELERY_TASK_SERIALIZER = 'json'
+
+# twilio credentials
+TWILIO_ACCOUNT_SID=config('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN=config('TWILIO_AUTH_TOKEN')
+TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"

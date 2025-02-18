@@ -24,7 +24,7 @@ from phonenumber_field.validators import validate_international_phonenumber
 
 # models 
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_whatsapp.models import TempRecipient, WhatsappRecipient, WhatsappTemplate
+from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappRecipient, WhatsappTemplate
 
 # forms
 from bulk_whatsapp.forms import  MessageDraftUpdateForm, TempRecipientImportForm, MessageCreationForm
@@ -129,6 +129,7 @@ class ConfirmWhatsappRecipientsView(View):
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
         temp_ids = request.POST.getlist('recipient_ids[]')
+        # print(temp_ids)
 
         # check if exist temporary data 
         if not temp_ids:
@@ -145,6 +146,7 @@ class ConfirmWhatsappRecipientsView(View):
         # Normalize phone numbers and filter out None values
         normalized_numbers = [normalize_phone_number(tr.recipient_id) for tr in temp_recipients]
         normalized_numbers = [num for num in normalized_numbers if num is not None]
+        print(normalized_numbers)
         # array of all duplicate recipients 
         existing_recipients = {
             recipient.recipient_number: recipient for recipient in WhatsappRecipient.objects.filter(
@@ -155,6 +157,8 @@ class ConfirmWhatsappRecipientsView(View):
         # create new list for new recipients and update existed recipients if need any
         new_recipients = []
         update_recipients = []
+        print(new_recipients)
+        print(update_recipients)
 
         for tr in temp_recipients:
             # check if exist but update category 
@@ -311,16 +315,80 @@ class SelectRecipientsView(View):
             'message_content': email_content
         })
     
-
-
+from twilio.twiml.messaging_response import MessagingResponse
+from django.utils.decorators import method_decorator
+from django_twilio.decorators import twilio_view
+from twilio.rest import Client
 class SendMessageView(View):
     def post(self,request,*args,**kwargs):
-        email_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
+        whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
         recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
         session_id = str(uuid.uuid4())
         sender = request.user 
-        print(email_content)
+        print(whatsapp_content)
         print(recipient_ids)
         print(recipients)
+
+        account_sid = settings.TWILIO_ACCOUNT_SID
+        auth_token = settings.TWILIO_AUTH_TOKEN
+        client = Client(account_sid, auth_token)
+        # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        # results = []
+
+        success_count = 0  
+        failure_count = 0
+
+        # Loop through each recipient
+        for recipient in recipients:
+            # Plain text fallback
+            text_body = f"""Hello {recipient.name},\n
+
+                            {whatsapp_content.message_content}\n\n
+
+                            Best Regards,\n
+                            Fabric Expo Management\n
+                        """
+            # Send the message
+            try:
+                message = client.messages.create(
+                    from_=settings.TWILIO_WHATSAPP_NUMBER,
+                    body=text_body,
+                    to=f"whatsapp:{recipient.recipient_number}"
+                )
+                # results.append({"recipient": recipient.phone_number, "status": "Sent", "sid": message.sid})
+
+                success_count += 1
+
+                # Log successful message
+                SentMessage.objects.create(
+                    recipient_to=recipient,
+                    message_template=whatsapp_content,
+                    sent_by=sender,
+                    sent_at=timezone.now(),  # Set current time
+                    session_id=session_id,  # Generate unique ID
+                    status=True,
+                )
+            except Exception as e:
+                # Log unsuccessful message
+                SentMessage.objects.create(
+                    recipient_to=recipient,
+                    message_template=whatsapp_content,
+                    sent_by=sender,
+                    sent_at=timezone.now(),  # Set current time
+                    session_id=session_id,  # Generate unique ID
+                    error_message=str(e),
+                    status=True,
+                )
+            
+           
+
+        # Close the connection after all emails are sent
+        # connection.close()
+        
+        # Add success message
+        # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
+        return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
+        
+        return r
 """end::manage messages """

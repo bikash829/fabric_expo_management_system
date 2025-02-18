@@ -18,6 +18,8 @@ urlpatterns = [
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name="select_recipients"),
     path('send_message/<int:draft_id>/',views.SendMessageView.as_view(),name="send_message"),
     path('delete_draft/<int:pk>/',views.DraftDeleteView.as_view(),name="delete_draft"),
+    path('sent_message_session/',views.SenTMessageSessionListView.as_view(),name='sent_message_session'),
+
     # path('message_draft')
 
     

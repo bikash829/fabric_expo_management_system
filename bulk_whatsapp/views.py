@@ -342,13 +342,7 @@ class SendMessageView(View):
         # Loop through each recipient
         for recipient in recipients:
             # Plain text fallback
-            text_body = f"""Hello {recipient.name},\n
-
-                            {whatsapp_content.message_content}\n\n
-
-                            Best Regards,\n
-                            Fabric Expo Management\n
-                        """
+            text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\nFabric Expo Management\n"
             # Send the message
             try:
                 message = client.messages.create(
@@ -390,5 +384,11 @@ class SendMessageView(View):
         # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
         return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
         
-        return r
+
 """end::manage messages """
+class SenTMessageSessionListView(ListView):
+    model = SentMessage
+    template_name = "bulk_whatsapp/manage_messages/sent_message_session_list.html"
+
+    def get_queryset(self):
+        return super().get_queryset().order_by('-id')

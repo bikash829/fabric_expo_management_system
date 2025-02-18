@@ -130,7 +130,7 @@ def get_sidebar_items(request):
                         {
                             'name': 'Sent Records',
                             'code_name': 'sent_wa_records',
-                            'url': None,
+                            'url': reverse('bulk_whatsapp:sent_message_session'),
                             'icon': "fa-solid fa-check",
                         },
                     ]

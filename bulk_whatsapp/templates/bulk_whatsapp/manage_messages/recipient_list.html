@@ -168,12 +168,13 @@
               },
               success: function(response) {
                 Swal.fire({
-                  position: "top-end",
+                  position: "center",
                   icon: "success",
                   title: "Message has been sent",
                   text: response.message,
-                  showConfirmButton: false,
-                  timer: 5000,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  window.location.href = "{% url 'bulk_whatsapp:draft_list' %}";
                 });
               },
               error: function(xhr, status, error) {

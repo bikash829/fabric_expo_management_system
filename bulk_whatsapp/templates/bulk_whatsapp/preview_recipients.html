@@ -10,9 +10,6 @@
 
 {% block content %}
   <!--begin::Header-->
-    {% comment %} {% with page_title="Imported Recipients Preview for "|add:category_id %}
-        {% include 'core/layouts/content_header.html' with page_name=page_title only %}
-    {% endwith %} {% endcomment %}
   {% include 'core/layouts/content_header.html' with page_name="Imported Recipients Preview " only%}
   <!--end::Header-->
   <!--begin::App Content-->
@@ -98,36 +95,62 @@
 
 <!--begin::JavaScript-->
 <script>
+  /*** begin:: document ***/
   $(document).ready(function () {
+    // Collect all recipient IDs from Django context
+    const recipientIds = {{ recipient_ids|safe }};
+    if (!recipientIds || recipientIds.length === 0){
+      // popup warning
+      Swal.fire({
+        title: "Invalid recipients",
+        text: "The recipient list appears to be invalid. Please cancel the operation and upload a valid recipient data sheet.",
+        icon: "warning"
+      });
+      return
+    }
+
+    /*** begin:: confirm save button ***/
     $('#btn_confirm').on('click', function(e) {
       e.preventDefault();
-      const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
-      console.log(url)
-      // begin:: ajax code 
-      const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
-      console.log(csrf_token)
-      // Collect all recipient IDs from Django context
-      const recipientIds = {{ recipient_ids|safe }};
+
+      if (!recipientIds || recipientIds.length === 0){
+        // popup warning
+        Swal.fire({
+          title: "Invalid recipients",
+          text: "The recipient list appears to be invalid. Please cancel the operation and upload a valid recipient data sheet.",
+          icon: "warning"
+        });
+        return
+      }else{
+        const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
+        const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+      }
+
+      /*** begin:: ajax code ***/ 
       $.ajax({
         url: url,
-        type: 'POST',  // Use POST since Django doesn't handle DELETE via forms easily
+        type: 'POST', 
         data: {'recipient_ids':recipientIds,},
-        headers: { "X-CSRFToken": csrf_token },  // CSRF protection
+        headers: { "X-CSRFToken": csrf_token },  
         success: function(response) {
             if (response.success) {
                 window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
-                console.log('success')
             }
         },
         error: function(xhr, status, error) {
-          //window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
-          alert(error)
+          Swal.fire({
+            title: "Technical error",
+            text: error,
+            icon: "error"
+          });
+          return
         }
       });
-      // end:: ajax code 
-      
-      });
+      /*** end:: ajax code ***/
+    });
+    /*** end:: confirm save ***/
   });
+  /*** end :: document ***/
 
 </script>
 <script>
@@ -136,36 +159,7 @@
             responsive: true
         } );
     });
-    // Collect all recipient IDs from Django context
-    const recipientIds = {{ recipient_ids|safe }};
-    
-    // clear temporary data from temporary data tables 
-    $('#data-sheet-cancel').on('click', function(e) {
-      e.preventDefault();
-        // select element
-        const url = "{% url 'bulk_whatsapp:delete_datasheet' datasheet_id=data_sheet.id %}";
-        
-        // Include CSRF token
-        let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
 
-        $.ajax({
-          url: url,
-          type: 'POST',  // Use POST since Django doesn't handle DELETE via forms easily
-          data: {'recipient_ids':recipientIds},
-          headers: { "X-CSRFToken": csrfToken },  // CSRF protection
-          success: function(response) {
-              if (response.success) {
-                  window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
-              }
-          },
-          error: function(xhr, status, error) {
-            window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
-
-          }
-      });
-        
-        
-    });
 </script>
 <!--end::JavaScript-->
 {% endblock push_scripts %}

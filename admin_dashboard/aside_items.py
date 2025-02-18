@@ -105,15 +105,35 @@ def get_sidebar_items(request):
                             'name': 'Sent Records',
                             'code_name': 'sent_records',
                             'url': reverse('bulk_email:sent_email_session'),
-                            'icon': "fa-regular fa-folder-open",
+                            'icon': "fa-solid fa-envelope-circle-check",
                         },
                     ]
                 },
                 {
-                    'name': 'Send Whatsapp Message',
+                    'name': 'Send wa Message',
                     'code_name': 'send_wh_msg',
                     'url': None,
                     'icon': "fa-solid fa-message",
+                    'children':[
+                        {
+                            'name': 'Create Message',
+                            'code_name': 'create_wa_message',
+                            'url': reverse('bulk_whatsapp:create_message'),
+                            'icon': "fa-solid fa-pen-to-square",
+                        },
+                        {
+                            'name': 'WA draft',
+                            'code_name': 'select_wa_draft',
+                            'url': reverse('bulk_whatsapp:draft_list'),
+                            'icon': "fa-regular fa-folder-open",
+                        },
+                        {
+                            'name': 'Sent Records',
+                            'code_name': 'sent_wa_records',
+                            'url': None,
+                            'icon': "fa-solid fa-check",
+                        },
+                    ]
                 },
                 {
                     'name': 'Send WeChat Message',

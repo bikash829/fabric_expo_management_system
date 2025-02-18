@@ -1,0 +1,131 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}Whatsapp Drafts{% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+<link herf="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
+
+{% endblock push_css %}
+      
+{% block content %}
+<!--begin::header-->
+
+{% include 'core/layouts/content_header.html' with page_name="Whatsapp Draft" only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div>
+        <table id="whatsapp_draft" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                <th>Count</th>
+                <th>Template Name</th>
+                <th>Created At</th>
+                <th>Created By</th>
+                <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in whatsapptemplate_list %}
+              <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.created_at}}</td>
+                  <td>{{item.created_by}}</td>
+                  <td>
+                    <div class="btn-group">
+                        <button
+                          type="button"
+                          class="btn btn-primary dropdown-toggle"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item text-primary" href="{% url 'bulk_whatsapp:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            <form method="POST" action="{% url 'bulk_whatsapp:delete_draft' pk=item.pk %}">
+                              {% csrf_token %}
+                                <li><button class="dropdown-item text-danger delete-draft" type="submit"  data-draft="{{item.name}}">Delete <i class="fa-solid fa-trash"></i></button></li>
+                            </form>
+                        </ul>
+                      </div> 
+                  </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                <th>Count</th>
+                <th>Template Name</th>
+                <th>Created At</th>
+                <th>Created By</th>
+                <th>Action</th>
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <!--end::Container-->
+    {% for message in messages %}
+    {{message}}
+    {% endfor %}
+</div>
+<!--end::App Content-->
+<!--begin:: Toaster alert -->
+{% include 'core/components/alert/toaster.html' %}
+<!--end:: Toaster alert-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
+
+<script>
+    // Datatable 
+    const table = $('#whatsapp_draft').DataTable({
+      responsive: true,
+      // select: true,
+    });
+
+    $('document').ready(function(){
+        // toast alert
+        $('.toast').toast({
+          delay: 1000*5,
+        }).toast('show');
+
+        // delete group 
+        $('.delete-draft').on('click', function(e) {
+            e.preventDefault();
+            const form = $(this).closest('form'); 
+            // popup alert 
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                  form.submit()
+                }
+            });
+          });
+    })
+</script>
+<script>
+    // toast alert
+    $('.toast').toast({
+      delay: 1000*20,
+    }).toast('show')
+
+</script>
+{% endblock push_scripts %}

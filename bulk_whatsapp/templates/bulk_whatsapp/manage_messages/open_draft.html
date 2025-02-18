@@ -1,0 +1,112 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Draft Opened Message{% endblock title %}
+
+{% block content %}
+  <!--begin::Header-->
+  {% include 'core/layouts/content_header.html' with page_name=form.instance.name only%}
+  <!--end::Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">{{form.instance.name}}</div>
+          </div>
+          <!--end::Header-->
+          <!--begin::Form-->
+          <form method="POST"  id="formDraft" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <!--begin::Body-->
+            <div class="card-body">
+              <!--begin::Row-->
+              <div class="row g-3">
+                {{form}}
+              </div>
+              <!--end::Row-->
+            </div>
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer">
+              <button class="btn btn-warning" type="submit">Save Template</button>
+              <button class="btn btn-success" onclick="window.location.href='{% url 'bulk_whatsapp:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
+              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_whatsapp:draft_list' %}'">Cancel</button>
+            </div>
+            <!--end::Footer-->
+          </form>
+          <!--end::Form-->
+          
+        </div>
+        <!--end::Form Validation-->
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!--begin::JavaScript-->
+<script>
+  // Example starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          form.classList.add('was-validated');
+        },
+        false,
+      );
+    });
+  })();
+</script>
+<script>
+  $(document).ready(function () {
+    // Attach event listener to all inputs, selects, and textareas within the form
+    $("#formDraft").on("change", "input, textarea", function () {
+      var formData = $("#formDraft").serialize(); // Serialize form data
+
+      $.ajax({
+          url: "{% url 'bulk_whatsapp:open_draft' pk=form.instance.pk %}", // Change this to your actual endpoint
+          type: "POST",
+          data: formData,
+          dataType: "json",
+          headers: {
+              "X-CSRFToken": "{{ csrf_token }}" // Ensure CSRF token is included
+          },
+          success: function (response) {
+              console.log("Data updated successfully:", response);
+          },
+          error: function (xhr, status, error) {
+              console.error("Error updating data:", error);
+          }
+      });
+    });
+  });
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

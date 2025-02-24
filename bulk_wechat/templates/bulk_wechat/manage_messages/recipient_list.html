@@ -1,0 +1,198 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}Whatsapp Recipient List{% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+<link herf="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
+
+{% endblock push_css %}
+      
+{% block content %}
+<!--begin::header-->
+{% comment %} {% url 'bulk_email:email_category' as email_category_url %} {% endcomment %}
+{% include 'core/layouts/content_header.html' with page_name="Recipient's List"  only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div>
+        <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
+          <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
+          <label class="btn btn-outline-primary" for="select-all">Select All</label>
+        </div>
+        <button id="button" class="btn btn-info" disabled>Row count</button>
+        <button id="send-data" class="btn btn-success">Send</button>
+        <button onclick="window.history.back();" class="btn btn-secondary">Back</button>
+
+      </div>
+      {% comment %} <div class="progress mt-3" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="display: none;">
+        <div class="progress-bar progress-bar-striped bg-success" style="width: 0%"></div>
+      </div> {% endcomment %}
+      <div>
+        <table id="recipients" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Count</th>
+                  <th>#ID</th>
+                  <th>Recipient Name</th>
+                  <th>Recipient Number</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in recipients %}
+              <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.recipient_number}}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                <th>Count</th>
+                <th>#ID</th>
+                <th>Recipient Name</th>
+                <th>Recipient Number</th>
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+
+{% comment %} 
+      <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="list-group">
+              {% if not recipients %}
+              <div colspan="4" class="bg-light text-center text-muted">
+                <h5 class="py-3">No Data Available</h5>
+              </div>
+              {% else %}
+                <div class="list-group-item fs-5 list-group-item-action active " aria-current="true">
+                  Select emails
+                </div> 
+                {% for item in recipients %}
+                <a href="#" class="list-group-item list-group-item-action">{{item.email}}</a>
+                {% endfor %}
+              {% endif %}
+                
+              </div>
+        </div>
+      </div> {% endcomment %}
+        
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
+
+<script>
+  
+    // Datatable 
+    const table = $('#recipients').DataTable({
+      responsive: true,
+      // select: true,
+    });
+
+    // toggle select recipients
+    $('#recipients tbody').on('click', 'tr', function() {
+      $(this).toggleClass('selected');
+      updateRowCount();
+    });
+
+    // Show row count 
+    function updateRowCount() {
+      const count = table.rows('.selected').data().length;
+      $('#button').text(count + ' row(s) selected');
+    }
+    
+    // Handle "Select All" checkbox click event
+    $('#select-all').on('click', function() {
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      if (this.checked) {
+          $(rows).addClass('selected');
+      } else {
+          $(rows).removeClass('selected');
+      }
+      updateRowCount();
+    });
+
+    // Handle individual row click event to update "Select All" checkbox state
+    $('#recipients tbody').on('click', 'tr', function() {
+      var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
+      $('#select-all').prop('checked', allChecked);
+    });
+    
+    // Initial update of the row count button text
+    updateRowCount();
+
+    // Handle "Send Data" button click event to send selected column data to backend
+    $('#send-data').on('click', function() {
+      const selectedRecipientIds = table.rows('.selected').data().pluck(1).toArray();  // Extract data from the first column (Name)
+      const messageContent = {{message_content.id}}
+      
+      if (selectedRecipientIds.length === 0){
+        Swal.fire({
+          icon: 'info',
+          text: "Please select desired recipients first!"
+        });
+      }else{
+        console.log(selectedRecipientIds)
+        console.log(messageContent)
+        Swal.fire({
+          title: "Do you want to send this message to the selected users?",
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: "Send",
+          denyButtonText: `Don't Send`
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            $.ajax({
+              //url: "#",  // Replace with your backend endpoint
+              url: "{% url 'bulk_whatsapp:send_message' draft_id=message_content.id %}",  
+              type: 'POST',
+              data: {
+                selectedRecipientIds: selectedRecipientIds,
+                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
+              },
+              success: function(response) {
+                Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  title: "Message has been sent",
+                  text: response.message,
+                  showConfirmButton: true,
+                }).then((result) => {
+                  window.location.href = "{% url 'bulk_whatsapp:draft_list' %}";
+                });
+              },
+              error: function(xhr, status, error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+                });
+              }
+            });
+
+          } else if (result.isDenied) {
+            Swal.fire("Canceled", "", "info"); 
+          }
+        });
+        
+      }
+      
+  });
+</script>
+{% endblock push_scripts %}

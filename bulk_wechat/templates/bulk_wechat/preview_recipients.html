@@ -1,0 +1,195 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Import Recipients {% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+
+
+{% block content %}
+  <!--begin::Header-->
+  {% include 'core/layouts/content_header.html' with page_name="Imported Recipients Preview " only%}
+  <!--end::Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Preview Recipients</div>
+          </div>
+          <!--end::Header-->
+          <div class="p-3">
+            <div class="pb-3">
+              <h4>Data sheet Info</h4>
+              <ul class="list-group">
+                <li class="list-group-item"><a href="{{data_sheet.data_sheet.url}}">Download Sheet</a></li>
+                <li class="list-group-item">Uploaded at: {{data_sheet.uploaded_at}}</li>
+                <li class="list-group-item">Platform: {{data_sheet.get_platform_display}}</li>
+                <li class="list-group-item">Recipient Category: {{data_sheet.category}}</li>
+                <li class="list-group-item">Description: {{data_sheet.description}}</li>
+              </ul>
+            </div>
+              <form  method="post" action="{% url 'bulk_email:confirm_recipients' datasheet_id=data_sheet.id %}">
+                {% csrf_token %}
+
+                <table id="recipients" class="table table-striped" style="width:100%">
+                  <thead>
+                      <tr>
+                          <th>id</th>
+                          <th>Recipient Name</th>
+                          <th>Whatsapp Id</th>
+                          {% comment %} <th>Action</th> {% endcomment %}
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in recipients %}
+                      <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>{{item.name}}</td>
+                          <td>{{item.recipient_id}}</td>
+                          <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}">
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <th>id</th>
+                          <th>Recipient Name</th>
+                          <th>Whatsapp Id</th>
+                      </tr>
+                  </tfoot>
+                </table>
+              </form>
+
+                <!--begin::Form-->
+                <div class="text-center">
+                  <button id="btn_confirm" class="btn btn-success" type="button">Confirm and Save</button>
+                  <button id="data-sheet-cancel" class="btn btn-secondary" type="submit">Cancel</button>
+                </div>
+          </div>
+        </div>
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+<!--begin::JavaScript-->
+<script>
+  /*** begin:: document ***/
+  $(document).ready(function () {
+    // Collect all recipient IDs from Django context
+    const recipientIds = {{ recipient_ids|safe }};
+    if (!recipientIds || recipientIds.length === 0){
+      // popup warning
+      Swal.fire({
+        title: "Invalid recipients",
+        text: "The recipient list appears to be invalid. Please cancel the operation and upload a valid recipient data sheet.",
+        icon: "warning"
+      });
+      return
+    }
+
+    /*** begin:: confirm save button ***/
+    $('#btn_confirm').on('click', function(e) {
+      e.preventDefault();
+
+      if (!recipientIds || recipientIds.length === 0){
+        // popup warning
+        Swal.fire({
+          title: "Invalid recipients",
+          text: "The recipient list appears to be invalid. Please cancel the operation and upload a valid recipient data sheet.",
+          icon: "warning"
+        });
+        return
+      }
+      const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
+      const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
+      
+      console.log(url)
+      console.log(csrf_token)
+      /*** begin:: ajax code ***/ 
+      $.ajax({
+        url: url,
+        type: 'POST', 
+        data: {'recipient_ids':recipientIds,},
+        headers: { "X-CSRFToken": csrf_token },  
+        success: function(response) {
+            if (response.success) {
+                window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+            }
+        },
+        error: function(xhr, status, error) {
+          Swal.fire({
+            title: "Technical error",
+            text: error,
+            icon: "error"
+          });
+          return
+        }
+      });
+      /*** end:: ajax code ***/
+    });
+    /*** end:: confirm save ***/
+  });
+  /*** end :: document ***/
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#recipients').DataTable( {
+            responsive: true
+        } );
+    });
+
+    // delete group 
+    $('#data-sheet-cancel').on('click', function(e) {
+      e.preventDefault();
+        // select element
+        const recipientIds = {{ recipient_ids|safe }};
+        const url = "{% url 'bulk_whatsapp:delete_datasheet' datasheet_id=data_sheet.id %}";
+ 
+        // Include CSRF token
+        let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
+
+        $.ajax({
+          url: url,
+          type: 'POST',  // Use POST since Django doesn't handle DELETE via forms easily
+          data: {'recipient_ids':recipientIds},
+          headers: { "X-CSRFToken": csrfToken },  // CSRF protection
+          success: function(response) {
+              if (response.success) {
+                  window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+              }
+          },
+          error: function(xhr, status, error) {
+            window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+
+          }
+      });
+        
+        
+    });
+
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

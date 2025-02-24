@@ -7,9 +7,9 @@ from django.views import View
 from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_email.forms import EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
+from bulk_email.forms import EmailAttachmentForm, EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
 from fabric_expo_management_system import settings
-from .models import EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
+from .models import EmailAttachment, EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
 from django.urls import reverse_lazy, reverse
@@ -253,8 +253,17 @@ class CreateEmail(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user 
-        return super().form_valid(form)
+
+        # Save the email template instance
+        email_template = form.save(commit=False)
+        email_template.created_by = self.request.user
+        email_template.save()
     
+        # Handle file attachments
+        for file in self.request.FILES.getlist('attachment'):
+            EmailAttachment.objects.create(attachment=file,template=email_template)
+    
+        return super().form_valid(form)
 
 class EmailDraftListView(ListView):
     model = EmailTemplate
@@ -274,6 +283,11 @@ class EmailChangeView(UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)  # Correct method call
+        # email_template = self.object
+        #         # Handle file attachments
+        # if 'attachment' in self.request.FILES:
+        #     for file in self.request.FILES.getlist('attachment'):
+        #         EmailAttachment.objects.create(attachment=file, template=email_template)
 
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': 'Draft Updated'})
@@ -287,7 +301,55 @@ class EmailChangeView(UpdateView):
 
         return super().form_invalid(form)
 
-# soft delete email draft  
+
+### add attachment 
+class AddAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+
+        draft_id = kwargs.get('draft_id')
+        email_template = get_object_or_404(EmailTemplate, id=draft_id)
+
+        # Calculate total size of existing attachments
+        existing_attachments = EmailAttachment.objects.filter(template=email_template)
+        existing_size_mb = sum(item.attachment.size for item in existing_attachments) / (1024 * 1024)
+
+        # Calculate total size of new files
+        new_files = request.FILES.getlist('attachment')
+        new_files_size_mb = sum(file.size for file in new_files) / (1024 * 1024)
+
+        total_size_mb = existing_size_mb + new_files_size_mb
+
+        # Ensure the total size does not exceed the 20MB limit
+        if total_size_mb > 20:
+            response = JsonResponse({'success': False, 'error': 'Total file size exceeds the 20MB limit.'}, status=400)
+            print(f"Returning response: {response.content}, status: {response.status_code}")
+            return response
+        else:
+            try:
+                # Handle file attachments
+                if new_files:
+                    for file in new_files:
+                        EmailAttachment.objects.create(attachment=file, template=email_template)
+
+                return JsonResponse({'success': True, 'message': 'Attachments added successfully'}, status=200)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+### remove attachment 
+class RemoveAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        attachment_id = self.request.POST.get('id')
+        attachment = get_object_or_404(EmailAttachment, id=attachment_id)
+
+        try:
+            attachment.delete()
+            return JsonResponse({'success': True, 'message': 'Attachment deleted successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        
+
+### soft delete email draft  
 class DeleteEmailDraftView(UpdateView):
     model = EmailTemplate
     fields = ['delete_status']

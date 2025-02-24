@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.forms import ValidationError
 from django.utils.timezone import now, timedelta
 import threading
 from bulk_core.models import RecipientCategory, RecipientDataSheet
@@ -80,7 +81,11 @@ class EmailAttachment(models.Model):
     template = models.ForeignKey(EmailTemplate,on_delete=models.CASCADE,related_name='attachments')
 
     def __str__(self):
-        return self.template
+        return self.attachment.name
+    
+    def clean(self):
+        if self.file.size > 20 * 1024 * 1024:
+            raise ValidationError("File size must be under 20MB")
 
 
 

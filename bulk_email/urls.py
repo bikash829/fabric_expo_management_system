@@ -20,6 +20,8 @@ urlpatterns = [
 
     # sending mail 
     path('write_email/',views.CreateEmail.as_view(),name='create_email'),
+    path('add_attachment/<int:draft_id>/',views.AddAttachmentView.as_view(),name='add_attachment'),
+    path('remove_attachment/', views.RemoveAttachmentView.as_view(), name='remove_attachment'),
     path('draft_list/',views.EmailDraftListView.as_view(),name='draft_list'),
     path('open_draft/<int:pk>/',views.EmailChangeView.as_view(),name='open_draft'),
     path('delete_draft/<int:pk>/',views.DeleteEmailDraftView.as_view(),name='delete_draft'),

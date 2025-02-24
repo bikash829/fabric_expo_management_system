@@ -45,7 +45,7 @@ def normalize_phone_number(number):
 """end:: Utility functions """
 
 
-"""begin::import recipients """
+"""begin::manage recipients """
 ### Generate demo csv for whatsapp
 class GenerateCSV(View):
     def get(self, request, *args, **kwargs):
@@ -238,8 +238,46 @@ class DataSheetDeleteView(View):
 #     def get_queryset(self):
 #         category_id = self.kwargs.get('pk')  # Assuming pk refers to category
 #         return EmailRecipient.objects.filter(category_id=category_id)
+from django.db.models import F
+### Recipient list view 
+class RecipientListView(ListView):
+    model = WhatsappRecipient
+    template_name = "bulk_core/manage_recipient/recipient_list.html"
+    context_object_name = 'recipient_list' 
+
+    def get_queryset(self):
+        # Query the data and rename the column
+        queryset = super().get_queryset().annotate(
+            recipient_id=F('recipient_number')  # Rename the 'email' column to 'recipient_email'
+        )
+        return queryset
     
-"""end::import email """
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        context['source'] = 'bulk_whatsapp'
+        context['source_title'] = 'whatsapp'
+        return context
+
+
+### Export recipient list view 
+class ExportRecipientToCSVView(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="whatsapp_recipients.csv"'},
+        )
+
+        recipients = WhatsappRecipient.objects.all()
+
+        writer = csv.writer(response)
+        writer.writerow(["name", "whatsapp_no","category","id"])
+        for item in recipients:
+            writer.writerow([item.name,item.recipient_number,item.category,item.pk, ])
+
+        return response
+
+    
+"""end::manage recipients """
 
 
 """begin::Mange messages"""

@@ -42,6 +42,12 @@ class EmailCreationForm(ModelForm):
         model = EmailTemplate
         fields = ['name', 'subject', 'body',]
 
+        labels = {
+            'name': 'Template Name',
+            'subject': 'Email Subject',
+            'body': 'Email Body',
+        }
+
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
@@ -53,6 +59,12 @@ class EmailChangeForm(ModelForm):
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body']
+
+        labels = {
+            'name': 'Template Name',
+            'subject': 'Email Subject',
+            'body': 'Email Body',
+        }
 
         widgets = {
             'name': forms.HiddenInput(attrs={'class': 'form-control',}),

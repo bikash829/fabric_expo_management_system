@@ -20,9 +20,10 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
+from django.db.models import F
 
 
-"""begin::import email """
+"""begin::manage email recipients """
 ### Generate demo csv file 
 class GenerateCSV(View):
     def get(self, request, *args, **kwargs):
@@ -200,7 +201,48 @@ class EmailCategoriesRecipientList(ListView):
         category_id = self.kwargs.get('pk')  # Assuming pk refers to category
         return EmailRecipient.objects.filter(category_id=category_id)
     
-"""end::import email """
+
+# Recipient list view 
+class RecipientListView(ListView):
+    model = EmailRecipient
+    template_name = "bulk_core/manage_recipient/recipient_list.html"
+    context_object_name = 'recipient_list'
+
+    def get_queryset(self):
+        # Query the data and rename the column
+        queryset = super().get_queryset().annotate(
+            recipient_id=F('email')  # Rename the 'email' column to 'recipient_email'
+        )
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['source'] = 'bulk_email'  # Add extra context
+        context['source_title'] = 'email'  # Add extra context
+        context['total_recipients'] = self.get_queryset().count()  # Example: Count total recipients
+        return context
+    
+
+
+### Export recipient list view 
+class ExportRecipientToCSVView(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="email_recipients.csv"'},
+        )
+
+        recipients = EmailRecipient.objects.all()
+
+        writer = csv.writer(response)
+        writer.writerow(["name", "email","category","id"])
+        for item in recipients:
+            writer.writerow([item.name,item.email,item.category,item.pk, ])
+
+        return response
+
+    
+"""end::manage email recipients """
 
 """begin::writing email """
 class CreateEmail(CreateView):

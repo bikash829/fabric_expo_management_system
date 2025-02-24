@@ -1,0 +1,132 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% block title %}{{source_title|title}} Recipient List{% endblock title %}
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+<link herf="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
+
+{% endblock push_css %}
+      
+{% block content %}
+<!--begin::header-->
+{% comment %} {% url 'bulk_email:email_category' as email_category_url %} {% endcomment %}
+{% include 'core/layouts/content_header.html' with page_name="Recipient List"  only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <a  class="btn btn-success" href="
+                {% if source == 'bulk_email' %}
+                    {% url 'bulk_email:import_recipients' %}
+                {% elif source == 'bulk_whatsapp' %}
+                    {% url 'bulk_whatsapp:import_recipients' %}
+                {% elif source == 'bulk_wechat'%}
+                    bulk_wechat
+                {% endif %}
+                " >Import Recipients</a>
+                <a class="btn btn-secondary" href="
+                {% if source == 'bulk_email' %}
+                    {% url 'bulk_email:export_recipient_list' %}
+                {% elif source == 'bulk_whatsapp' %}
+                    {% url 'bulk_whatsapp:export_recipient_list' %}
+                {% elif source == 'bulk_wechat'%}
+                    bulk_wechat
+                {% endif %}
+                ">Export Recipients</a>
+
+            </div>
+            <div class="col-md-6 text-end">
+                
+                {% comment %} <button class="btn btn-info" disabled>Row count</button> {% endcomment %}
+            </div>
+        </div>
+      
+    
+      <div>
+        <table id="recipients" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Count</th>
+                  <th>#ID</th>
+                  <th>Recipient Name</th>
+                  <th>Recipient Id</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in recipient_list %}
+              <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.recipient_id}}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                <th>Count</th>
+                <th>#ID</th>
+                <th>Recipient Name</th>
+                <th>Recipient Id</th>
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
+
+<script>
+  
+    // Datatable 
+    const table = $('#recipients').DataTable({
+      responsive: true,
+      // select: true,
+    });
+
+    // toggle select recipients
+    $('#recipients tbody').on('click', 'tr', function() {
+      $(this).toggleClass('selected');
+      updateRowCount();
+    });
+
+    // Show row count 
+    function updateRowCount() {
+      const count = table.rows('.selected').data().length;
+      $('#button').text(count + ' row(s) selected');
+    }
+    
+    // Handle "Select All" checkbox click event
+    $('#select-all').on('click', function() {
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      if (this.checked) {
+          $(rows).addClass('selected');
+      } else {
+          $(rows).removeClass('selected');
+      }
+      updateRowCount();
+    });
+
+    // Handle individual row click event to update "Select All" checkbox state
+    $('#recipients tbody').on('click', 'tr', function() {
+      var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
+      $('#select-all').prop('checked', allChecked);
+    });
+    
+</script>
+{% endblock push_scripts %}

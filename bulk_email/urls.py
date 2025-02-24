@@ -4,11 +4,15 @@ from . import views
 app_name = 'bulk_email'
 
 urlpatterns = [
+    # manage recipients 
     path('import/', views.EmailRecipientCreateView.as_view(), name='import_recipients'),
     path('confirm//<int:datasheet_id>/', views.ConfirmEmailRecipientsView.as_view(), name='confirm_recipients'),
     path('preview/<int:datasheet_id>/', views.PreviewEmailRecipientsView.as_view(), name='preview_recipients'),
     path('data-sheet/<int:datasheet_id>/delete/', views.DataSheetDeleteView.as_view(), name='delete_datasheet'),
     path('generate_csv/',views.GenerateCSV.as_view(),name='generate_csv'),
+    path('recipient_list/',views.RecipientListView.as_view(),name='recipient_list'),
+    path('export_recipient_list/',views.ExportRecipientToCSVView.as_view(),name='export_recipient_list'),
+
 
 
     path('email_category/', views.EmailCategories.as_view(), name='email_category'),

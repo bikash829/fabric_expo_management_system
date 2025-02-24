@@ -10,6 +10,9 @@ urlpatterns = [
     path('confirm/<int:datasheet_id>/', views.ConfirmWhatsappRecipientsView.as_view(), name='confirm_recipients'),
     path('generate_csv/',views.GenerateCSV.as_view(),name='generate_csv'),
     path('data-sheet/<int:datasheet_id>/delete/', views.DataSheetDeleteView.as_view(), name='delete_datasheet'),
+    path('recipient_list/',views.RecipientListView.as_view(),name='recipient_list'),
+    path('export_recipient_list/',views.ExportRecipientToCSVView.as_view(),name='export_recipient_list'),
+
 
     # create message template for whats app 
     path('create_message/',views.CreateMessageView.as_view(),name="create_message"),

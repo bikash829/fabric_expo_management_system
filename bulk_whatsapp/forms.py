@@ -41,7 +41,9 @@ class MessageCreationForm(ModelForm):
     class Meta:
         model = WhatsappTemplate
         fields = ['name', 'message_content']
-
+        labels = {
+                    'name': 'Template Name',
+        }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'message_content': forms.Textarea(attrs={'class':'form-control','rows':3}),
@@ -63,6 +65,9 @@ class MessageDraftUpdateForm(ModelForm):
     class Meta:
         model = WhatsappTemplate
         fields = ['name', 'message_content', ]
+        labels = {
+            'name': 'Template Name',
+        }
 
         widgets = {
             'name': forms.HiddenInput(attrs={'class': 'form-control',}),

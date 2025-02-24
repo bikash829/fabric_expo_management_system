@@ -77,6 +77,35 @@ def get_sidebar_items(request):
             ]
         },
         {
+            'name': 'View Recipients',
+            'code_name': 'view_recipients',
+            'url': None,
+            'icon': 'fa-solid fa-eye',
+            'children':[
+                {
+                    'name': 'Email Recipients',
+                    'code_name': 'email_recipients_list',
+                    'url': reverse('bulk_email:recipient_list'),
+                    # 'icon': "bi bi-circle-fill",
+                    'icon': "bi bi-record-circle-fill",
+                },
+                {
+                    'name': 'WA Recipients',
+                    'code_name': 'whatsapp_recipients_list',
+                    'url': reverse('bulk_whatsapp:recipient_list'),
+                    # 'icon': "bi bi-circle-fill",
+                    'icon': "bi bi-record-circle-fill",
+                },
+                {
+                    'name': 'WeChat Recipients',
+                    'code_name': 'wechat_recipients_list',
+                    'url': None,
+                    # 'icon': "bi bi-circle-fill",
+                    'icon': "bi bi-record-circle-fill",
+                },
+            ]
+        },
+        {
             'name': 'Send Bulk Message',
             'code_name': 'send_bulk_message',
             'url': None,

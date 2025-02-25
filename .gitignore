@@ -92,5 +92,7 @@ packages_adminlte/
 /templates/AdminLTE/
 /templates/AdminLTE-3.2.0/
 /media/profile/user_upload/
+/media/bulk_messages_data/email_attachments/
+/media/bulk_messages_data/whatsapp_attachment/
 static/
 note.md

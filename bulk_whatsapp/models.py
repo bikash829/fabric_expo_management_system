@@ -57,7 +57,7 @@ class WhatsappAttachment(models.Model):
     template = models.ForeignKey(WhatsappTemplate,on_delete=models.CASCADE,related_name='attachments')
 
     def __str__(self):
-        return self.template
+        return self.attachment.name
 
 
 

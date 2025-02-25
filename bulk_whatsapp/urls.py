@@ -16,6 +16,8 @@ urlpatterns = [
 
     # create message template for whats app 
     path('create_message/',views.CreateMessageView.as_view(),name="create_message"),
+    path('add_attachment/<int:draft_id>/',views.AddAttachmentView.as_view(),name='add_attachment'),
+    path('remove_attachment/', views.RemoveAttachmentView.as_view(), name='remove_attachment'),
     path('draft_list/',views.DraftView.as_view(),name="draft_list"),
     path('open_draft/<int:pk>/',views.DraftUpdateView.as_view(),name="open_draft"),
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name="select_recipients"),

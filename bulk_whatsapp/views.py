@@ -311,6 +311,51 @@ class DraftView(ListView):
     model = WhatsappTemplate
 
 
+### add attachment 
+class AddAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        draft_id = kwargs.get('draft_id')
+        wa_template = get_object_or_404(WhatsappTemplate, id=draft_id)
+
+        # Calculate total size of existing attachments
+        existing_attachments = WhatsappAttachment.objects.filter(template=wa_template)
+        existing_size_mb = sum(item.attachment.size for item in existing_attachments) / (1024 * 1024)
+
+        # Calculate total size of new files
+        new_files = request.FILES.getlist('attachment')
+        new_files_size_mb = sum(file.size for file in new_files) / (1024 * 1024)
+        total_size_mb = existing_size_mb + new_files_size_mb
+
+        # Ensure the total size does not exceed the 20MB limit
+        if total_size_mb > 20:
+            response = JsonResponse({'success': False, 'error': 'Total file size exceeds the 20MB limit.'}, status=400)
+            return response
+        else:
+            try:
+                # Handle file attachments
+                if new_files:
+                    for file in new_files:
+                        WhatsappAttachment.objects.create(attachment=file, template=wa_template)
+
+                return JsonResponse({'success': True, 'message': 'Attachments added successfully'}, status=200)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+### remove attachment 
+class RemoveAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        attachment_id = self.request.POST.get('id')
+        attachment = get_object_or_404(WhatsappAttachment, id=attachment_id)
+
+        try:
+            attachment.delete()
+            return JsonResponse({'success': True, 'message': 'Attachment deleted successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        
+
+
 ### WA draft delete view 
 class DraftDeleteView(UpdateView):
     # template_name = "bulk_whatsapp/manage_messages/open_draft.html"

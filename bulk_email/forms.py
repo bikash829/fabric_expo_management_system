@@ -55,7 +55,7 @@ class TempEmailRecipientImportForm(ModelForm):
 # create email form 
 class EmailCreationForm(ModelForm):
     template_name = "form_template/full_width_form.html"
-    attachment = MultipleFileField(label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+    attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body','attachment']

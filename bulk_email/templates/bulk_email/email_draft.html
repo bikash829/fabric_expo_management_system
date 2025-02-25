@@ -22,7 +22,7 @@
         <table id="email_drafts" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                <th>Count</th>
+                <th>#ID</th>
                 <th>Template Name</th>
                 <th>Subject</th>
                 <th>Created At</th>
@@ -33,7 +33,7 @@
           <tbody>
               {% for item in emailtemplate_list %}
               <tr>
-                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
                   <td>{{item.name}}</td>
                   <td>{{item.subject}}</td>
                   <td>{{item.created_at}}</td>
@@ -61,7 +61,7 @@
           </tbody>
           <tfoot>
               <tr>
-                <th>Count</th>
+                <th>#ID</th>
                 <th>Template Name</th>
                 <th>Subject</th>
                 <th>Created At</th>
@@ -95,6 +95,7 @@
     const table = $('#email_drafts').DataTable({
       responsive: true,
       // select: true,
+      "order": [[0, "desc"]],
     });
 
     $('document').ready(function(){

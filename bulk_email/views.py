@@ -381,6 +381,83 @@ class SelectRecipientsView(View):
 import os
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.exceptions import ValidationError
+# class SendEmailView(View):
+#     def post(self,request,*args,**kwargs):
+#         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+#         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+#         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
+#         session_id = str(uuid.uuid4())
+#         sender = request.user
+
+#         # Maximum allowed file size (5MB)
+#         MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
+
+#         # # List of attachments (file paths)
+#         # attachments = ["path/to/file1.pdf", "path/to/file2.jpg", "path/to/file3.docx"]
+
+#         # # Function to validate file size
+#         # def validate_attachment(file_path):
+#         #     if os.path.exists(file_path):
+#         #         file_size = os.path.getsize(file_path)  # Get file size in bytes
+#         #         if file_size > MAX_FILE_SIZE:
+#         #             raise ValidationError(f"File {file_path} exceeds the 5MB size limit.")
+#         #     else:
+#         #         raise ValidationError(f"File {file_path} does not exist.")
+
+#         # Open a single SMTP connection for efficiency
+#         connection = get_connection()
+#         connection.open()
+
+#         # Track success and failure
+#         success_count = 0
+#         failure_count = 0
+
+#         emails = []
+
+#         # Loop through each recipient
+#         for recipient in recipients:
+#             # Plain text fallback
+#             text_body = f"Dear {recipient.name},\n{email_content.body}\n\nBest Regards,\nFabric Expo Management\n"
+
+#             # HTML Email (Better Formatting)
+#             html_body = f"""
+#                             <html>
+#                             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+#                                 <p>Dear {recipient.name},</p>
+#                                 <p>{email_content.body}</p>
+#                                 <p style="margin-top: 20px;">Best Regards,<br>
+#                                 <strong>Fabric Expo Management</strong></p>
+#                             </body>
+#                             </html>
+#                         """
+            
+#             email1 = EmailMessage(
+#                 subject=email_content.subject,
+#                 body=text_body,
+#                 html_body=html_body,
+#                 from_email="from@example.com",
+#                 to=[recipient.email],
+#             )
+#             emails.append(email1)
+
+#         # Send the email
+#         try:
+#             connection.send_messages(emails)
+#         except Exception as e:
+#             # Log failed email
+#             failure_count += 1
+           
+
+#         # Close the connection after all emails are sent
+#         connection.close()
+        
+#         # Add success message
+#         # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
+#         return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
+        
+
+import mimetypes
 class SendEmailView(View):
     def post(self,request,*args,**kwargs):
         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
@@ -388,22 +465,6 @@ class SendEmailView(View):
         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
         session_id = str(uuid.uuid4())
         sender = request.user
-
-        # Maximum allowed file size (5MB)
-        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
-
-
-        # # List of attachments (file paths)
-        # attachments = ["path/to/file1.pdf", "path/to/file2.jpg", "path/to/file3.docx"]
-
-        # # Function to validate file size
-        # def validate_attachment(file_path):
-        #     if os.path.exists(file_path):
-        #         file_size = os.path.getsize(file_path)  # Get file size in bytes
-        #         if file_size > MAX_FILE_SIZE:
-        #             raise ValidationError(f"File {file_path} exceeds the 5MB size limit.")
-        #     else:
-        #         raise ValidationError(f"File {file_path} does not exist.")
 
         # Open a single SMTP connection for efficiency
         connection = get_connection()
@@ -448,7 +509,14 @@ class SendEmailView(View):
             
             # Attach HTML version for better formatting
             email_message.attach_alternative(html_body, "text/html")
-
+            # Attach files
+            attachments = EmailAttachment.objects.filter(template=email_content)
+            for attachment in attachments:
+                file_path = attachment.attachment.path
+                file_name = attachment.attachment.name
+                mime_type, _ = mimetypes.guess_type(file_path)
+                with open(file_path, 'rb') as f:
+                    email_message.attach(file_name, f.read(), mime_type)
             # Send the email
             try:
                 email_message.send()

@@ -1,6 +1,6 @@
 from django.utils import timezone
 import uuid
-import time
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
@@ -12,8 +12,8 @@ import csv
 from fabric_expo_management_system import settings
 # import views 
 from django.views import View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import ListView
 
 
 # validators 
@@ -23,8 +23,9 @@ from django.shortcuts import get_object_or_404
 from phonenumber_field.validators import validate_international_phonenumber
 
 # models 
-from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
+from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
 from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappTemplate
+from django.db.models import F
 
 # forms
 from bulk_whatsapp.forms import  MessageDraftUpdateForm, TempRecipientImportForm, MessageCreationForm
@@ -157,8 +158,6 @@ class ConfirmWhatsappRecipientsView(View):
         # create new list for new recipients and update existed recipients if need any
         new_recipients = []
         update_recipients = []
-        print(new_recipients)
-        print(update_recipients)
 
         for tr in temp_recipients:
             # check if exist but update category 
@@ -238,7 +237,7 @@ class DataSheetDeleteView(View):
 #     def get_queryset(self):
 #         category_id = self.kwargs.get('pk')  # Assuming pk refers to category
 #         return EmailRecipient.objects.filter(category_id=category_id)
-from django.db.models import F
+
 ### Recipient list view 
 class RecipientListView(ListView):
     model = WhatsappRecipient
@@ -423,6 +422,16 @@ class SendMessageView(View):
         print(whatsapp_content)
         print(recipient_ids)
         print(recipients)
+        # retriving attachments
+        attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
+        media_urls = [request.build_absolute_uri(attachment.attachment.url) for attachment in attachments]
+        media_urls = [
+            "https://demo.twilio.com/owl.png",
+            "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
+        ]
+
+        print(media_urls)
+        
 
         account_sid = settings.TWILIO_ACCOUNT_SID
         auth_token = settings.TWILIO_AUTH_TOKEN
@@ -442,7 +451,8 @@ class SendMessageView(View):
                 message = client.messages.create(
                     from_=settings.TWILIO_WHATSAPP_NUMBER,
                     body=text_body,
-                    to=f"whatsapp:{recipient.recipient_number}"
+                    to=f"whatsapp:{recipient.recipient_number}",
+                    media_url=media_urls # doesn't support direct file path
                 )
                 # results.append({"recipient": recipient.phone_number, "status": "Sent", "sid": message.sid})
 

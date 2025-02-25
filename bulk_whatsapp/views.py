@@ -24,7 +24,7 @@ from phonenumber_field.validators import validate_international_phonenumber
 
 # models 
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappRecipient, WhatsappTemplate
+from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappTemplate
 
 # forms
 from bulk_whatsapp.forms import  MessageDraftUpdateForm, TempRecipientImportForm, MessageCreationForm
@@ -287,8 +287,19 @@ class CreateMessageView(CreateView):
     form_class = MessageCreationForm
     success_url = reverse_lazy('bulk_whatsapp:draft_list')
 
+    
+
     def form_valid(self, form):
-        form.instance.created_by = self.request.user 
+        # Save the email template instance
+        wa_template = form.save(commit=False)
+        wa_template.created_by = self.request.user
+        wa_template.save()
+        
+        # Handle file attachments
+        for file in self.request.FILES.getlist('attachment'):
+            WhatsappAttachment.objects.create(attachment=file,template=wa_template)
+
+        
         messages.success(self.request, f'Whatsapp message draft "{form.instance.name}" has been created successfully!')
         return super().form_valid(form)
     

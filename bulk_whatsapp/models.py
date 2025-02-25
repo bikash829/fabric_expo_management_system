@@ -52,7 +52,7 @@ class WhatsappTemplate(models.Model):
         return self.name
 
 
-class WhatssappAttachment(models.Model):
+class WhatsappAttachment(models.Model):
     attachment = models.FileField(upload_to="bulk_messages_data/whatsapp_attachment")
     template = models.ForeignKey(WhatsappTemplate,on_delete=models.CASCADE,related_name='attachments')
 

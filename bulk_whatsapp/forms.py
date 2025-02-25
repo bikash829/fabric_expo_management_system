@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from bulk_whatsapp.models import TempRecipient, WhatsappTemplate
 from bulk_core.models import RecipientDataSheet,RecipientCategory,TempRecipientDataSheet
+from bulk_core.utils import MultipleFileField,MultipleFileInput
 
 
 
@@ -38,6 +39,8 @@ class TempRecipientImportForm(ModelForm):
 # create message form 
 class MessageCreationForm(ModelForm):
     template_name = "form_template/full_width_form.html"
+    attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = WhatsappTemplate
         fields = ['name', 'message_content']
@@ -49,17 +52,6 @@ class MessageCreationForm(ModelForm):
             'message_content': forms.Textarea(attrs={'class':'form-control','rows':3}),
         }
 
-# class EmailChangeForm(ModelForm):
-#     template_name = "form_template/full_width_form.html"
-#     class Meta:
-#         model = EmailTemplate
-#         fields = ['name', 'subject', 'body']
-
-#         widgets = {
-#             'name': forms.HiddenInput(attrs={'class': 'form-control',}),
-#             'subject': forms.TextInput(attrs={'class': 'form-control'}),
-#             'body': forms.Textarea(attrs={'class':'form-control','rows':3}),
-#         }
 class MessageDraftUpdateForm(ModelForm):
     template_name = "form_template/full_width_form.html"
     class Meta:
@@ -76,23 +68,3 @@ class MessageDraftUpdateForm(ModelForm):
 
 
 
-
-
-# class MultipleFileInput(forms.ClearableFileInput):
-#     allow_multiple_selected = True
-
-# class MultipleFileField(forms.FileField):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault("widget", MultipleFileInput())
-#         super().__init__(*args, **kwargs)
-
-#     def clean(self, data, initial=None):
-#         single_file_clean = super().clean
-#         if isinstance(data, (list, tuple)):
-#             result = [single_file_clean(d, initial) for d in data]
-#         else:
-#             result = [single_file_clean(data, initial)]
-#         return result
-
-# class FileFieldForm(forms.Form):
-#     file_field = MultipleFileField(required=False)

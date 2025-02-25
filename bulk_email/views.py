@@ -21,7 +21,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 from django.db.models import F
-
+import os
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.exceptions import ValidationError
 
 """begin::manage email recipients """
 ### Generate demo csv file 
@@ -378,9 +380,7 @@ class SelectRecipientsView(View):
             'email_content': email_content
         })
 
-import os
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.core.exceptions import ValidationError
+
 # class SendEmailView(View):
 #     def post(self,request,*args,**kwargs):
 #         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))

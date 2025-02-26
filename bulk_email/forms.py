@@ -39,10 +39,9 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 class EmailCreationForm(ModelForm):
     # template_name = "form_template/full_width_form.html"
     attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
-    body = CKEditor5Widget(attrs={"class":"django_ckeditor_5"},config_name="extends")
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["body"].required = False
+        self.fields["body"].required = True
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body','attachment']
@@ -56,6 +55,9 @@ class EmailCreationForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
+            "body": CKEditor5Widget(
+                  attrs={"class": "django_ckeditor_5"}, config_name="extends"
+              )
         }
         
 
@@ -63,7 +65,9 @@ class EmailCreationForm(ModelForm):
 class EmailChangeForm(ModelForm):
     template_name = "form_template/full_width_form.html"
    
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["body"].required = True
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body']
@@ -77,7 +81,9 @@ class EmailChangeForm(ModelForm):
         widgets = {
             'name': forms.HiddenInput(attrs={'class': 'form-control',}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'body': forms.Textarea(attrs={'class':'form-control','rows':3}),
+            "body": CKEditor5Widget(
+                  attrs={"class": "django_ckeditor_5"}, config_name="extends"
+              )
 
         }
 

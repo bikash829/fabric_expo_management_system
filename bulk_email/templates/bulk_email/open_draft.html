@@ -20,6 +20,9 @@
             <div class="card-title">{{form.name.value}}</div>
           </div>
           <!--end::Header-->
+          {% block header %}
+              {{ form.media }} 
+          {% endblock %}
           <!--begin::Form-->
           <form method="POST" id="formDraft" class="needs-validation" novalidate>
             {% csrf_token %}

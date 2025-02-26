@@ -500,7 +500,7 @@ class SendEmailView(View):
             # Create email
             email_message = EmailMultiAlternatives(
                 subject=email_content.subject,
-                body=text_body,  # Plain text version
+                # body=text_body,  # Plain text version
                 from_email=settings.EMAIL_HOST_USER,
                 # from_email="admin@email.com",
                 to=[recipient.email],

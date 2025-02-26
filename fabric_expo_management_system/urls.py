@@ -22,6 +22,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("ckeditor5/", include('django_ckeditor_5.urls')),
     path("accounts/", include("accounts.urls")),
     path('dashboard/',include('admin_dashboard.urls')),
     # """begin::bulk messaging"""
@@ -30,5 +31,6 @@ urlpatterns = [
     path('bulk_whatsapp/',include('bulk_whatsapp.urls')),
     path('bulk_core/',include('bulk_core.urls')),
     # """end::bulk messaging"""
+    # path("upload/", custom_upload_function, name="custom_upload_file"),
     path('', RedirectView.as_view(url='/dashboard/', permanent=True)),  # make the dashboard root url
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

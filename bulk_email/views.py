@@ -501,8 +501,8 @@ class SendEmailView(View):
             email_message = EmailMultiAlternatives(
                 subject=email_content.subject,
                 body=text_body,  # Plain text version
-                # from_email=settings.EMAIL_HOST_USER,
-                from_email="admin@email.com",
+                from_email=settings.EMAIL_HOST_USER,
+                # from_email="admin@email.com",
                 to=[recipient.email],
                 connection=connection,  # Use open connection
             )

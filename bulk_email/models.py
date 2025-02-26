@@ -60,11 +60,12 @@ class TempEmailRecipient(models.Model):
 #     def __str__(self):
 #         return self.sent_email
 
-
+from django_ckeditor_5.fields import CKEditor5Field
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
-    body = models.TextField()
+    # body = models.TextField()
+    body = CKEditor5Field(config_name='extends')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     # changed_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)

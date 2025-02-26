@@ -21,6 +21,10 @@
           </div>
           <!--end::Header-->
           <!--begin::Form-->
+          {% block header %}
+              {{ form.media }} 
+          {% endblock %}
+
           <form method="POST" class="needs-validation"  enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             <!--begin::Body-->

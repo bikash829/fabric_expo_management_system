@@ -19,3 +19,19 @@ class MultipleFileField(forms.FileField):
             raise ValidationError(f"One or more files exceed the 20MB size limit.")
         
         return data
+    
+
+import re
+from colorsys import hls_to_rgb
+
+def hsl_to_rgb(h, s, l):
+    r, g, b = hls_to_rgb(h / 360, l / 100, s / 100)
+    return int(r * 255), int(g * 255), int(b * 255)
+
+def replace_hsl_with_rgb(html_content):
+    def hsl_to_rgb_match(match):
+        h, s, l = map(float, match.groups())
+        r, g, b = hsl_to_rgb(h, s, l)
+        return f"rgb({r}, {g}, {b})"
+
+    return re.sub(r'hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)', hsl_to_rgb_match, html_content)

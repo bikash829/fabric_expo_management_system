@@ -108,10 +108,41 @@
   })();
 </script>
 <script>
-    $(document).ready(function () {
-      // Attach event listener to all inputs, selects, and textareas within the form
-      $("#formDraft").on("change", "input, textarea", function () {
-        var formData = $("#formDraft").serialize(); // Serialize form data
+  $(document).ready(function () {
+    let editorInstance; // Store CKEditor instance
+
+    // Initialize CKEditor 5
+    ClassicEditor
+        .create(document.querySelector(".ck-editor-container")) 
+        .then(editor => {
+            editorInstance = editor; // Store instance globally
+
+            // Listen for typing inside CKEditor 5
+            editor.model.document.on("change:data", () => {
+                sendFormData();
+            });
+        })
+        .catch(error => {
+            console.error("Error initializing CKEditor 5:", error);
+        });
+
+    // Listen for typing in text inputs & textareas
+    $("#formDraft").on("input", "input, textarea", function () {
+        sendFormData();
+    });
+
+    // Listen for clicks anywhere in the form
+    $("#formDraft").on("click", function () {
+        sendFormData();
+    });
+
+    function sendFormData() {
+        // Ensure CKEditor 5 content is updated before serialization
+        if (editorInstance) {
+            $("#editor").val(editorInstance.getData()); // Update hidden textarea with editor content
+        }
+
+        var formData = $("#formDraft").serialize(); // Serialize the form
 
         $.ajax({
             url: "{% url 'bulk_email:open_draft' pk=form.instance.pk %}", // Change this to your actual endpoint
@@ -128,8 +159,8 @@
                 console.error("Error updating data:", error);
             }
         });
-      });
-    });
+    }
+});
 
     // Add attachment 
     $(document).ready(function(){

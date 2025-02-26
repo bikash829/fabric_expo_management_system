@@ -458,6 +458,8 @@ class SelectRecipientsView(View):
         
 
 import mimetypes
+from premailer import transform
+from bulk_core.utils import replace_hsl_with_rgb
 class SendEmailView(View):
     def post(self,request,*args,**kwargs):
         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
@@ -496,7 +498,10 @@ class SendEmailView(View):
                             </body>
                             </html>
                         """
-
+            
+            # Transform HSL to RGB
+            html_body = transform(replace_hsl_with_rgb(html_body))
+            
             # Create email
             email_message = EmailMultiAlternatives(
                 subject=email_content.subject,

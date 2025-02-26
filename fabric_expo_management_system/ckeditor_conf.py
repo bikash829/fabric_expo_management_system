@@ -45,25 +45,31 @@ CKEDITOR_5_CONFIGS = {
         ],
         'toolbar': {
             'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
-                        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
-                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                        'code','subscript', 'superscript', 'highlight', '|',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'removeFormat',
                     'insertTable',
                     ],
+            # 'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+            #             'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+            #         'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+            #         'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+            #         'insertTable',
+            #         ],
             'shouldNotGroupWhenFull': 'true'
         },
-        'image': {
-            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
-                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
-            'styles': [
-                'full',
-                'side',
-                'alignLeft',
-                'alignRight',
-                'alignCenter',
-            ]
+        # 'image': {
+        #     'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+        #                 'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+        #     'styles': [
+        #         'full',
+        #         'side',
+        #         'alignLeft',
+        #         'alignRight',
+        #         'alignCenter',
+        #     ]
 
-        },
+        # },
         'table': {
             'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
             'tableProperties', 'tableCellProperties' ],

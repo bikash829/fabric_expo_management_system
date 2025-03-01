@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from bulk_core.utils import MultipleFileField, MultipleFileInput
 from bulk_wechat.models import WeChatTemplate
 from bulk_core.models import RecipientDataSheet,RecipientCategory,TempRecipientDataSheet
 
@@ -32,3 +33,19 @@ class TempRecipientImportForm(ModelForm):
                 raise forms.ValidationError("Only CSV files are allowed.")
         return file
     
+
+# create message form 
+class MessageCreationForm(ModelForm):
+    template_name = "form_template/full_width_form.html"
+    attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = WeChatTemplate
+        fields = ['name', 'message_content']
+        labels = {
+                    'name': 'Template Name',
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'message_content': forms.Textarea(attrs={'class':'form-control','rows':3}),
+        }

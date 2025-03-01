@@ -173,13 +173,13 @@ def get_sidebar_items(request):
                         {
                             'name': 'Create Message',
                             'code_name': 'create_wc_message',
-                            'url': "#",
+                            'url': reverse('bulk_wechat:create_message'),
                             'icon': "fa-solid fa-pen-to-square",
                         },
                         {
                             'name': 'WC draft',
                             'code_name': 'select_wc_draft',
-                            'url': "#",
+                            'url':  reverse('bulk_wechat:draft_list'),
                             'icon': "fa-regular fa-folder-open",
                         },
                         {

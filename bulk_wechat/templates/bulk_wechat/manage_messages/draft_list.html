@@ -1,6 +1,6 @@
 {% extends "core/_base.html" %}
 {% load static %}
-{% block title %}Whatsapp Drafts{% endblock title %}
+{% block title %}WeChat Drafts{% endblock title %}
 
 {% block push_css %}
 <!--Datatable -->
@@ -12,14 +12,14 @@
 {% block content %}
 <!--begin::header-->
 
-{% include 'core/layouts/content_header.html' with page_name="Whatsapp Draft" only%}
+{% include 'core/layouts/content_header.html' with page_name="WeChat Draft" only%}
 <!--end::header-->
 <!--begin::App Content-->
 <div class="app-content">
     <!--begin::Container-->
     <div class="container-fluid">
       <div>
-        <table id="whatsapp_draft" class="table table-striped" style="width:100%">
+        <table id="wechat_draft" class="table table-striped" style="width:100%">
           <thead>
               <tr>
                 <th>Count</th>
@@ -30,7 +30,7 @@
               </tr>
           </thead>
           <tbody>
-              {% for item in whatsapptemplate_list %}
+              {% for item in wechattemplate_list %}
               <tr>
                   <td>{{forloop.counter}}</td>
                   <td>{{item.name}}</td>
@@ -89,7 +89,7 @@
 
 <script>
     // Datatable 
-    const table = $('#whatsapp_draft').DataTable({
+    const table = $('#wechat_draft').DataTable({
       responsive: true,
       // select: true,
     });

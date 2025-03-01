@@ -10,8 +10,9 @@ from django.contrib import messages
 import csv
 from django.db.models import F
 
-from bulk_wechat.forms import TempRecipientImportForm
-from bulk_wechat.models import TempWCRecipient, WeChatRecipient
+from bulk_wechat.forms import MessageCreationForm, TempRecipientImportForm
+from bulk_wechat.models import TempWCRecipient, WeChatAttachment, WeChatRecipient, WeChatTemplate
+from bulk_whatsapp.models import WhatsappTemplate
 from fabric_expo_management_system import settings
 # import views 
 from django.views import View
@@ -250,4 +251,36 @@ class ExportRecipientToCSVView(View):
 
     
 """end::manage recipients """
+
+
+"""begin::Mange messages"""
+### WA create message 
+class CreateMessageView(CreateView):
+    template_name = "bulk_wechat/manage_messages/create_message.html"
+    form_class = MessageCreationForm
+    success_url = reverse_lazy('bulk_wechat:draft_list')
+
+    
+
+    def form_valid(self, form):
+        # Save the email template instance
+        wc_template = form.save(commit=False)
+        wc_template.created_by = self.request.user
+        wc_template.save()
+        
+        # Handle file attachments
+        for file in self.request.FILES.getlist('attachment'):
+            WeChatAttachment.objects.create(attachment=file,template=wc_template)
+
+        
+        messages.success(self.request, f'WeChat message draft "{form.instance.name}" has been created successfully!')
+        return super().form_valid(form)
+    
+
+
+### WA draft view 
+class DraftView(ListView):
+    template_name = "bulk_wechat/manage_messages/draft_list.html" 
+    model = WeChatTemplate
+
 

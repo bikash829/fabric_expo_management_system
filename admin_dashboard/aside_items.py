@@ -142,7 +142,7 @@ def get_sidebar_items(request):
                     'name': 'Send wa Message',
                     'code_name': 'send_wh_msg',
                     'url': None,
-                    'icon': "fa-solid fa-message",
+                    'icon': "fa-brands fa-whatsapp",
                     'children':[
                         {
                             'name': 'Create Message',
@@ -168,7 +168,27 @@ def get_sidebar_items(request):
                     'name': 'Send WeChat Message',
                     'code_name': 'send_wechat_msg',
                     'url': None,
-                    'icon': "fa-solid fa-comments",
+                    'icon': "fa-brands fa-weixin",
+                    'children':[
+                        {
+                            'name': 'Create Message',
+                            'code_name': 'create_wc_message',
+                            'url': "#",
+                            'icon': "fa-solid fa-pen-to-square",
+                        },
+                        {
+                            'name': 'WC draft',
+                            'code_name': 'select_wc_draft',
+                            'url': "#",
+                            'icon': "fa-regular fa-folder-open",
+                        },
+                        {
+                            'name': 'Sent Records',
+                            'code_name': 'sent_wc_records',
+                            'url': "#",
+                            'icon': "fa-solid fa-check",
+                        },
+                    ]
                 },
             ]
         },

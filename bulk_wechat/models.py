@@ -1,21 +1,21 @@
-# from django.db import models
+from django.db import models
 
-# # Create your models here.
-# import uuid
-# from django.db import models
-# from django.utils.timezone import now, timedelta
-# import threading
-# from bulk_core.models import RecipientCategory, RecipientDataSheet
-# from django.contrib.auth import get_user_model
-# # Create your models here.
+# Create your models here.
+import uuid
+from django.db import models
+from django.utils.timezone import now, timedelta
+import threading
+from bulk_core.models import RecipientCategory, RecipientDataSheet
+from django.contrib.auth import get_user_model
+# Create your models here.
 
-# class WeChatRecipient(models.Model):
-#     name = models.CharField(max_length=50,null=True)
-#     recipient_number = models.CharField(unique=True)
-#     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
+class WeChatRecipient(models.Model):
+    name = models.CharField(max_length=50,null=True)
+    recipient_id = models.CharField(max_length=255,unique=True)
+    category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
 
-#     def __str__(self):
-#         return f"WeChat number: {self.recipient_number}, Category: {self.category}"
+    def __str__(self):
+        return f"WeChat number: {self.recipient_id}, Category: {self.category}"
     
 
 # class TempRecipient(models.Model):

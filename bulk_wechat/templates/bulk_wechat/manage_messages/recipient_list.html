@@ -1,6 +1,6 @@
 {% extends "core/_base.html" %}
 {% load static %}
-{% block title %}Whatsapp Recipient List{% endblock title %}
+{% block title %}WeChat Recipient List{% endblock title %}
 
 {% block push_css %}
 <!--Datatable -->
@@ -38,7 +38,7 @@
                   <th>Count</th>
                   <th>#ID</th>
                   <th>Recipient Name</th>
-                  <th>Recipient Number</th>
+                  <th>Recipient id</th>
               </tr>
           </thead>
           <tbody>
@@ -47,7 +47,7 @@
                   <td>{{forloop.counter}}</td>
                   <td>{{item.id}}</td>
                   <td>{{item.name}}</td>
-                  <td>{{item.recipient_number}}</td>
+                  <td>{{item.recipient_id}}</td>
               </tr>
               {% endfor %}
           </tbody>
@@ -56,7 +56,7 @@
                 <th>Count</th>
                 <th>#ID</th>
                 <th>Recipient Name</th>
-                <th>Recipient Number</th>
+                <th>Recipient id</th>
               </tr>
           </tfoot>
         </table>
@@ -174,7 +174,7 @@
                   text: response.message,
                   showConfirmButton: true,
                 }).then((result) => {
-                  window.location.href = "{% url 'bulk_whatsapp:draft_list' %}";
+                  window.location.href = "{% url 'bulk_wechat:draft_list' %}";
                 });
               },
               error: function(xhr, status, error) {

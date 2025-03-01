@@ -54,7 +54,7 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-warning" type="submit">Save Template</button>
+              {% comment %} <button class="btn btn-warning" type="submit">Save Template</button> {% endcomment %}
               <button class="btn btn-success" onclick="window.location.href='{% url 'bulk_whatsapp:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
               <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_whatsapp:draft_list' %}'">Cancel</button>
             </div>

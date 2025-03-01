@@ -310,6 +310,10 @@ class DraftView(ListView):
     template_name = "bulk_whatsapp/manage_messages/draft_list.html" 
     model = WhatsappTemplate
 
+    
+    def get_queryset(self):
+        return self.model.objects.filter(delete_status=False)  # Only active drafts
+
 
 ### add attachment 
 class AddAttachmentView(View):
@@ -358,11 +362,10 @@ class RemoveAttachmentView(View):
 
 ### WA draft delete view 
 class DraftDeleteView(UpdateView):
-    # template_name = "bulk_whatsapp/manage_messages/open_draft.html"
-    model = WhatsappTemplate
-    fields = ['delete_status'] 
-    success_url = reverse_lazy('bulk_email:draft_list')
 
+    model = WhatsappTemplate
+    fields = ['delete_status']
+    success_url = reverse_lazy('bulk_whatsapp:draft_list')
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -370,7 +373,8 @@ class DraftDeleteView(UpdateView):
         self.object.save()
         messages.success(request, f"Draft '{self.object.name}' has been deleted.")  # Fixed message
        
-        return redirect(self.success_url) 
+        return redirect(self.success_url)
+     
 
 
 ## WA template update view 

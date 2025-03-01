@@ -22,7 +22,7 @@
         <table id="wechat_draft" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                <th>Count</th>
+                <th>#ID</th>
                 <th>Template Name</th>
                 <th>Created At</th>
                 <th>Created By</th>
@@ -32,7 +32,7 @@
           <tbody>
               {% for item in wechattemplate_list %}
               <tr>
-                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
                   <td>{{item.name}}</td>
                   <td>{{item.created_at}}</td>
                   <td>{{item.created_by}}</td>
@@ -46,8 +46,8 @@
                         >
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item text-primary" href="{% url 'bulk_whatsapp:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
-                            <form method="POST" action="{% url 'bulk_whatsapp:delete_draft' pk=item.pk %}">
+                            <li><a class="dropdown-item text-primary" href="{% url 'bulk_wechat:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            <form method="POST" action="{% url 'bulk_wechat:delete_draft' pk=item.pk %}">
                               {% csrf_token %}
                                 <li><button class="dropdown-item text-danger delete-draft" type="submit"  data-draft="{{item.name}}">Delete <i class="fa-solid fa-trash"></i></button></li>
                             </form>
@@ -59,7 +59,7 @@
           </tbody>
           <tfoot>
               <tr>
-                <th>Count</th>
+                <th>#ID</th>
                 <th>Template Name</th>
                 <th>Created At</th>
                 <th>Created By</th>
@@ -70,9 +70,6 @@
       </div>
     </div>
     <!--end::Container-->
-    {% for message in messages %}
-    {{message}}
-    {% endfor %}
 </div>
 <!--end::App Content-->
 <!--begin:: Toaster alert -->
@@ -92,6 +89,8 @@
     const table = $('#wechat_draft').DataTable({
       responsive: true,
       // select: true,
+      // select: true,
+      "order": [[0, "desc"]]
     });
 
     $('document').ready(function(){

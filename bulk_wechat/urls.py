@@ -17,10 +17,13 @@ urlpatterns = [
     # # create message template for whats app 
     path('create_message/',views.CreateMessageView.as_view(),name="create_message"),
     path('draft_list/',views.DraftView.as_view(),name="draft_list"),
-    # path('open_draft/<int:pk>/',views.DraftUpdateView.as_view(),name="open_draft"),
-    # path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name="select_recipients"),
+    path('open_draft/<int:pk>/',views.DraftUpdateView.as_view(),name="open_draft"),
+    path('add_attachment/<int:draft_id>/',views.AddAttachmentView.as_view(),name='add_attachment'),
+    path('remove_attachment/', views.RemoveAttachmentView.as_view(), name='remove_attachment'),
+
+    path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name="select_recipients"),
     # path('send_message/<int:draft_id>/',views.SendMessageView.as_view(),name="send_message"),
-    # path('delete_draft/<int:pk>/',views.DraftDeleteView.as_view(),name="delete_draft"),
+    path('delete_draft/<int:pk>/',views.DraftDeleteView.as_view(),name="delete_draft"),
     # path('sent_message_session/',views.SenTMessageSessionListView.as_view(),name='sent_message_session'),
 
 

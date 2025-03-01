@@ -94,5 +94,6 @@ packages_adminlte/
 /media/profile/user_upload/
 /media/bulk_messages_data/email_attachments/
 /media/bulk_messages_data/whatsapp_attachment/
+/media/bulk_messages_data/wechat_attachment/
 static/
 note.md

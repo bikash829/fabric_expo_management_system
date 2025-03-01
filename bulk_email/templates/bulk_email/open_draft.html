@@ -20,6 +20,9 @@
             <div class="card-title">{{form.name.value}}</div>
           </div>
           <!--end::Header-->
+          {% block header %}
+              {{ form.media }} 
+          {% endblock %}
           <!--begin::Form-->
           <form method="POST" id="formDraft" class="needs-validation" novalidate>
             {% csrf_token %}
@@ -28,15 +31,35 @@
               <!--begin::Row-->
               <div class="row g-3">
                 {{form}}
+
+                <div>
+                  <h5>Existing Attachments:</h5>
+                  <button class="btn btn-warning mb-3" id="add_attachment">Add Attachment <i class="fa-solid fa-plus"></i></button>
+                  <input type="file" id="attachment_input" name="attachment" style="display: none;" multiple>
+                    <ul class="list-group">
+                      {% for attachment in object.attachments.all %}
+                      <li class="list-group-item">
+                        <div class="row">
+                          <div class="col-6">
+                          <a href="{{attachment.attachment.url}}">{{attachment.attachment.name}}</a>
+                        </div>
+                          <div class="col-6 text-end">
+                          <a href="#" id="attachment_{{attachment.id}}" data-attachmentid="{{attachment.id}}" class="btn btn-sm btn-danger attachment_remove">Remove</a>
+                        </div>
+                        </div>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                </div>
               </div>
               <!--end::Row-->
             </div>
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-warning" type="submit">Save Email</button>
+              {% comment %} <button class="btn btn-warning" type="submit">Save Email</button> {% endcomment %}
               <button class="btn btn-success" onclick="window.location.href='{% url 'bulk_email:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
-              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'">Cancel</button>
+              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'">Back</button>
             </div>
             <!--end::Footer-->
           </form>
@@ -85,10 +108,41 @@
   })();
 </script>
 <script>
-    $(document).ready(function () {
-      // Attach event listener to all inputs, selects, and textareas within the form
-      $("#formDraft").on("change", "input, textarea", function () {
-        var formData = $("#formDraft").serialize(); // Serialize form data
+  $(document).ready(function () {
+    let editorInstance; // Store CKEditor instance
+
+    // Initialize CKEditor 5
+    ClassicEditor
+        .create(document.querySelector(".ck-editor-container")) 
+        .then(editor => {
+            editorInstance = editor; // Store instance globally
+
+            // Listen for typing inside CKEditor 5
+            editor.model.document.on("change:data", () => {
+                sendFormData();
+            });
+        })
+        .catch(error => {
+            console.error("Error initializing CKEditor 5:", error);
+        });
+
+    // Listen for typing in text inputs & textareas
+    $("#formDraft").on("input", "input, textarea", function () {
+        sendFormData();
+    });
+
+    // Listen for clicks anywhere in the form
+    $("#formDraft").on("click", function () {
+        sendFormData();
+    });
+
+    function sendFormData() {
+        // Ensure CKEditor 5 content is updated before serialization
+        if (editorInstance) {
+            $("#editor").val(editorInstance.getData()); // Update hidden textarea with editor content
+        }
+
+        var formData = $("#formDraft").serialize(); // Serialize the form
 
         $.ajax({
             url: "{% url 'bulk_email:open_draft' pk=form.instance.pk %}", // Change this to your actual endpoint
@@ -105,8 +159,106 @@
                 console.error("Error updating data:", error);
             }
         });
+    }
+});
+
+    // Add attachment 
+    $(document).ready(function(){
+      $("#add_attachment").click(e =>{
+        e.preventDefault();
+        $("#attachment_input").click();
       });
     });
+
+    // Handle file input change event
+    $("#attachment_input").change(function() {
+      let formData = new FormData();
+      let files = $("#attachment_input")[0].files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('attachment', files[i]);
+      }
+
+      $.ajax({
+        url: "{% url 'bulk_email:add_attachment' draft_id=form.instance.id %}", // Change this to your actual endpoint
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}" // Ensure CSRF token is included
+        },
+        success: function (response) {
+          console.log("Attachment added successfully:", response);
+          //location.reload(); // Reload the page to show the new attachment
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: response.message,
+            showConfirmButton: true,
+          }).then((result) => {
+            window.location.reload();
+          });
+        },    
+        error: function (xhr, status, error) {
+          try {
+            let responseJson = JSON.parse(xhr.responseText);
+            Swal.fire({
+              position: "center",
+              icon: "warning",
+              title: "Can't upload attachment",
+              text: responseJson.error,
+              showConfirmButton: true,
+            })
+            
+          } catch (e) {
+            alert("An unknown error occurred.");
+          }
+        }
+
+      });
+    });
+
+    // Remove attachment
+    $(document).on("click", ".attachment_remove", function (e) {
+      e.preventDefault();
+  
+      let attachmentId = $(this).data("attachmentid");
+      let attachmentElement = $(this).closest('.list-group-item'); // Assuming attachments are wrapped in an element
+      const url = "{% url 'bulk_email:remove_attachment' %}"
+
+      $.ajax({
+          url: url,  // Adjust this based on your Django URL configuration
+          type: "POST",
+          data: {id:attachmentId},
+          headers: {
+              "X-CSRFToken": "{{ csrf_token }}"  // Ensure CSRF token is included
+          },
+          success: function (response) {
+              if (response.success) {
+                  attachmentElement.remove();  // Remove the element from DOM
+              } else {
+                  Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: "An error occurred",
+                    text: response.error,
+                    showConfirmButton: true,
+                  })
+              }
+          },
+          error: function (xhr) {
+              let responseJson = JSON.parse(xhr.responseText);
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "An error occurred",
+                text: responseJson.error,
+                showConfirmButton: true,
+              })
+          }
+      });
+  });
+  
 </script>
 <!--end::JavaScript-->
 {% endblock push_scripts %}

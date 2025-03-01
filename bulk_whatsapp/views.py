@@ -1,6 +1,6 @@
 from django.utils import timezone
 import uuid
-import time
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
@@ -13,8 +13,8 @@ import csv
 from fabric_expo_management_system import settings
 # import views 
 from django.views import View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import ListView
 
 
 # validators 
@@ -24,8 +24,9 @@ from django.shortcuts import get_object_or_404
 from phonenumber_field.validators import validate_international_phonenumber
 
 # models 
-from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappRecipient, WhatsappTemplate
+from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
+from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappTemplate
+from django.db.models import F
 
 # forms
 from bulk_whatsapp.forms import  MessageDraftUpdateForm, TempRecipientImportForm, MessageCreationForm
@@ -158,8 +159,6 @@ class ConfirmWhatsappRecipientsView(View):
         # create new list for new recipients and update existed recipients if need any
         new_recipients = []
         update_recipients = []
-        print(new_recipients)
-        print(update_recipients)
 
         for tr in temp_recipients:
             # check if exist but update category 
@@ -288,8 +287,19 @@ class CreateMessageView(CreateView):
     form_class = MessageCreationForm
     success_url = reverse_lazy('bulk_whatsapp:draft_list')
 
+    
+
     def form_valid(self, form):
-        form.instance.created_by = self.request.user 
+        # Save the email template instance
+        wa_template = form.save(commit=False)
+        wa_template.created_by = self.request.user
+        wa_template.save()
+        
+        # Handle file attachments
+        for file in self.request.FILES.getlist('attachment'):
+            WhatsappAttachment.objects.create(attachment=file,template=wa_template)
+
+        
         messages.success(self.request, f'Whatsapp message draft "{form.instance.name}" has been created successfully!')
         return super().form_valid(form)
     
@@ -299,6 +309,51 @@ class CreateMessageView(CreateView):
 class DraftView(ListView):
     template_name = "bulk_whatsapp/manage_messages/draft_list.html" 
     model = WhatsappTemplate
+
+
+### add attachment 
+class AddAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        draft_id = kwargs.get('draft_id')
+        wa_template = get_object_or_404(WhatsappTemplate, id=draft_id)
+
+        # Calculate total size of existing attachments
+        existing_attachments = WhatsappAttachment.objects.filter(template=wa_template)
+        existing_size_mb = sum(item.attachment.size for item in existing_attachments) / (1024 * 1024)
+
+        # Calculate total size of new files
+        new_files = request.FILES.getlist('attachment')
+        new_files_size_mb = sum(file.size for file in new_files) / (1024 * 1024)
+        total_size_mb = existing_size_mb + new_files_size_mb
+
+        # Ensure the total size does not exceed the 20MB limit
+        if total_size_mb > 20:
+            response = JsonResponse({'success': False, 'error': 'Total file size exceeds the 20MB limit.'}, status=400)
+            return response
+        else:
+            try:
+                # Handle file attachments
+                if new_files:
+                    for file in new_files:
+                        WhatsappAttachment.objects.create(attachment=file, template=wa_template)
+
+                return JsonResponse({'success': True, 'message': 'Attachments added successfully'}, status=200)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+### remove attachment 
+class RemoveAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        attachment_id = self.request.POST.get('id')
+        attachment = get_object_or_404(WhatsappAttachment, id=attachment_id)
+
+        try:
+            attachment.delete()
+            return JsonResponse({'success': True, 'message': 'Attachment deleted successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        
 
 
 ### WA draft delete view 
@@ -368,6 +423,16 @@ class SendMessageView(View):
         print(whatsapp_content)
         print(recipient_ids)
         print(recipients)
+        # retriving attachments
+        attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
+        media_urls = [request.build_absolute_uri(attachment.attachment.url) for attachment in attachments]
+        media_urls = [
+            "https://demo.twilio.com/owl.png",
+            "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
+        ]
+
+        print(media_urls)
+        
 
         account_sid = settings.TWILIO_ACCOUNT_SID
         auth_token = settings.TWILIO_AUTH_TOKEN
@@ -387,7 +452,8 @@ class SendMessageView(View):
                 message = client.messages.create(
                     from_=settings.TWILIO_WHATSAPP_NUMBER,
                     body=text_body,
-                    to=f"whatsapp:{recipient.recipient_number}"
+                    to=f"whatsapp:{recipient.recipient_number}",
+                    media_url=media_urls # doesn't support direct file path
                 )
                 # results.append({"recipient": recipient.phone_number, "status": "Sent", "sid": message.sid})
 

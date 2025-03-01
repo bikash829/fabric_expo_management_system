@@ -1,9 +1,8 @@
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, ValidationError
 from .models import RecipientCategory, EmailTemplate, EmailAttachment
 from bulk_core.models import RecipientDataSheet,RecipientCategory,TempRecipientDataSheet
-
-
+from bulk_core.utils import MultipleFileField,MultipleFileInput
 
     
 class TempEmailRecipientImportForm(ModelForm):
@@ -35,12 +34,17 @@ class TempEmailRecipientImportForm(ModelForm):
     
 
 
+from django_ckeditor_5.widgets import CKEditor5Widget
 # create email form 
 class EmailCreationForm(ModelForm):
-    template_name = "form_template/full_width_form.html"
+    # template_name = "form_template/full_width_form.html"
+    attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["body"].required = True
     class Meta:
         model = EmailTemplate
-        fields = ['name', 'subject', 'body',]
+        fields = ['name', 'subject', 'body','attachment']
 
         labels = {
             'name': 'Template Name',
@@ -51,11 +55,19 @@ class EmailCreationForm(ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'body': forms.Textarea(attrs={'class':'form-control','rows':3}),
+            "body": CKEditor5Widget(
+                  attrs={"class": "django_ckeditor_5"}, config_name="extends"
+              )
         }
+        
+
 
 class EmailChangeForm(ModelForm):
     template_name = "form_template/full_width_form.html"
+   
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["body"].required = True
     class Meta:
         model = EmailTemplate
         fields = ['name', 'subject', 'body']
@@ -69,27 +81,20 @@ class EmailChangeForm(ModelForm):
         widgets = {
             'name': forms.HiddenInput(attrs={'class': 'form-control',}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'body': forms.Textarea(attrs={'class':'form-control','rows':3}),
+            "body": CKEditor5Widget(
+                  attrs={"class": "django_ckeditor_5"}, config_name="extends"
+              )
+
         }
 
 
+class EmailAttachmentForm(ModelForm):
+    class Meta:
+        fields=['attachment','template']
+        
 
 
-class MultipleFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
 
-class MultipleFileField(forms.FileField):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("widget", MultipleFileInput())
-        super().__init__(*args, **kwargs)
 
-    def clean(self, data, initial=None):
-        single_file_clean = super().clean
-        if isinstance(data, (list, tuple)):
-            result = [single_file_clean(d, initial) for d in data]
-        else:
-            result = [single_file_clean(data, initial)]
-        return result
-
-class FileFieldForm(forms.Form):
-    file_field = MultipleFileField(required=False)
+# class FileFieldForm(forms.Form):
+#     file_field = MultipleFileField(required=False)

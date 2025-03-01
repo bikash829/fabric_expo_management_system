@@ -21,13 +21,22 @@
           </div>
           <!--end::Header-->
           <!--begin::Form-->
-          <form method="POST" class="needs-validation" novalidate>
+          {% block header %}
+              {{ form.media }} 
+          {% endblock %}
+
+          <form method="POST" class="needs-validation"  enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             <!--begin::Body-->
             <div class="card-body">
               <!--begin::Row-->
               <div class="row g-3">
                 {{form}}
+
+                {% comment %} <div>
+                  <label class="form-label" for="attachment">Choose Files to Attach (Multiple selections allowed)</label>
+                  <input class="form-control" id="attachment" type="file" name="attachment" multiple>
+                </div> {% endcomment %}
               </div>
               <!--end::Row-->
             </div>
@@ -88,5 +97,7 @@
     $(document).ready(function () {
     });
 </script>
+
+
 <!--end::JavaScript-->
 {% endblock push_scripts %}

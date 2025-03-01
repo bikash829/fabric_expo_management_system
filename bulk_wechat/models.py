@@ -12,9 +12,11 @@ from django.contrib.auth import get_user_model
 class WeChatRecipient(models.Model):
     name = models.CharField(max_length=50,null=True)
     recipient_id = models.CharField(max_length=255,unique=True)
+    recipient_id = models.CharField(max_length=255,unique=True)
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
 
     def __str__(self):
+        return f"WeChat number: {self.recipient_id}, Category: {self.category}"
         return f"WeChat number: {self.recipient_id}, Category: {self.category}"
     
 
@@ -25,22 +27,22 @@ class TempWCRecipient(models.Model):
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
     temp_id = models.CharField(max_length=36,unique=True,default=uuid.uuid4)
 
-    def __str__(self):
-        return f"Recipient ID: {self.recipient_id}, Category: {self.category}"
+#     def __str__(self):
+#         return f"Recipient ID: {self.recipient_id}, Category: {self.category}"
     
-    def schedule_deletion(self):
-        threading.Timer(10, self.delete).start()
+#     def schedule_deletion(self):
+#         threading.Timer(10, self.delete).start()
 
-    @classmethod
-    def cleanup_old_entries(cls, category=None):
-        time_threshold = now() - timedelta(minutes=1)
+#     @classmethod
+#     def cleanup_old_entries(cls, category=None):
+#         time_threshold = now() - timedelta(minutes=1)
 
-        query = cls.objects.filter(uploaded_at__lt=time_threshold)
-        if category:
-            query = query.filter(category=category)
+#         query = cls.objects.filter(uploaded_at__lt=time_threshold)
+#         if category:
+#             query = query.filter(category=category)
 
-        for entry in query:
-            entry.delete()
+#         for entry in query:
+#             entry.delete()
 
 # template model 
 class WeChatTemplate(models.Model):
@@ -51,16 +53,16 @@ class WeChatTemplate(models.Model):
     delete_status =  models.BooleanField(default=False)
     is_saved = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
-class WeChatAttachment(models.Model):
-    attachment = models.FileField(upload_to="bulk_messages_data/wechat_attachment")
-    template = models.ForeignKey(WeChatTemplate,on_delete=models.CASCADE,related_name='attachments')
+# class WeChatAttachment(models.Model):
+#     attachment = models.FileField(upload_to="bulk_messages_data/wechat_attachment")
+#     template = models.ForeignKey(WeChatTemplate,on_delete=models.CASCADE,related_name='attachments')
 
-    def __str__(self):
-        return self.template
+#     def __str__(self):
+#         return self.template
 
 
 
@@ -74,5 +76,5 @@ class SentWCMessage(models.Model):
     status = models.BooleanField(default=False)
     
 
-    def __str__(self):
-        return self.message_template
+#     def __str__(self):
+#         return self.message_template

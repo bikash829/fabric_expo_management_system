@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.forms import ValidationError
 from django.utils.timezone import now, timedelta
 import threading
 from bulk_core.models import RecipientCategory, RecipientDataSheet
@@ -59,11 +60,12 @@ class TempEmailRecipient(models.Model):
 #     def __str__(self):
 #         return self.sent_email
 
-
+from django_ckeditor_5.fields import CKEditor5Field
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
-    body = models.TextField()
+    # body = models.TextField()
+    body = CKEditor5Field(config_name='extends')
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     # changed_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
@@ -80,7 +82,11 @@ class EmailAttachment(models.Model):
     template = models.ForeignKey(EmailTemplate,on_delete=models.CASCADE,related_name='attachments')
 
     def __str__(self):
-        return self.template
+        return self.attachment.name
+    
+    def clean(self):
+        if self.file.size > 20 * 1024 * 1024:
+            raise ValidationError("File size must be under 20MB")
 
 
 

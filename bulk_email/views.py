@@ -7,9 +7,9 @@ from django.views import View
 from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_email.forms import EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
+from bulk_email.forms import EmailAttachmentForm, EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
 from fabric_expo_management_system import settings
-from .models import EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
+from .models import EmailAttachment, EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
 from django.urls import reverse_lazy, reverse
@@ -21,7 +21,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 from django.db.models import F
-
+import os
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.core.exceptions import ValidationError
 
 """begin::manage email recipients """
 ### Generate demo csv file 
@@ -253,8 +255,17 @@ class CreateEmail(CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user 
-        return super().form_valid(form)
+
+        # Save the email template instance
+        email_template = form.save(commit=False)
+        email_template.created_by = self.request.user
+        email_template.save()
     
+        # Handle file attachments
+        for file in self.request.FILES.getlist('attachment'):
+            EmailAttachment.objects.create(attachment=file,template=email_template)
+    
+        return super().form_valid(form)
 
 class EmailDraftListView(ListView):
     model = EmailTemplate
@@ -274,6 +285,11 @@ class EmailChangeView(UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)  # Correct method call
+        # email_template = self.object
+        #         # Handle file attachments
+        # if 'attachment' in self.request.FILES:
+        #     for file in self.request.FILES.getlist('attachment'):
+        #         EmailAttachment.objects.create(attachment=file, template=email_template)
 
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': 'Draft Updated'})
@@ -287,7 +303,55 @@ class EmailChangeView(UpdateView):
 
         return super().form_invalid(form)
 
-# soft delete email draft  
+
+### add attachment 
+class AddAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+
+        draft_id = kwargs.get('draft_id')
+        email_template = get_object_or_404(EmailTemplate, id=draft_id)
+
+        # Calculate total size of existing attachments
+        existing_attachments = EmailAttachment.objects.filter(template=email_template)
+        existing_size_mb = sum(item.attachment.size for item in existing_attachments) / (1024 * 1024)
+
+        # Calculate total size of new files
+        new_files = request.FILES.getlist('attachment')
+        new_files_size_mb = sum(file.size for file in new_files) / (1024 * 1024)
+
+        total_size_mb = existing_size_mb + new_files_size_mb
+
+        # Ensure the total size does not exceed the 20MB limit
+        if total_size_mb > 20:
+            response = JsonResponse({'success': False, 'error': 'Total file size exceeds the 20MB limit.'}, status=400)
+            print(f"Returning response: {response.content}, status: {response.status_code}")
+            return response
+        else:
+            try:
+                # Handle file attachments
+                if new_files:
+                    for file in new_files:
+                        EmailAttachment.objects.create(attachment=file, template=email_template)
+
+                return JsonResponse({'success': True, 'message': 'Attachments added successfully'}, status=200)
+
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+### remove attachment 
+class RemoveAttachmentView(View):
+    def post(self, request, *args, **kwargs):
+        attachment_id = self.request.POST.get('id')
+        attachment = get_object_or_404(EmailAttachment, id=attachment_id)
+
+        try:
+            attachment.delete()
+            return JsonResponse({'success': True, 'message': 'Attachment deleted successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+        
+
+### soft delete email draft  
 class DeleteEmailDraftView(UpdateView):
     model = EmailTemplate
     fields = ['delete_status']
@@ -316,9 +380,86 @@ class SelectRecipientsView(View):
             'email_content': email_content
         })
 
-import os
-from django.core.mail import EmailMultiAlternatives, get_connection
-from django.core.exceptions import ValidationError
+
+# class SendEmailView(View):
+#     def post(self,request,*args,**kwargs):
+#         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+#         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+#         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
+#         session_id = str(uuid.uuid4())
+#         sender = request.user
+
+#         # Maximum allowed file size (5MB)
+#         MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
+
+#         # # List of attachments (file paths)
+#         # attachments = ["path/to/file1.pdf", "path/to/file2.jpg", "path/to/file3.docx"]
+
+#         # # Function to validate file size
+#         # def validate_attachment(file_path):
+#         #     if os.path.exists(file_path):
+#         #         file_size = os.path.getsize(file_path)  # Get file size in bytes
+#         #         if file_size > MAX_FILE_SIZE:
+#         #             raise ValidationError(f"File {file_path} exceeds the 5MB size limit.")
+#         #     else:
+#         #         raise ValidationError(f"File {file_path} does not exist.")
+
+#         # Open a single SMTP connection for efficiency
+#         connection = get_connection()
+#         connection.open()
+
+#         # Track success and failure
+#         success_count = 0
+#         failure_count = 0
+
+#         emails = []
+
+#         # Loop through each recipient
+#         for recipient in recipients:
+#             # Plain text fallback
+#             text_body = f"Dear {recipient.name},\n{email_content.body}\n\nBest Regards,\nFabric Expo Management\n"
+
+#             # HTML Email (Better Formatting)
+#             html_body = f"""
+#                             <html>
+#                             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+#                                 <p>Dear {recipient.name},</p>
+#                                 <p>{email_content.body}</p>
+#                                 <p style="margin-top: 20px;">Best Regards,<br>
+#                                 <strong>Fabric Expo Management</strong></p>
+#                             </body>
+#                             </html>
+#                         """
+            
+#             email1 = EmailMessage(
+#                 subject=email_content.subject,
+#                 body=text_body,
+#                 html_body=html_body,
+#                 from_email="from@example.com",
+#                 to=[recipient.email],
+#             )
+#             emails.append(email1)
+
+#         # Send the email
+#         try:
+#             connection.send_messages(emails)
+#         except Exception as e:
+#             # Log failed email
+#             failure_count += 1
+           
+
+#         # Close the connection after all emails are sent
+#         connection.close()
+        
+#         # Add success message
+#         # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
+#         return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
+        
+
+import mimetypes
+from premailer import transform
+from bulk_core.utils import replace_hsl_with_rgb
 class SendEmailView(View):
     def post(self,request,*args,**kwargs):
         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
@@ -326,22 +467,6 @@ class SendEmailView(View):
         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
         session_id = str(uuid.uuid4())
         sender = request.user
-
-        # Maximum allowed file size (5MB)
-        MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
-
-
-        # # List of attachments (file paths)
-        # attachments = ["path/to/file1.pdf", "path/to/file2.jpg", "path/to/file3.docx"]
-
-        # # Function to validate file size
-        # def validate_attachment(file_path):
-        #     if os.path.exists(file_path):
-        #         file_size = os.path.getsize(file_path)  # Get file size in bytes
-        #         if file_size > MAX_FILE_SIZE:
-        #             raise ValidationError(f"File {file_path} exceeds the 5MB size limit.")
-        #     else:
-        #         raise ValidationError(f"File {file_path} does not exist.")
 
         # Open a single SMTP connection for efficiency
         connection = get_connection()
@@ -373,20 +498,30 @@ class SendEmailView(View):
                             </body>
                             </html>
                         """
-
+            
+            # Transform HSL to RGB
+            html_body = transform(replace_hsl_with_rgb(html_body))
+            
             # Create email
             email_message = EmailMultiAlternatives(
                 subject=email_content.subject,
-                body=text_body,  # Plain text version
-                # from_email=settings.EMAIL_HOST_USER,
-                from_email="admin@email.com",
+                # body=text_body,  # Plain text version
+                from_email=settings.EMAIL_HOST_USER,
+                # from_email="admin@email.com",
                 to=[recipient.email],
                 connection=connection,  # Use open connection
             )
             
             # Attach HTML version for better formatting
             email_message.attach_alternative(html_body, "text/html")
-
+            # Attach files
+            attachments = EmailAttachment.objects.filter(template=email_content)
+            for attachment in attachments:
+                file_path = attachment.attachment.path
+                file_name = attachment.attachment.name
+                mime_type, _ = mimetypes.guess_type(file_path)
+                with open(file_path, 'rb') as f:
+                    email_message.attach(file_name, f.read(), mime_type)
             # Send the email
             try:
                 email_message.send()

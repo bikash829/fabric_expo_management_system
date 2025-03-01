@@ -11,14 +11,15 @@ from django.contrib.auth import get_user_model
 
 class WeChatRecipient(models.Model):
     name = models.CharField(max_length=50,null=True)
-    recipient_number = models.CharField(unique=True)
+    recipient_id = models.CharField(max_length=255,unique=True)
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"WeChat number: {self.recipient_number}, Category: {self.category}"
+        return f"WeChat number: {self.recipient_id}, Category: {self.category}"
     
 
-class TempRecipient(models.Model):
+# temp recipient is on 
+class TempWCRecipient(models.Model):
     name = models.CharField(max_length=50,null=True)
     recipient_id = models.CharField(max_length=100)
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
@@ -41,7 +42,7 @@ class TempRecipient(models.Model):
         for entry in query:
             entry.delete()
 
-
+# template model 
 class WeChatTemplate(models.Model):
     name = models.CharField(max_length=255)
     message_content = models.TextField()
@@ -63,7 +64,7 @@ class WeChatAttachment(models.Model):
 
 
 
-class SentMessage(models.Model):
+class SentWCMessage(models.Model):
     message_template = models.ForeignKey(WeChatTemplate,on_delete=models.CASCADE)
     recipient_to = models.ForeignKey(WeChatRecipient,on_delete=models.CASCADE)
     sent_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)

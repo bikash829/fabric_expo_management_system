@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 
+from django.db.models import F
 from django.db import transaction
 from django.contrib import messages
 import csv
@@ -238,7 +239,7 @@ class DataSheetDeleteView(View):
 #     def get_queryset(self):
 #         category_id = self.kwargs.get('pk')  # Assuming pk refers to category
 #         return EmailRecipient.objects.filter(category_id=category_id)
-from django.db.models import F
+
 ### Recipient list view 
 class RecipientListView(ListView):
     model = WhatsappRecipient

@@ -19,10 +19,10 @@
           <div class="card-header">
             <div class="row">
               <div class="col-6">
-                <div class="card-title">Import Recipients From CSV Form(<span class="text-danger">***Number should have prefix</span>)</div>
+                <div class="card-title">Import Recipients From CSV Form</div>
               </div>
               <div class="col-6 text-end">
-                <a href="{% url 'bulk_whatsapp:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
+                <a href="{% url 'bulk_wechat:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
             <!--begin::Footer-->
             <div class="card-footer">
               <button class="btn btn-info" type="submit">Import Recipients</button>
-              {% comment %} <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button> {% endcomment %}
+              <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
             </div>
             <!--end::Footer-->
           </form>

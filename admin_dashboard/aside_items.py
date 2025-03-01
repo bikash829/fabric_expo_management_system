@@ -71,7 +71,7 @@ def get_sidebar_items(request):
                 {
                     'name': 'Import WeChat CSV',
                     'code_name': 'import_wechat',
-                    'url': None,
+                    'url': reverse('bulk_wechat:import_recipients'),
                     'icon': "fa-brands fa-weixin",
                 },
             ]
@@ -99,7 +99,7 @@ def get_sidebar_items(request):
                 {
                     'name': 'WeChat Recipients',
                     'code_name': 'wechat_recipients_list',
-                    'url': None,
+                    'url': reverse('bulk_wechat:recipient_list'),
                     # 'icon': "bi bi-circle-fill",
                     'icon': "bi bi-record-circle-fill",
                 },

@@ -26,7 +26,7 @@
                 {% elif source == 'bulk_whatsapp' %}
                     {% url 'bulk_whatsapp:import_recipients' %}
                 {% elif source == 'bulk_wechat'%}
-                    bulk_wechat
+                    {% url 'bulk_wechat:import_recipients' %}
                 {% endif %}
                 " >Import Recipients</a>
                 <a class="btn btn-secondary" href="
@@ -35,7 +35,7 @@
                 {% elif source == 'bulk_whatsapp' %}
                     {% url 'bulk_whatsapp:export_recipient_list' %}
                 {% elif source == 'bulk_wechat'%}
-                    bulk_wechat
+                    {% url 'bulk_wechat:export_recipient_list' %}
                 {% endif %}
                 ">Export Recipients</a>
 

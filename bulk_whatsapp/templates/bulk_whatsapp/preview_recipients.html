@@ -37,7 +37,7 @@
                 <li class="list-group-item">Description: {{data_sheet.description}}</li>
               </ul>
             </div>
-              <form  method="post" action="{% url 'bulk_email:confirm_recipients' datasheet_id=data_sheet.id %}">
+              <form  method="post">
                 {% csrf_token %}
 
                 <table id="recipients" class="table table-striped" style="width:100%">

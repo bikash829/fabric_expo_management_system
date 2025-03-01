@@ -37,7 +37,7 @@
                 <li class="list-group-item">Description: {{data_sheet.description}}</li>
               </ul>
             </div>
-              <form  method="post" action="{% url 'bulk_email:confirm_recipients' datasheet_id=data_sheet.id %}">
+              <form  method="post">
                 {% csrf_token %}
 
                 <table id="recipients" class="table table-striped" style="width:100%">
@@ -45,7 +45,7 @@
                       <tr>
                           <th>id</th>
                           <th>Recipient Name</th>
-                          <th>Whatsapp Id</th>
+                          <th>WeChat Id</th>
                           {% comment %} <th>Action</th> {% endcomment %}
                       </tr>
                   </thead>
@@ -63,7 +63,7 @@
                       <tr>
                           <th>id</th>
                           <th>Recipient Name</th>
-                          <th>Whatsapp Id</th>
+                          <th>WeChat Id</th>
                       </tr>
                   </tfoot>
                 </table>
@@ -122,7 +122,7 @@
         });
         return
       }
-      const url = "{% url 'bulk_whatsapp:confirm_recipients' datasheet_id=data_sheet.id %}";
+      const url = "{% url 'bulk_wechat:confirm_recipients' datasheet_id=data_sheet.id %}";
       const csrf_token = $("input[name=csrfmiddlewaretoken]").val();
       
       console.log(url)
@@ -135,7 +135,7 @@
         headers: { "X-CSRFToken": csrf_token },  
         success: function(response) {
             if (response.success) {
-                window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+                window.location.href="{% url 'bulk_wechat:import_recipients' %}"
             }
         },
         error: function(xhr, status, error) {
@@ -166,7 +166,7 @@
       e.preventDefault();
         // select element
         const recipientIds = {{ recipient_ids|safe }};
-        const url = "{% url 'bulk_whatsapp:delete_datasheet' datasheet_id=data_sheet.id %}";
+        const url = "{% url 'bulk_wechat:delete_datasheet' datasheet_id=data_sheet.id %}";
  
         // Include CSRF token
         let csrfToken = $("input[name=csrfmiddlewaretoken]").val();
@@ -178,11 +178,11 @@
           headers: { "X-CSRFToken": csrfToken },  // CSRF protection
           success: function(response) {
               if (response.success) {
-                  window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+                  window.location.href="{% url 'bulk_wechat:import_recipients' %}"
               }
           },
           error: function(xhr, status, error) {
-            window.location.href="{% url 'bulk_whatsapp:import_recipients' %}"
+            window.location.href="{% url 'bulk_wechat:import_recipients' %}"
 
           }
       });

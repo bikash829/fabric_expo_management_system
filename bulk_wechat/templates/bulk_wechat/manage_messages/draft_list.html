@@ -100,7 +100,7 @@
         }).toast('show');
 
         // delete group 
-        $('.delete-draft').on('click', function(e) {
+        $( $('#wechat_draft tbody')).on('click','.delete-draft', function(e) {
             e.preventDefault();
             const form = $(this).closest('form'); 
             // popup alert 
@@ -120,11 +120,5 @@
           });
     })
 </script>
-<script>
-    // toast alert
-    $('.toast').toast({
-      delay: 1000*20,
-    }).toast('show')
 
-</script>
 {% endblock push_scripts %}

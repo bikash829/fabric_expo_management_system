@@ -1,0 +1,14 @@
+-- product 
+Customer Name	
+Composition	Construction 	
+Weight (GSM/OZ)	
+Color	
+Cut Width (Inch)	
+Wash	
+Price (yards)	
+Shrinkage%	
+Available/Stock qty	
+Images	
+Barcode	
+QR Code	
+Concern Person

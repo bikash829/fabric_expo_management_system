@@ -1,0 +1,23 @@
+-- supplier 
+Date	
+Mill name	
+Supplier Name	
+Concern Person Name	
+Concern Person Designation	
+Product Category 	
+Product Range	
+Speciality 	
+COO	
+Email ID1	
+Email ID2	
+Email ID3	
+WhatsApp Number	
+WeChat Number	
+Phone Number	
+Payment Term	
+Fabric Reference 
+dealing with	
+Mailing Address	Factory/Visiting address	
+LinkedIn Profile Link	
+Remarks	
+Concern FE Representative

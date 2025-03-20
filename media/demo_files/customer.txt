@@ -1,0 +1,22 @@
+-- Customer 
+Date	
+Company name	
+Organization Type	
+Brand	
+Category (Apparel or Textile) 	
+Department	
+Customer Name	
+Designation	
+COO (Local)	
+Buyer Email ID	
+WhatsApp Number	
+Phone Number	
+Company Website	
+Payment Term	
+Fabric Reference 
+dealing with	
+Mailing Address	
+Visiting address	
+LinkedIn Profile Link	
+Remarks	
+Concern FE Representative

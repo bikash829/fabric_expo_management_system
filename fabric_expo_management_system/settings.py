@@ -37,12 +37,15 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # Application definition
 
 INSTALLED_APPS = [
+    # local apps
+    'master_data.apps.MasterDataConfig',
     'bulk_email.apps.BulkEmailConfig',
     'bulk_wechat.apps.BulkWechatConfig',
     'bulk_whatsapp.apps.BulkWhatsappConfig',
     'bulk_core.apps.BulkCoreConfig',
     'admin_dashboard.apps.AdminDashboardConfig',
     'accounts.apps.AccountsConfig',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

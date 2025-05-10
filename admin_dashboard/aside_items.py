@@ -193,55 +193,60 @@ def get_sidebar_items(request):
             ]
         },
         {
-            'divider_header': 'Example Divider',
-            'code_name': '',
+            'divider_header': 'Manage Business Data',
+            'code_name': 'manager_buyers',
             'url': None,
         },
-        {
-            'name': 'Example 1',
-            'code_name': '',
-            'url': None,
-            'icon': 'fa-solid fa-calendar-check',
-        },
-        {
-            'name': 'Example 2',
-            'code_name': '',
-            'url': None,
-            'icon': 'fa-solid fa-hourglass-end',
-        },
-        {
-            'name': 'Noboard',
-            'code_name': '',
-            'url': "#",
-            'icon': 'bi bi-speedometer',
-        },
-        {
-            'divider_header': 'Community',
-            'code_name': '',
-            'url': None,
-        },
-        {
-            'name': 'Community Forum',
-            'code_name': '',
-            'url': None,
-            'icon': 'fa-solid fa-users'
-        },
-        {
-            'divider_header': 'Notifications and Messages',
-            'code_name': '',
-            'url': None,
-        },
-        {
-            'name': 'Contact Us Query',
-            'code_name': '',
-            'url' : None,
-            'icon': 'fa-solid fa-envelope',
-        },
+        # {
+        #     'divider_header': 'Example Divider',
+        #     'code_name': '',
+        #     'url': None,
+        # },
+        # {
+        #     'name': 'Example 1',
+        #     'code_name': '',
+        #     'url': None,
+        #     'icon': 'fa-solid fa-calendar-check',
+        # },
+        # {
+        #     'name': 'Example 2',
+        #     'code_name': '',
+        #     'url': None,
+        #     'icon': 'fa-solid fa-hourglass-end',
+        # },
+        # {
+        #     'name': 'Noboard',
+        #     'code_name': '',
+        #     'url': "#",
+        #     'icon': 'bi bi-speedometer',
+        # },
+        # {
+        #     'divider_header': 'Community',
+        #     'code_name': '',
+        #     'url': None,
+        # },
+        # {
+        #     'name': 'Community Forum',
+        #     'code_name': '',
+        #     'url': None,
+        #     'icon': 'fa-solid fa-users'
+        # },
+        # {
+        #     'divider_header': 'Notifications and Messages',
+        #     'code_name': '',
+        #     'url': None,
+        # },
+        # {
+        #     'name': 'Contact Us Query',
+        #     'code_name': '',
+        #     'url' : None,
+        #     'icon': 'fa-solid fa-envelope',
+        # },
         
     ]
 
 
-    """begin:: manage group """
+    """begin:: section 1 manage group """
     # create divider and parent group extender if any permission is available
     if request.user.has_perm('auth.add_group') or request.user.has_perm('auth.view_group'):
         sidebar_items.insert(
@@ -290,7 +295,7 @@ def get_sidebar_items(request):
     """begin:: manage group """
 
     
-    """begin: Manage Users"""
+    """begin: section 2 Manage Users"""
     # create divider and parent group extender if any permission is available
     if request.user.has_perm('accounts.add_user') or request.user.has_perm('accounts.view_user'):
         sidebar_items.insert(
@@ -358,6 +363,141 @@ def get_sidebar_items(request):
                     )
             
     """end: Manage Users"""
+
+    """ begin:: section 3 bulk messaging"""
+    """ end::section 3 bulk messaging """
+
+    """ begin : section 4 manage business data """
+    # manage buyers 
+    if (
+    request.user.has_perm('master_data.view_buyer') or
+    request.user.has_perm('master_data.add_buyer') or
+    request.user.has_perm('master_data.change_buyer') or
+    request.user.has_perm('master_data.delete_buyer')
+    ):
+        buyer_menu = {
+            'name': 'Manage Buyers',
+            'code_name': 'manage_buyers',
+            'url': None,
+            'icon': 'fa-solid fa-briefcase',
+            'children':[]
+            
+        }
+        sidebar_items.append(buyer_menu)
+        if request.user.has_perm('master_data.view_buyer'):
+            buyer_menu['children'].append(
+                {
+                    'name': 'View Buyers',
+                    'url': None,
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        if request.user.has_perm('master_data.add_buyer'):
+            buyer_menu['children'].append(
+                {
+                    'name': 'Add Buyers',
+                    'url': None,
+                    'icon': 'fa-solid fa-user-plus',
+                },
+            )
+        
+
+    # manage customers 
+    if (
+    request.user.has_perm('master_data.view_customer') or
+    request.user.has_perm('master_data.add_customer') or
+    request.user.has_perm('master_data.change_customer') or
+    request.user.has_perm('master_data.delete_customer')
+    ):
+        customer_menu = {
+            'name': 'Manage Customers',
+            'code_name': 'manage_customers',
+            'url': None,
+            'icon': 'fa-solid fa-users',
+            'children':[]
+        }
+        sidebar_items.append(customer_menu)
+        if request.user.has_perm('master_data.view_customer'):
+            customer_menu['children'].append(
+                {
+                    'name': 'View Customers',
+                    'url': None,
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        if request.user.has_perm('master_data.add_customer'):
+            customer_menu['children'].append(
+                {
+                    'name': 'Add Customers',
+                    'url': None,
+                    'icon': 'fa-solid fa-user-plus',
+                },
+            )
+
+    # manage suppliers 
+    if (
+    request.user.has_perm('master_data.view_supplier') or
+    request.user.has_perm('master_data.add_supplier') or
+    request.user.has_perm('master_data.change_supplier') or
+    request.user.has_perm('master_data.delete_supplier')
+    ):
+        supplier_menu = {
+            'name': 'Manage Suppliers',
+            'code_name': 'manage_suppliers',
+            'url': None,
+            'icon': 'fa-solid fa-truck',
+            'children':[]
+        }
+        sidebar_items.append(supplier_menu)
+        if request.user.has_perm('master_data.view_supplier'):
+            supplier_menu['children'].append(
+                {
+                    'name': 'View Suppliers',
+                    'url': None,
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        if request.user.has_perm('master_data.add_supplier'):
+            supplier_menu['children'].append(
+                {
+                    'name': 'Add Supplier',
+                    'url': None,
+                    'icon': 'fa-solid fa-plus',
+                },
+            )
+    # manage products 
+    if (
+    request.user.has_perm('master_data.view_product') or
+    request.user.has_perm('master_data.add_product') or
+    request.user.has_perm('master_data.change_product') or
+    request.user.has_perm('master_data.delete_product')
+    ):
+        product_menu = {
+            'name': 'Manage Products',
+            'code_name': 'manage_products',
+            'url': None,
+            'icon': 'fa-solid fa-box',
+            'children':[]
+        }
+        sidebar_items.append(product_menu)
+        if request.user.has_perm('master_data.view_product'):
+            product_menu['children'].append(
+                {
+                    'name': 'View Products',
+                    'url': None,
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        if request.user.has_perm('master_data.add_product'):
+            product_menu['children'].append(
+                {
+                    'name': 'Add Product',
+                    'url': None,
+                    'icon': 'fa-solid fa-plus',
+                },
+            )
+
+    """ end: section 4 manage business data """
 
     # if request.user.groups.filter(name='doctor').exists():
     #     sidebar_items, _ = mark_active_sidebar_items(doctor_sidebar_items, request.path)

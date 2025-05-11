@@ -38,7 +38,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 INSTALLED_APPS = [
     # local apps
-    'master_data.apps.MasterDataConfig',
+    'business_data.apps.BusinessDataConfig',
     'bulk_email.apps.BulkEmailConfig',
     'bulk_wechat.apps.BulkWechatConfig',
     'bulk_whatsapp.apps.BulkWhatsappConfig',
@@ -131,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dhaka'
 
 USE_I18N = True
 

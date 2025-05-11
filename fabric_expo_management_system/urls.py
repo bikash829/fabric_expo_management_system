@@ -31,7 +31,8 @@ urlpatterns = [
     path('bulk_whatsapp/',include('bulk_whatsapp.urls')),
     path('bulk_core/',include('bulk_core.urls')),
     # """end::bulk messaging"""
-    path('business_data/',include('master_data.urls')),
+    path('business_data/',include('business_data.urls')),
+    # path('business_data/',include('master_data.urls')),
     # path("upload/", custom_upload_function, name="custom_upload_file"),
     path('', RedirectView.as_view(url='/dashboard/', permanent=True)),  # make the dashboard root url
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

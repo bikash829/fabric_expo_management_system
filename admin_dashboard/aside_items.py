@@ -384,6 +384,15 @@ def get_sidebar_items(request):
             
         }
         sidebar_items.append(buyer_menu)
+
+        if request.user.has_perm('master_data.add_buyer'):
+            buyer_menu['children'].append(
+                {
+                    'name': 'Add Buyers',
+                    'url': reverse('business_data:buyer-upload'),
+                    'icon': 'fa-solid fa-user-plus',
+                },
+            )
         if request.user.has_perm('master_data.view_buyer'):
             buyer_menu['children'].append(
                 {
@@ -392,15 +401,6 @@ def get_sidebar_items(request):
                     'icon': 'fa-solid fa-eye',
                 },
             )
-        if request.user.has_perm('master_data.add_buyer'):
-            buyer_menu['children'].append(
-                {
-                    'name': 'Add Buyers',
-                    'url': None,
-                    'icon': 'fa-solid fa-user-plus',
-                },
-            )
-        
 
     # manage customers 
     if (

@@ -2,6 +2,7 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 # Contact info 
 class ContactInfo(models.Model):
+    date = models.DateField(null=True,blank=True)
     company_name = models.CharField(max_length=255)
     organization_type = models.CharField(max_length=100, blank=True, null=True)
     brand = models.CharField(max_length=255, blank=True, null=True)
@@ -17,6 +18,7 @@ class ContactInfo(models.Model):
     remarks = models.TextField(blank=True, null=True)
     concern_fe_rep = models.CharField(max_length=255, blank=True)
     created_at = models.DateField(auto_now_add=True)
+    tag = models.CharField(max_length=50,null=True,blank=True)
 
 
     def __str__(self):

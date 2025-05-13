@@ -62,6 +62,7 @@ class BuyerPreviewView(View):
             'buyers': preview_data,
             'file_info': file_info,
         }
+        
         return render(request, 'business_data/manage_buyers/preview.html', context)
 
     def post(self, request):
@@ -83,6 +84,7 @@ class BuyerPreviewView(View):
             def generate_unique_color():
                     return "#{:06x}".format(randint(0, 0xFFFFFF))
             tag = generate_unique_color()
+            
             for _, row in df.iterrows():
                 
 
@@ -91,6 +93,7 @@ class BuyerPreviewView(View):
                     company_name=row['company_name'],
                     organization_type=row['organization_type'],
                     brand=row['brand'],
+                    category=row['category'],
                     department=row['department'],
                     buyer_name=row['buyer_name'],
                     designation=row['designation'],

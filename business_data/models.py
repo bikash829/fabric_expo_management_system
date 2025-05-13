@@ -49,6 +49,7 @@ class PersonPhone(models.Model):
 class Buyer(ContactInfo):
     buyer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
+    category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")
     is_international = models.BooleanField(default=True)  # <-- flag
     payment_term = models.CharField(max_length=100, blank=True)
     fabric_reference = models.CharField(max_length=255, blank=True)

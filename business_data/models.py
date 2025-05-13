@@ -35,7 +35,8 @@ class PersonEmail(models.Model):
 
 # multiple phone number 
 class PersonPhone(models.Model):
-    phone = PhoneNumberField()
+    # phone = PhoneNumberField()
+    phone = models.CharField(max_length=20)
     is_whatsapp = models.BooleanField(default=False)  # Flag for WhatsApp connection
     is_wechat = models.BooleanField(default=False)    # Flag for WeChat connection
 

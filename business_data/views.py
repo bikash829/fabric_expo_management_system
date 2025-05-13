@@ -1,16 +1,19 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView
-from business_data.models import Buyer, Supplier, Customer, Product
+from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
 import os
 import pandas as pd
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.views import View
 from django.contrib import messages
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import phonenumber_field
 
 from .forms import BuyerUploadForm
 from random import randint
+
 
 class BuyerUploadView(View):
     def get(self, request):
@@ -62,7 +65,7 @@ class BuyerPreviewView(View):
             'buyers': preview_data,
             'file_info': file_info,
         }
-        
+        print(preview_data)
         return render(request, 'business_data/manage_buyers/preview.html', context)
 
     def post(self, request):
@@ -88,7 +91,7 @@ class BuyerPreviewView(View):
             for _, row in df.iterrows():
                 
 
-                Buyer.objects.create(
+                buyer = Buyer.objects.create(
                     date=row['date'],
                     company_name=row['company_name'],
                     organization_type=row['organization_type'],
@@ -111,6 +114,29 @@ class BuyerPreviewView(View):
                     concern_fe_rep=row['concern_fe_representative'],
                     tag=tag
                 )
+
+                if buyer:
+                    if row['buyer_email_id']:
+                        try:
+                            validate_email(row['buyer_email_id'])
+                            if not PersonEmail.objects.filter(email=row['buyer_email_id']).exists():
+                                PersonEmail.objects.create(email=row['buyer_email_id'], contact_info=buyer)
+                        except ValidationError:
+                            pass  # Invalid email, skip or handle as needed
+                    if row['whatsapp_number']:
+                        PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = buyer)
+                        try:
+                            PersonPhone.objects.create(phone=row['whatsapp_number'], contact_info=buyer)
+                        except ValidationError:
+                            messages.error(request,ValidationError)
+
+                    
+                    if row['phone_number']:
+                        try:
+                            PersonPhone.objects.create(phone=row['phone_number'], contact_info=buyer)
+                        except ValidationError:
+                            messages.error(request,ValidationError)
+
                 messages.success(request, "Buyers have been successfully saved.")
 
         if default_storage.exists(file_path):

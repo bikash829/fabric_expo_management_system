@@ -1,3 +1,5 @@
+import csv
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView
 from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
@@ -89,31 +91,35 @@ class BuyerPreviewView(View):
             tag = generate_unique_color()
             
             for _, row in df.iterrows():
-                
 
-                buyer = Buyer.objects.create(
-                    date=row['date'],
-                    company_name=row['company_name'],
-                    organization_type=row['organization_type'],
-                    brand=row['brand'],
-                    category=row['category'],
-                    department=row['department'],
-                    buyer_name=row['buyer_name'],
-                    designation=row['designation'],
-                    country_of_origin=row['coo'],
-                    # email=row['buyer_email_id'],  # foreign
-                    # whatsapp_number=row['whatsapp_number'],  # foreign key
-                    # phone=row['phone'],  # foreign
-                    website=row['company_website'],
-                    payment_term=row['payment_term'],
-                    fabric_reference=row['fabric_reference_dealing_with'],
-                    mailing_address=row['mailing_address'],
-                    visiting_address=row['visiting_address'],
-                    linkedin_profile=row['linkedin_profile_link'],
-                    remarks=row['remarks'],
-                    concern_fe_rep=row['concern_fe_representative'],
-                    tag=tag
-                )
+                try:
+                    buyer = Buyer.objects.create(
+                        date=row['date'],
+                        company_name=row['company_name'],
+                        organization_type=row['organization_type'],
+                        brand=row['brand'],
+                        category=row['category'],
+                        department=row['department'],
+                        buyer_name=row['buyer_name'],
+                        designation=row['designation'],
+                        country_of_origin=row['coo'],
+                        website=row['company_website'],
+                        payment_term=row['payment_term'],
+                        fabric_reference=row['fabric_reference_dealing_with'],
+                        mailing_address=row['mailing_address'],
+                        visiting_address=row['visiting_address'],
+                        linkedin_profile=row['linkedin_profile_link'],
+                        remarks=row['remarks'],
+                        concern_fe_rep=row['concern_fe_representative'],
+                        tag=tag
+                    )
+                except Exception as e:
+                    messages.error(request, "Invalid data upload. Please check your file and try again.")
+                    if default_storage.exists(file_path):
+                        default_storage.delete(file_path)
+                    request.session.pop('preview_data', None)
+                    request.session.pop('temp_file_path', None)
+                    return redirect('business_data:buyer-upload')
 
                 if buyer:
                     if row['buyer_email_id']:
@@ -151,7 +157,33 @@ class BuyerPreviewView(View):
 
 
 
-class CreateBuyerView(CreateView):
-    model = Buyer
-    form_class = None
-    template_name = "business_data/manage_buyers/add_buyers.html"
+### Generate demo csv for whatsapp
+class GenerateCSVBuyer(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_buyer_details.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "date", "company_name", "organization_type", "brand", "category", "department",
+            "buyer_name", "designation", "coo", "buyer_email_id", "whatsapp_number", "phone_number",
+            "company_website", "payment_term", "fabric_reference_dealing_with", "mailing_address",
+            "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
+        ])
+        writer.writerow([
+            "2025-05-13", "Acme Textiles", "Manufacturer", "Acme", "Textile", "Sales",
+            "John Doe", "Manager", "Bangladesh", "john.doe@acme.com", "+8801777777254", "+8801555555555",
+            "https://acme.com", "Net 30", "Cotton, Denim", "123 Main St, Dhaka", "456 Market Rd, Dhaka",
+            "https://linkedin.com/in/johndoe", "Top buyer", "Alice Smith"
+        ])
+        writer.writerow([
+            "2025-05-13", "Beta Apparel", "Exporter", "Beta", "Apparel", "Export",
+            "Jane Smith", "Director", "India", "jane.smith@beta.com", "+919999999999", "+918888888888",
+            "https://beta.com", "Advance", "Knit, Woven", "789 Fashion Ave, Mumbai", "1011 Textile St, Mumbai",
+            "https://linkedin.com/in/janesmith", "Prefers organic", "Bob Lee"
+        ])
+
+        return response
+        

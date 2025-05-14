@@ -1,20 +1,23 @@
 import csv
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.views.generic import CreateView
-from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
 import os
+from random import randint
+
 import pandas as pd
 from django.conf import settings
-from django.core.files.storage import default_storage
-from django.views import View
 from django.contrib import messages
-from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
+from django.core.validators import validate_email
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.views import View
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
+
+from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
 import phonenumber_field
 
 from .forms import BuyerUploadForm
-from random import randint
 
 
 class BuyerUploadView(View):
@@ -154,10 +157,7 @@ class BuyerPreviewView(View):
         return redirect('business_data:buyer-upload')
         # return redirect('business_data:upload-success')
 
-
-
-
-### Generate demo csv for whatsapp
+### Generate demo csv for buyers
 class GenerateCSVBuyer(View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
@@ -187,3 +187,6 @@ class GenerateCSVBuyer(View):
 
         return response
         
+class BuyerListView(ListView):
+    model = Buyer
+    template_name = "business_data/manage_buyers/buyer_list.html"

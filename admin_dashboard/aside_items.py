@@ -397,7 +397,7 @@ def get_sidebar_items(request):
             buyer_menu['children'].append(
                 {
                     'name': 'View Buyers',
-                    'url': None,
+                    'url': reverse('business_data:buyer_list'),
                     'icon': 'fa-solid fa-eye',
                 },
             )
@@ -417,14 +417,6 @@ def get_sidebar_items(request):
             'children':[]
         }
         sidebar_items.append(customer_menu)
-        if request.user.has_perm('master_data.view_customer'):
-            customer_menu['children'].append(
-                {
-                    'name': 'View Customers',
-                    'url': None,
-                    'icon': 'fa-solid fa-eye',
-                },
-            )
         if request.user.has_perm('master_data.add_customer'):
             customer_menu['children'].append(
                 {
@@ -433,6 +425,16 @@ def get_sidebar_items(request):
                     'icon': 'fa-solid fa-user-plus',
                 },
             )
+        
+        if request.user.has_perm('master_data.view_customer'):
+            customer_menu['children'].append(
+                {
+                    'name': 'View Customers',
+                    'url': None,
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        
 
     # manage suppliers 
     if (

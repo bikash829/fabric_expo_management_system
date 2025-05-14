@@ -6,13 +6,34 @@ app_name = "business_data"
 
 
 urlpatterns = [
+    # Begin::buyer details """
     path('buyer-details-demo-csv/',views.GenerateCSVBuyer.as_view(),name="buyer_demo_csv"),
     path('upload/', views.BuyerUploadView.as_view(), name='buyer-upload'),
     path('preview/', views.BuyerPreviewView.as_view(), name='buyer-preview'),
-    path('success/', lambda request: render(request, 'business_data/manage_buyers/success.html'), name='upload-success'),
-
-    # manage data 
     path('buyer_list/',views.BuyerListView.as_view(),name='buyer_list'),
+    # path('success/', lambda request: render(request, 'business_data/manage_buyers/success.html'), name='upload-success'),
+    # End::buyer details """
+    
+    # Begin::Customer details"""
+    # path('customer-details-demo-csv/',views.GenerateCSVCustomer.as_view(),name="customer_demo_csv"),
+    # path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
+    # path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
+    # path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
+    # End::Customer details"""
+
+    # Begin::Supplier details"""
+    # path('supplier-details-demo-csv/',views.GenerateCSVSupplier.as_view(),name="supplier_demo_csv"),
+    # path('supplier-upload/', views.SupplierUploadView.as_view(), name='supplier-upload'),
+    # path('supplier-preview/', views.SupplierPreviewView.as_view(), name='supplier-preview'),
+    # path('supplier-list/',views.SupplierListView.as_view(),name='supplier-list'),
+    # End::Supplier details"""
+
+    # Begin::Product details"""
+    # path('product-details-demo-csv/',views.GenerateCSVProduct.as_view(),name="product_demo_csv"),
+    # path('product-upload/', views.ProductUploadView.as_view(), name='product-upload'),
+    # path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
+    # path('product-list/',views.ProductListView.as_view(),name='product-list'),
+    # End::Product details"""
 
 ]
 

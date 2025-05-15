@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_filtertags %}
 
-{% block title %}Customer List{% endblock title %}
+{% block title %}Supplier List{% endblock title %}
 
 {% block push_css %}
     <!-- Datatable -->
@@ -13,7 +13,7 @@
 {% block content %}
 
 <!--begin::header-->
-{% include 'core/layouts/content_header.html' with page_name="Customer List"  only%}
+{% include 'core/layouts/content_header.html' with page_name="Supplier List"  only%}
 <!--end::header-->
 <!--begin::App Content-->
 <div class="app-content">
@@ -34,22 +34,22 @@
                   <th>Count</th>
                   <th>#ID</th>
                   <th>{{'date'|pretty_label}}</th>
-                  <th>{{'company_name'|pretty_label}}</th>
-                  <th>{{'organization_type'|pretty_label}}</th>
-                  <th>{{'brand'|pretty_label}}</th>
-                  <th>{{'category'|pretty_label}}</th>
-                  <th>{{'department'|pretty_label}}</th>
-                  <th>{{'customer_name'|pretty_label}}</th>
-                  <th>{{'designation'|pretty_label}}</th>
+                  <th>{{'mill_name'|pretty_label}}</th>
+                  <th>{{'supplier_name'|pretty_label}}</th>
+                  <th>{{'concern_person_name'|pretty_label}}</th>
+                  <th>{{'concern_person_designation'|pretty_label}}</th>
+                  <th>{{'product_category'|pretty_label}}</th>
+                  <th>{{'product_range'|pretty_label}}</th>
+                  <th>{{'speciality'|pretty_label}}</th>
                   <th>{{'coo'|pretty_label}}</th>
-                  <th>{{'company_website'|pretty_label}}</th>
-                  <th>{{'customer_email_id'|pretty_label}}</th>
-                  <th>{{'whatsapp_number'|pretty_label}}</th>
+                  <th>{{'email'|pretty_label}}</th>
                   <th>{{'phone_number'|pretty_label}}</th>
+                  <th>{{'whatsapp_number'|pretty_label}}</th>
+                  <th>{{'wechat_number'|pretty_label}}</th>
                   <th>{{'payment_term'|pretty_label}}</th>
                   <th>{{'fabric_reference_dealing_with'|pretty_label}}</th>
                   <th>{{'mailing_address'|pretty_label}}</th>
-                  <th>{{'visiting_address'|pretty_label}}</th>
+                  <th>{{'factory/visiting_address'|pretty_label}}</th>
                   <th>{{'linkedin_profile_link'|pretty_label}}</th>
                   <th>{{'remarks'|pretty_label}}</th>
                   <th>{{'concern_fe_representative'|pretty_label}}</th>
@@ -62,16 +62,22 @@
                   <td>{{forloop.counter}}</td>
                   <td>{{item.id}}</td>
                   <td>{{item.date}}</td>
-                  <td>{{item.company_name}}</td>
-                  <td>{{item.organization_type}}</td>
-                  <td>{{item.brand}}</td>
-                  <td>{{item.category}}</td>
-                  <td>{{item.department}}</td>
-                  <td>{{item.customer_name}}</td>
-                  <td>{{item.designation}}</td>
+                  <td>{{item.mill_name}}</td>
+                  <td>{{item.supplier_name}}</td>
+                  <td>{{item.concern_person}}</td>
+                  <td>{{item.concern_person_designation}}</td>
+                  <td>{{item.product_category}}</td>
+                  <td>{{item.product_range}}</td>
+                  <td>{{item.speciality}}</td>
                   <td>{{item.country_of_origin}}</td>
-                  <td>{{item.website}}</td>
                   <td>{{ item.emails.all|join:", " }}</td>
+                  <td>
+                    {% for object in item.phones.all %}
+                      {% if not object.is_whatsapp and not object.is_wechat %}
+                        {{object|join:','}}
+                      {% endif %} 
+                    {% endfor %}
+                  </td>
                   <td>
                     {% for object in item.phones.all %}
                       {% if  object.is_whatsapp  %}
@@ -79,13 +85,7 @@
                       {% endif %}
                     {% endfor %}
                   </td>
-                  <td>
-                    {% for object in item.phones.all %}
-                      {% if not object.is_whatsapp and not object.is_wechat %}
-                        {{object}}
-                      {% endif %} 
-                    {% endfor %}
-                  </td>
+                  <td>{{item.wechat_id}}</td>
                   <td>{{item.payment_term}}</td>
                   <td>{{item.fabric_reference}}</td>
                   <td>{{item.mailing_address}}</td>
@@ -101,22 +101,25 @@
                 <th>Count</th>
                 <th>#ID</th>
                 <th>{{'date'|pretty_label}}</th>
-                <th>{{'company_name'|pretty_label}}</th>
-                <th>{{'organization_type'|pretty_label}}</th>
-                <th>{{'brand'|pretty_label}}</th>
-                <th>{{'category'|pretty_label}}</th>
-                <th>{{'department'|pretty_label}}</th>
-                <th>{{'customer_name'|pretty_label}}</th>
-                <th>{{'designation'|pretty_label}}</th>
+                <th>{{'mill_name'|pretty_label}}</th>
+                <th>{{'supplier_name'|pretty_label}}</th>
+                <th>{{'concern_person_name'|pretty_label}}</th>
+                <th>{{'concern_person_designation'|pretty_label}}</th>
+                <th>{{'product_category'|pretty_label}}</th>
+                <th>{{'product_range'|pretty_label}}</th>
+                <th>{{'speciality'|pretty_label}}</th>
                 <th>{{'coo'|pretty_label}}</th>
-                <th>{{'company_website'|pretty_label}}</th>
-                <th>{{'customer_email_id'|pretty_label}}</th>
+                <th>{{'email_id1'|pretty_label}}</th>
+                <th>{{'email_id2'|pretty_label}}</th>
+                <th>{{'email_id3'|pretty_label}}</th>
+                <th>{{'phone_number1'|pretty_label}}</th>
+                <th>{{'phone_number2'|pretty_label}}</th>
                 <th>{{'whatsapp_number'|pretty_label}}</th>
-                <th>{{'phone_number'|pretty_label}}</th>
+                <th>{{'wechat_number'|pretty_label}}</th>
                 <th>{{'payment_term'|pretty_label}}</th>
                 <th>{{'fabric_reference_dealing_with'|pretty_label}}</th>
                 <th>{{'mailing_address'|pretty_label}}</th>
-                <th>{{'visiting_address'|pretty_label}}</th>
+                <th>{{'factory/visiting_address'|pretty_label}}</th>
                 <th>{{'linkedin_profile_link'|pretty_label}}</th>
                 <th>{{'remarks'|pretty_label}}</th>
                 <th>{{'concern_fe_representative'|pretty_label}}</th>

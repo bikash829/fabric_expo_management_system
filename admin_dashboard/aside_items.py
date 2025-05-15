@@ -451,22 +451,23 @@ def get_sidebar_items(request):
             'children':[]
         }
         sidebar_items.append(supplier_menu)
-        if request.user.has_perm('master_data.view_supplier'):
-            supplier_menu['children'].append(
-                {
-                    'name': 'View Suppliers',
-                    'url': None,
-                    'icon': 'fa-solid fa-eye',
-                },
-            )
         if request.user.has_perm('master_data.add_supplier'):
             supplier_menu['children'].append(
                 {
                     'name': 'Add Supplier',
-                    'url': None,
+                    'url': reverse('business_data:supplier-upload'),
                     'icon': 'fa-solid fa-plus',
                 },
             )
+        if request.user.has_perm('master_data.view_supplier'):
+            supplier_menu['children'].append(
+                {
+                    'name': 'View Suppliers',
+                    'url': reverse('business_data:supplier-list'),
+                    'icon': 'fa-solid fa-eye',
+                },
+            )
+        
     # manage products 
     if (
     request.user.has_perm('master_data.view_product') or

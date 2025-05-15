@@ -411,6 +411,209 @@ class GenerateCSVCustomer(View):
 """End::Customer Details"""
 
 """Begin::Supplier Details"""
+
+### Generate demo csv for suppliers
+class GenerateCSVSupplier(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_supplier_details.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "date", "mill_name", "supplier_name", "concern_person_name", "concern_person_designation", "product_category",
+            "product_range", "speciality", "coo", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2","whatsapp_number",
+            "wechat_number", "payment_term", "fabric_reference_dealing_with", "mailing_address",
+            "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
+        ])
+        writer.writerow([
+            "2025-05-15", "Sunshine Textiles", "Global Fibers Ltd.", "John Doe", "Procurement Manager", "Cotton",
+            "Lightweight", "Organic", "India", "john.doe@globalfibers.com", "doe.j@fibersmail.com", "jd.supply@sunshine.com",
+            "+91-9876543210", "+91-9123456789", "+91-9876543210",
+            "john_doe123", "Net 30", "Ref001", "123 Mill Road, Mumbai, India",
+            "456 Corporate Avenue, Mumbai, India", "https://linkedin.com/in/johndoe", "Reliable supplier with on-time delivery", "Fahim Rahman"
+        ])
+
+        writer.writerow([
+            "2025-05-15", "Evergreen Mills", "Textura Inc.", "Jane Smith", "Supply Chain Director", "Polyester",
+            "Heavyweight", "Water-resistant", "China", "jane.smith@textura.cn", "smith.jane@evergreen.com", "jsupplies@textura.cn",
+            "+86-1357924680", "+86-1398765432", "+86-1357924680",
+            "jane_smith88", "Net 45", "Ref009", "88 Textile Park, Hangzhou, China",
+            "12 Industry Street, Hangzhou, China", "https://linkedin.com/in/janesmith", "Interested in sustainable options", "Hasan Chowdhury"
+        ])
+
+        return response
+
+
+
+# upload suppliers
+class SupplierUploadView(View):
+    def get(self, request):
+        form = FileUploadForm()
+        context = {
+            'form': form,
+            "title": "Import Suppliers",
+            "header_title": "Import Suppliers From CSV",
+            "card_title": "Import Suppliers",
+            "form_button_title": "Import Suppliers",
+            'csv_generator_url': reverse_lazy('business_data:supplier-demo-csv'), 
+        }
+        return render(request, 'business_data/forms/upload.html', context)
+
+    def post(self, request):
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = extract_data(request,form)
+            
+            request.session['preview_supplier_data'] = data
+            return redirect('business_data:supplier-preview')
+        context = {
+            'form': form,
+            "title": "Import Suppliers",
+            "header_title": "Import Suppliers From CSV",
+            "card_title": "Import Suppliers",
+            "form_button_title": "Import Suppliers",
+            'csv_generator_url': reverse_lazy('business_data:supplier-demo-csv'), 
+        }
+        return render(request, 'business_data/forms/upload.html', context) 
+
+
+# preview supplier 
+class SupplierPreviewView(View):
+    def get(self, request):
+        preview_data = request.session.get('preview_supplier_data', [])
+        temp_file_path = request.session.get('temp_file_path', None)
+        file_info = {}
+        if temp_file_path:
+            file_name = os.path.basename(temp_file_path)
+            file_info = {
+                'name': file_name,
+                'url': default_storage.url(temp_file_path),
+                'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
+            }
+
+        context = {
+            'suppliers': preview_data,
+            'file_info': file_info,
+        }
+
+        return render(request, 'business_data/manage_suppliers/preview.html', context)
+
+    def post(self, request):
+        action = request.POST.get('action')
+        file_path = request.session.get('temp_file_path')
+
+        if not file_path:
+            return redirect('business_data:supplier-upload')
+
+        abs_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+        if action == 'confirm':
+            if file_path.endswith('.csv'):
+                df = pd.read_csv(abs_path)
+            else:
+                df = pd.read_excel(abs_path)
+
+            df.columns = df.columns.str.strip().str.lower()
+            def generate_unique_color():
+                    return "#{:06x}".format(randint(0, 0xFFFFFF))
+            tag = generate_unique_color()
+            
+            for _, row in df.iterrows():
+
+                try:
+                    supplier = Supplier.objects.create(
+                        date=row['date'],
+                        mill_name=row['mill_name'],
+                        supplier_name=row['supplier_name'],
+                        concern_person=row['concern_person_name'],
+                        concern_person_designation=row['concern_person_designation'],
+                        product_category=row['product_category'],
+                        product_range=row['product_range'],
+                        speciality=row['speciality'],
+                        country_of_origin=row['coo'],
+                        # email 
+                        # phone 
+                        # whatsapp 
+                        wechat_id = row['wechat_number'],
+                        payment_term=row['payment_term'],
+                        fabric_reference=row['fabric_reference_dealing_with'],
+                        mailing_address=row['mailing_address'],
+                        visiting_address=row['visiting_address'],
+                        linkedin_profile=row['linkedin_profile_link'],
+                        remarks=row['remarks'],
+                        concern_fe_rep=row['concern_fe_representative'],
+                        tag=tag
+                    )
+                except Exception as e:
+                    messages.error(request, "Invalid data upload. Please check your file and try again.")
+                    if default_storage.exists(file_path):
+                        default_storage.delete(file_path)
+                    request.session.pop('preview_data', None)
+                    request.session.pop('temp_file_path', None)
+                    return redirect('business_data:supplier-upload')
+
+                if supplier:
+                    # email ids
+                    if row['email_id1']:
+                        try:
+                            validate_email(row['email_id1'])
+                            if not PersonEmail.objects.filter(email=row['email_id1']).exists():
+                                PersonEmail.objects.create(email=row['email_id1'], contact_info=supplier)
+                        except ValidationError:
+                            pass  # Invalid email, skip or handle as needed
+                    if row['email_id2']:
+                        try:
+                            validate_email(row['email_id2'])
+                            if not PersonEmail.objects.filter(email=row['email_id2']).exists():
+                                PersonEmail.objects.create(email=row['email_id2'], contact_info=supplier)
+                        except ValidationError:
+                            pass  # Invalid email, skip or handle as needed
+                    if row['email_id3']:
+                        try:
+                            validate_email(row['email_id3'])
+                            if not PersonEmail.objects.filter(email=row['email_id3']).exists():
+                                PersonEmail.objects.create(email=row['email_id3'], contact_info=supplier)
+                        except ValidationError:
+                            pass  # Invalid email, skip or handle as needed
+                    
+                    # whatsapp number 
+                    if row['whatsapp_number']:
+                        try:
+                            PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = supplier)
+                        except ValidationError:
+                            messages.error(request,ValidationError)
+
+                    # phone numbers 
+                    if row['phone_number1']:
+                        try:
+                            PersonPhone.objects.create(phone=row['phone_number1'], contact_info=supplier)
+                        except ValidationError:
+                            messages.error(request,ValidationError)
+                    if row['phone_number2']:
+                        try:
+                            PersonPhone.objects.create(phone=row['phone_number2'], contact_info=supplier)
+                        except ValidationError:
+                            messages.error(request,ValidationError)
+
+                messages.success(request, "Suppliers have been successfully saved.")
+
+        if default_storage.exists(file_path):
+            default_storage.delete(file_path)
+
+        request.session.pop('preview_data', None)
+        request.session.pop('temp_file_path', None)
+
+        return redirect('business_data:supplier-upload') 
+
+
+# supplier list 
+class SupplierListView(ListView):
+    model = Supplier
+    template_name = "business_data/manage_suppliers/supplier_list.html"
+
+
 """End::Supplier Details"""
 
 """Begin::Product Details"""

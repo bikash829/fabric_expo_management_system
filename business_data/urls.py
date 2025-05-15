@@ -22,10 +22,10 @@ urlpatterns = [
     # End::Customer details"""
 
     # Begin::Supplier details"""
-    # path('supplier-details-demo-csv/',views.GenerateCSVSupplier.as_view(),name="supplier_demo_csv"),
-    # path('supplier-upload/', views.SupplierUploadView.as_view(), name='supplier-upload'),
-    # path('supplier-preview/', views.SupplierPreviewView.as_view(), name='supplier-preview'),
-    # path('supplier-list/',views.SupplierListView.as_view(),name='supplier-list'),
+    path('supplier-details-demo-csv/',views.GenerateCSVSupplier.as_view(),name="supplier-demo-csv"),
+    path('supplier-upload/', views.SupplierUploadView.as_view(), name='supplier-upload'),
+    path('supplier-preview/', views.SupplierPreviewView.as_view(), name='supplier-preview'),
+    path('supplier-list/',views.SupplierListView.as_view(),name='supplier-list'),
     # End::Supplier details"""
 
     # Begin::Product details"""

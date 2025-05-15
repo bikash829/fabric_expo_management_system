@@ -29,10 +29,10 @@ urlpatterns = [
     # End::Supplier details"""
 
     # Begin::Product details"""
-    # path('product-details-demo-csv/',views.GenerateCSVProduct.as_view(),name="product_demo_csv"),
-    # path('product-upload/', views.ProductUploadView.as_view(), name='product-upload'),
-    # path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
-    # path('product-list/',views.ProductListView.as_view(),name='product-list'),
+    path('product-details-demo-csv/',views.GenerateCSVProduct.as_view(),name="product-demo-csv"),
+    path('product-upload/', views.ProductUploadView.as_view(), name='product-upload'),
+    path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
+    path('product-list/',views.ProductListView.as_view(),name='product-list'),
     # End::Product details"""
 
 ]

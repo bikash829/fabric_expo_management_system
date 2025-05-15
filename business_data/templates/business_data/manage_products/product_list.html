@@ -1,0 +1,192 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% load custom_filtertags %}
+
+{% block title %}Product List{% endblock title %}
+
+{% block push_css %}
+    <!-- Datatable -->
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
+{% endblock push_css %}
+      
+{% block content %}
+
+<!--begin::header-->
+{% include 'core/layouts/content_header.html' with page_name="Product List"  only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div>
+        <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
+          <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
+          <label class="btn btn-outline-primary" for="select-all">Select All</label>
+        </div>
+        <button id="row_count" class="btn btn-info" disabled>Row count</button>
+      </div>
+
+      <div>
+        <table id="data_list" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Count</th>
+                  <th>#ID</th>
+                  <th>{{'date'|pretty_label}}</th>
+                  <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
+                  <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
+                  <th>{{'fabric_mill (supplier)'|pretty_label}}</th>
+                  <th>{{'rd_generated_date'|pretty_label}}</th>
+                  <th>{{'fabric_mill (source)'|pretty_label}}</th>
+                  <th>{{'coo'|pretty_label}}</th>
+                  <th>{{'product_category'|pretty_label}}</th>
+                  <th>{{'mill_reference/article'|pretty_label}}</th>
+                  <th>{{'fabric_expo_reference/article'|pretty_label}}</th>
+                  <th>{{'season'|pretty_label}}</th>
+                  <th>{{'style'|pretty_label}}</th>
+                  <th>{{'po'|pretty_label}}</th>
+                  <th>{{'customer_name'|pretty_label}}</th>
+                  <th>{{'composition'|pretty_label}}</th>
+                  <th>{{'construction'|pretty_label}}</th>
+                  <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
+                  <th>{{'color'|pretty_label}}</th>
+                  <th>{{'cut_width (inch)'|pretty_label}}</th>
+                  <th>{{'wash'|pretty_label}}</th>
+                  <th>{{'price (yards)'|pretty_label}}</th>
+                  <th>{{'shrinkage%'|pretty_label}}</th>
+                  <th>{{'available/ stock_qty'|pretty_label}}</th>
+                  <th>{{'images'|pretty_label}}</th>
+                  <th>{{'barcode'|pretty_label}}</th>
+                  <th>{{'qr_code'|pretty_label}}</th>
+                  <th>{{'concern_person'|pretty_label}}</th>
+                  
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in object_list %}
+              <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
+                  <td>{{item.date}}</td>
+                  <td>{{item.fabric_article_supplier}}</td>
+                  <td>{{item.fabric_article_fexpo}}</td>
+                  <td>{{item.fabric_mill_supplier}}</td>
+                  <td>{{item.rd_generated_date}}</td>
+                  <td>{{item.fabric_mill_source}}</td>
+                  <td>{{item.coo}}</td>
+                  <td>{{item.product_category}}</td>
+                  <td>{{item.mill_reference}}</td>
+                  <td>{{item.fabricexpo_reference}}</td>
+                  <td>{{item.season}}</td>
+                  <td>{{item.style}}</td>
+                  <td>{{item.po}}</td>
+                  <td>{{item.customer_name}}</td>
+                  <td>{{item.composition}}</td>
+                  <td>{{item.construction}}</td>
+                  <td>{{item.weight}}</td>
+                  <td>{{item.color}}</td>
+                  <td>{{item.cut_width}}</td>
+                  <td>{{item.wash}}</td>
+                  <td>{{item.price_per_yard}}</td>
+                  <td>{{item.shrinkage_percent}}</td>
+                  <td>{{item.stock_qty}}</td>
+                  <td>{{'item.images'}}</td>
+                  <td>{{item.barcode}}</td>
+                  <td>{{item.qr_code}}</td>
+                  <td>{{item.concern_person}}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                 <th>Count</th>
+                <th>#ID</th>
+                <th>{{'date'|pretty_label}}</th>
+                <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
+                <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
+                <th>{{'fabric_mill (supplier)'|pretty_label}}</th>
+                <th>{{'rd_generated_date'|pretty_label}}</th>
+                <th>{{'fabric_mill (source)'|pretty_label}}</th>
+                <th>{{'coo'|pretty_label}}</th>
+                <th>{{'product_category'|pretty_label}}</th>
+                <th>{{'mill_reference/article'|pretty_label}}</th>
+                <th>{{'fabric_expo_reference/article'|pretty_label}}</th>
+                <th>{{'season'|pretty_label}}</th>
+                <th>{{'style'|pretty_label}}</th>
+                <th>{{'po'|pretty_label}}</th>
+                <th>{{'customer_name'|pretty_label}}</th>
+                <th>{{'composition'|pretty_label}}</th>
+                <th>{{'construction'|pretty_label}}</th>
+                <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
+                <th>{{'color'|pretty_label}}</th>
+                <th>{{'cut_width (inch)'|pretty_label}}</th>
+                <th>{{'wash'|pretty_label}}</th>
+                <th>{{'price (yards)'|pretty_label}}</th>
+                <th>{{'shrinkage%'|pretty_label}}</th>
+                <th>{{'available/ stock_qty'|pretty_label}}</th>
+                <th>{{'images'|pretty_label}}</th>
+                <th>{{'barcode'|pretty_label}}</th>
+                <th>{{'qr_code'|pretty_label}}</th>
+                <th>{{'concern_person'|pretty_label}}</th>
+                
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
+
+<script>
+
+    // Datatable 
+    const table = $('#data_list').DataTable({
+      responsive: true,
+      // select: true,
+    });
+
+    // toggle select data_list
+    $('#data_list tbody').on('click', 'tr', function() {
+      $(this).toggleClass('selected');
+      updateRowCount();
+    });
+
+    // Show row count 
+    function updateRowCount() {
+      const count = table.rows('.selected').data().length;
+      $('#row_count').text(count + ' row(s) selected');
+    }
+    
+    // Handle "Select All" checkbox click event
+    $('#select-all').on('click', function() {
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      if (this.checked) {
+          $(rows).addClass('selected');
+      } else {
+          $(rows).removeClass('selected');
+      }
+      updateRowCount();
+    });
+
+    // Handle individual row click event to update "Select All" checkbox state
+    $('#data_list tbody').on('click', 'tr', function() {
+      var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
+      $('#select-all').prop('checked', allChecked);
+    });
+    
+    // Initial update of the row count button text
+    updateRowCount();
+      
+
+</script>
+{% endblock push_scripts %}

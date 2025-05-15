@@ -107,7 +107,8 @@ class Product(models.Model):
     season = models.CharField(max_length=100)
     style = models.CharField(max_length=100)
     po = models.CharField(max_length=100)
-    customer_name = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    # customer_name = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
+    customer_name = models.CharField(max_length=100,null=True)
     composition = models.CharField(max_length=255)
     construction = models.CharField(max_length=255)
     weight = models.CharField(max_length=50)  # e.g., "220 GSM"
@@ -121,6 +122,8 @@ class Product(models.Model):
     barcode = models.CharField(max_length=255, blank=True)
     qr_code = models.CharField(max_length=255, blank=True)
     concern_person = models.CharField(max_length=255)
+    tag = models.CharField(max_length=50,null=True,blank=True)
+ 
 
     def __str__(self):
         return f"{self.fabric_article_supplier} - {self.style}"

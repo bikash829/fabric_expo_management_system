@@ -617,4 +617,180 @@ class SupplierListView(ListView):
 """End::Supplier Details"""
 
 """Begin::Product Details"""
+# generate csv file of product details 
+class GenerateCSVProduct(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_product_details.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "date", "fabric_article_supplier", "fabric_article_fabric_expo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
+            "coo", "product_category", "mill_reference", "fabric_expo_reference","season","style",  "po","customer_name","composition",
+            "construction", "weight", "color", "cut_width",
+            "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
+            "images", "barcode", "qr_code", "concern_person"
+        ])
+
+        # writer.writerow([
+        #     "2025-05-15", "Sunshine Textiles", "Global Fibers Ltd.", "John Doe", "Procurement Manager", "Cotton",
+        #     "Lightweight", "Organic", "India", "john.doe@globalfibers.com", "doe.j@fibersmail.com", "jd.supply@sunshine.com",
+        #     "+91-9876543210", "+91-9123456789", "+91-9876543210",
+        #     "john_doe123", "Net 30", "Ref001", "123 Mill Road, Mumbai, India",
+        #     "456 Corporate Avenue, Mumbai, India", "https://linkedin.com/in/johndoe", "Reliable supplier with on-time delivery", "Fahim Rahman"
+        # ])
+
+        # writer.writerow([
+        #     "2025-05-15", "Evergreen Mills", "Textura Inc.", "Jane Smith", "Supply Chain Director", "Polyester",
+        #     "Heavyweight", "Water-resistant", "China", "jane.smith@textura.cn", "smith.jane@evergreen.com", "jsupplies@textura.cn",
+        #     "+86-1357924680", "+86-1398765432", "+86-1357924680",
+        #     "jane_smith88", "Net 45", "Ref009", "88 Textile Park, Hangzhou, China",
+        #     "12 Industry Street, Hangzhou, China", "https://linkedin.com/in/janesmith", "Interested in sustainable options", "Hasan Chowdhury"
+        # ])
+
+        return response
+ 
+
+# upload product details 
+class ProductUploadView(View):
+    def get(self, request):
+        form = FileUploadForm()
+        context = {
+            'form': form,
+            "title": "Import Products",
+            "header_title": "Import Products From CSV",
+            "card_title": "Import Products",
+            "form_button_title": "Import Products",
+            'csv_generator_url': reverse_lazy('business_data:product-demo-csv'), 
+        }
+        return render(request, 'business_data/forms/upload.html', context)
+
+    def post(self, request):
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = extract_data(request,form)
+            
+            request.session['preview_product_data'] = data
+            return redirect('business_data:product-preview')
+        context = {
+            'form': form,
+            "title": "Import Products",
+            "header_title": "Import Products From CSV",
+            "card_title": "Import Products",
+            "form_button_title": "Import Products",
+            'csv_generator_url': reverse_lazy('business_data:product_demo_csv'), 
+        }
+        return render(request, 'business_data/forms/upload.html', context) 
+
+
+
+# preview product list 
+class ProductPreviewView(View):
+    def get(self, request):
+        preview_data = request.session.get('preview_product_data', [])
+        temp_file_path = request.session.get('temp_file_path', None)
+        file_info = {}
+        if temp_file_path:
+            file_name = os.path.basename(temp_file_path)
+            file_info = {
+                'name': file_name,
+                'url': default_storage.url(temp_file_path),
+                'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
+            }
+
+        context = {
+            'products': preview_data,
+            'file_info': file_info,
+        }
+
+        return render(request, 'business_data/manage_products/preview.html', context)
+
+    def post(self, request):
+        action = request.POST.get('action')
+        file_path = request.session.get('temp_file_path')
+
+        if not file_path:
+            return redirect('business_data:product-upload')
+
+        abs_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+        if action == 'confirm':
+            if file_path.endswith('.csv'):
+                df = pd.read_csv(abs_path)
+            else:
+                df = pd.read_excel(abs_path)
+
+            df.columns = df.columns.str.strip().str.lower()
+            def generate_unique_color():
+                    return "#{:06x}".format(randint(0, 0xFFFFFF))
+            tag = generate_unique_color()
+            
+            for _, row in df.iterrows():
+
+                try:
+                    product = Supplier.objects.create(
+                        date=row['date'],
+                        fabric_article_supplier=row['fabric_article_supplier'],
+                        fabric_article_fexpo=row['fabric_article_fabric_expo'],
+                        fabric_mill_supplier=row['fabric_mill_supplier'],
+                        rd_generated_date=row['rd_generated_date'],
+                        fabric_mill_source=row['fabric_mill_source'],
+                        coo=row['coo'],
+                        product_category=row['product_category'],
+                        mill_reference=row['mill_reference'],
+                        fabricexpo_reference=row['fabric_expo_reference'],
+                        season=row['season'],
+                        style=row['style'],
+                        po=row['po'],
+                        customer_name=row['customer_name'],
+                        composition=row['composition'],
+                        construction=row['construction'],
+                        weight=row['weight'],
+                        color=row['color'],
+                        cut_width=row['cut_width'],
+                        wash=row['wash'],
+                        price_per_yard=row['price_per_yard'],
+                        shrinkage_percent=row['shrinkage_percent'],
+                        stock_qty=row['stock_qty'],
+                        # <td>{{'item.images'=row[''],
+                        barcode=row['barcode'],
+                        qr_code=row['qr_code'],
+                        concern_person=row['concern_person'],
+                        tag=tag
+                    )
+                except Exception as e:
+                    messages.error(request, "Invalid data upload. Please check your file and try again.")
+                    if default_storage.exists(file_path):
+                        default_storage.delete(file_path)
+                    request.session.pop('preview_data', None)
+                    request.session.pop('temp_file_path', None)
+                    return redirect('business_data:product-upload')
+
+                if product:
+                    # email ids
+                    if row['email_id1']:
+                        try:
+                            validate_email(row['email_id1'])
+                            if not PersonEmail.objects.filter(email=row['email_id1']).exists():
+                                PersonEmail.objects.create(email=row['email_id1'], contact_info=product)
+                        except ValidationError:
+                            pass  # Invalid email, skip or handle as needed
+                    
+
+                messages.success(request, "Products has been successfully saved.")
+
+        if default_storage.exists(file_path):
+            default_storage.delete(file_path)
+
+        request.session.pop('preview_data', None)
+        request.session.pop('temp_file_path', None)
+
+        return redirect('business_data:product-upload') 
+# Product list 
+class ProductListView(ListView):
+    model = Product
+    template_name = "business_data/manage_products/product_list.html"
 """End::Product Details"""
+

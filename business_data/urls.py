@@ -15,11 +15,10 @@ urlpatterns = [
     # End::buyer details """
     
     # Begin::Customer details"""
-    # path('customer-details-demo-csv/',views.GenerateCSVCustomer.as_view(),name="customer_demo_csv"),
+    path('generate-csv-data-file-demo/',views.GenerateCSVCustomer.as_view(),name='customer-demo-csv'),
     path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
     path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
-    # path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
-    path('generate-csv-data-file-demo/',views.GenerateCSVCustomer.as_view(),name='customer-demo-csv')
+    path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
     # End::Customer details"""
 
     # Begin::Supplier details"""

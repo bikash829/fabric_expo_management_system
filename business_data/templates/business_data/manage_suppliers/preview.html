@@ -1,0 +1,172 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Import Suppliers {% endblock title %}
+
+
+{% block push_css %}
+<!--Datatable -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+{% endblock push_css %}
+
+
+{% block content %}
+  <!--begin::Header-->
+  {% include 'core/layouts/content_header.html' with page_name="Import Suppliers From CSV" only%}
+  <!--end::Header-->
+    <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Preview Suppliers Information</div>
+          </div>
+          <!--end::Header-->
+          <div class="p-3">
+            <div class="pb-3">
+              <h4>Data sheet Info</h4>
+              <ul class="list-group">
+                <li class="list-group-item"><a href="{{file_info.url}}">Download Sheet</a></li>
+                <li class="list-group-item">File Name : {{file_info.name}}</li>
+                <li class="list-group-item">Uploaded at: {{file_info.uploaded_at}}</li>
+              </ul>
+            </div>
+              <form  method="post">
+                {% csrf_token %}
+
+                <table id="suppliers" class="table table-striped" style="width:100%">
+                  <thead>
+                      <tr>
+                          <th>Sr. No</th>
+                          <th>Date </th>
+                          <th>Company Name</th>
+                          <th>Organization Type</th>
+                          <th>Brand</th>
+                          <th>Category (Apparel or Textile) </th>
+                          <th>Department </th>
+                          <th>Buyer Name </th>
+                          <th>Designation</th>
+                          <th>COO</th>
+                          <th>Buyer Email ID</th>
+                          <th>WhatsApp Number</th>
+                          <th>Phone Number</th>
+                          <th>Company Website</th>
+                          <th>Payment Term</th>
+                          <th>Fabric Reference dealing with</th>
+                          <th>Mailing Address</th>
+                          <th>Visiting address</th>
+                          <th>LinkedIn Profile Link</th>
+                          <th>Remarks</th>
+                          <th>Concern FE Representative</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in suppliers %}
+                      <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>{{item.date}}</td>
+                          <td>{{item.company_name}}</td>
+                          <td>{{item.organization_type}}</td>
+                          <td>{{item.brand}}</td>
+                          <td>{{item.category}}</td>
+                          <td>{{item.department}}</td>
+                          <td>{{item.buyer_name}}</td>
+                          <td>{{item.designation}}</td>
+                          <td>{{item.coo}}</td>
+                          <td>{{item.buyer_email_id}}</td>
+                          <td>{{item.whatsapp_number}}</td>
+                          <td>{{item.phone_number}}</td>
+                          <td>{{item.company_website}}</td>
+                          <td>{{item.payment_term}}</td>
+                          <td>{{item.fabric_reference_dealing_with}}</td>
+                          <td>{{item.mailing_address}}</td>
+                          <td>{{item.visiting_address}}</td>
+                          <td>{{item.linkedin_profile_link}}</td>
+                          <td>{{item.remarks}}</td>
+                          <td>{{item.concern_fe_representative}}</td>
+                          {% comment %} <td></td> {% endcomment %}
+                          {% comment %} <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}"> {% endcomment %}
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+                  <tfoot>
+                      <tr>
+                          <th>Sr. No</th>
+                          <th>Date </th>
+                          <th>Company Name</th>
+                          <th>Organization Type</th>
+                          <th>Brand</th>
+                          <th>Category (Apparel or Textile) </th>
+                          <th>Department </th>
+                          <th>Buyer Name </th>
+                          <th>Designation</th>
+                          <th>COO</th>
+                          <th>Buyer Email ID</th>
+                          <th>WhatsApp Number</th>
+                          <th>Phone Number</th>
+                          <th>Company Website</th>
+                          <th>Payment Term</th>
+                          <th>Fabric Reference dealing with</th>
+                          <th>Mailing Address</th>
+                          <th>Visiting address</th>
+                          <th>LinkedIn Profile Link</th>
+                          <th>Remarks</th>
+                          <th>Concern FE Representative</th>
+                          {% comment %} <th>Action</th> {% endcomment %}
+                      </tr>
+                  </tfoot>
+                </table>
+
+                <!--begin::Form-->
+                <div class="text-center">
+                  <button name="action" value="confirm" class="btn btn-success" type="submit">Confirm and Save</button>
+                  <button name="action" value="cancel" class="btn btn-secondary" type="submit">Cancel</button>
+                </div>
+              </form>
+
+                
+          </div>
+        </div>
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+
+<!--begin:: Toaster alert -->
+{% include 'core/components/alert/toaster.html' %}
+<!--end:: Toaster alert-->
+{% endblock content %}
+
+{% block push_scripts %}
+
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+      // toast alert
+      $('.toast').toast({
+        delay: 1000*20,
+      }).toast('show')
+
+      $('#suppliers').DataTable( {
+          responsive: true
+      } );
+
+      
+    });
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

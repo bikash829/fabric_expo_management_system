@@ -20,6 +20,29 @@ import phonenumber_field
 
 from .forms import BuyerUploadForm, FileUploadForm
 
+# extract data from excel/csv
+def extract_data(request,form):
+    file = form.cleaned_data['file']
+    file_path = default_storage.save(f'temp/{file.name}', file)
+    abs_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+    request.session['temp_file_path'] = file_path
+
+    if file.name.endswith('.csv'):
+        df = pd.read_csv(abs_path)
+    else:
+        df = pd.read_excel(abs_path)
+
+    # Normalize column names
+    df.columns = df.columns.str.strip().str.lower()
+        # Convert Timestamp objects to strings
+    for col in df.select_dtypes(include=['datetime', 'datetime64[ns]']).columns:
+        df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d')
+
+    data = df.to_dict(orient='records')
+    return data 
+
+
 """Begin:: Buyer Details"""
 # upload buyer data
 class BuyerUploadView(View):
@@ -67,8 +90,6 @@ class BuyerUploadView(View):
             'csv_generator_url': reverse_lazy('business_data:buyer_demo_csv'), 
         }
         return render(request, 'business_data/manage_buyers/upload.html', context)
-
-
 
 # preview uploaded data
 class BuyerPreviewView(View):
@@ -151,9 +172,8 @@ class BuyerPreviewView(View):
                         except ValidationError:
                             pass  # Invalid email, skip or handle as needed
                     if row['whatsapp_number']:
-                        PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = buyer)
                         try:
-                            PersonPhone.objects.create(phone=row['whatsapp_number'], contact_info=buyer)
+                            PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = buyer)
                         except ValidationError:
                             messages.error(request,ValidationError)
 
@@ -214,6 +234,8 @@ class BuyerListView(ListView):
 """End:: Buyer details"""
 
 """Begin::Customer Details"""
+
+
 # upload customer data
 class CustomerUploadView(View):
     def get(self, request):
@@ -328,9 +350,8 @@ class CustomerPreviewView(View):
                         except ValidationError:
                             pass  # Invalid email, skip or handle as needed
                     if row['whatsapp_number']:
-                        PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = customer)
                         try:
-                            PersonPhone.objects.create(phone=row['whatsapp_number'], contact_info=customer)
+                            PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = customer)
                         except ValidationError:
                             messages.error(request,ValidationError)
 
@@ -352,27 +373,9 @@ class CustomerPreviewView(View):
         return redirect('business_data:customer-upload')
 
 
-def extract_data(request,form):
-    file = form.cleaned_data['file']
-    file_path = default_storage.save(f'temp/{file.name}', file)
-    abs_path = os.path.join(settings.MEDIA_ROOT, file_path)
-
-    request.session['temp_file_path'] = file_path
-
-    if file.name.endswith('.csv'):
-        df = pd.read_csv(abs_path)
-    else:
-        df = pd.read_excel(abs_path)
-
-    # Normalize column names
-    df.columns = df.columns.str.strip().str.lower()
-        # Convert Timestamp objects to strings
-    for col in df.select_dtypes(include=['datetime', 'datetime64[ns]']).columns:
-        df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d')
-
-    data = df.to_dict(orient='records')
-    return data 
-
+class CustomerListView(ListView):
+    model = Customer
+    template_name= "business_data/manage_customers/customer_list.html"
 
 
 ### Generate demo csv for buyers

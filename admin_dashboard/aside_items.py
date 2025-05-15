@@ -430,7 +430,7 @@ def get_sidebar_items(request):
             customer_menu['children'].append(
                 {
                     'name': 'View Customers',
-                    'url': None,
+                    'url': reverse('business_data:customer-list'),
                     'icon': 'fa-solid fa-eye',
                 },
             )

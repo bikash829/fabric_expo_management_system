@@ -421,7 +421,7 @@ def get_sidebar_items(request):
             customer_menu['children'].append(
                 {
                     'name': 'Add Customers',
-                    'url': None,
+                    'url': reverse('business_data:customer-upload'),
                     'icon': 'fa-solid fa-user-plus',
                 },
             )

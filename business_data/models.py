@@ -63,6 +63,7 @@ class Buyer(ContactInfo):
 class Customer(ContactInfo):
     customer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
+    category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")
     is_local = models.BooleanField(default=True)  # <-- flag
     payment_term = models.CharField(max_length=100, blank=True)
     fabric_reference = models.CharField(max_length=255, blank=True)

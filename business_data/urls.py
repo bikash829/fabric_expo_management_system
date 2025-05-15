@@ -16,9 +16,10 @@ urlpatterns = [
     
     # Begin::Customer details"""
     # path('customer-details-demo-csv/',views.GenerateCSVCustomer.as_view(),name="customer_demo_csv"),
-    # path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
-    # path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
+    path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
+    path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
     # path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
+    path('generate-csv-data-file-demo/',views.GenerateCSVCustomer.as_view(),name='customer-demo-csv')
     # End::Customer details"""
 
     # Begin::Supplier details"""

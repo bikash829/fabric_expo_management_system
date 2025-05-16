@@ -634,21 +634,30 @@ class GenerateCSVProduct(View):
             "images", "barcode", "qr_code", "concern_person"
         ])
 
-        # writer.writerow([
-        #     "2025-05-15", "Sunshine Textiles", "Global Fibers Ltd.", "John Doe", "Procurement Manager", "Cotton",
-        #     "Lightweight", "Organic", "India", "john.doe@globalfibers.com", "doe.j@fibersmail.com", "jd.supply@sunshine.com",
-        #     "+91-9876543210", "+91-9123456789", "+91-9876543210",
-        #     "john_doe123", "Net 30", "Ref001", "123 Mill Road, Mumbai, India",
-        #     "456 Corporate Avenue, Mumbai, India", "https://linkedin.com/in/johndoe", "Reliable supplier with on-time delivery", "Fahim Rahman"
-        # ])
+        writer.writerow([
+            "2025-05-16", "ABC Textiles Ltd", "ExpoTex 2025", "Global Mills Co.", "2025-04-01", "China",
+            "CN", "Denim", "GM1234", "ETX-567", "Spring/Summer", "ST-001", "PO12345", "Levi's", "98% Cotton, 2% Spandex",
+            "3x1 Right Hand Twill", "12 oz", "Indigo Blue", "58 in",
+            "Enzyme Wash", "7.50", "2.5", "1200",
+            "image1.png", "123456789012", "https://example.com/qrcode1", "John Doe"
+        ])
 
-        # writer.writerow([
-        #     "2025-05-15", "Evergreen Mills", "Textura Inc.", "Jane Smith", "Supply Chain Director", "Polyester",
-        #     "Heavyweight", "Water-resistant", "China", "jane.smith@textura.cn", "smith.jane@evergreen.com", "jsupplies@textura.cn",
-        #     "+86-1357924680", "+86-1398765432", "+86-1357924680",
-        #     "jane_smith88", "Net 45", "Ref009", "88 Textile Park, Hangzhou, China",
-        #     "12 Industry Street, Hangzhou, China", "https://linkedin.com/in/janesmith", "Interested in sustainable options", "Hasan Chowdhury"
-        # ])
+        writer.writerow([
+            "2025-05-16", "XYZ Fabrics", "Global Fabric Expo", "TexSource India", "2025-03-20", "India",
+            "IN", "Twill", "TX5678", "GFE-789", "Fall/Winter", "ST-002", "PO67890", "Zara", "100% Cotton",
+            "2x2 Twill", "10 oz", "Charcoal Grey", "56 in",
+            "Stone Wash", "6.80", "3.0", "850",
+            "image2.jpg", "987654321098", "https://example.com/qrcode2", "Jane Smith"
+        ])
+
+        writer.writerow([
+            "2025-05-16", "Elite Textiles", "AsiaTex Show", "Premium Mills", "2025-02-15", "Bangladesh",
+            "BD", "Chino", "PM7890", "ATS-234", "Resort", "ST-003", "PO11223", "H&M", "97% Cotton, 3% Elastane",
+            "Fine Chino Weave", "8 oz", "Khaki", "60 in",
+            "No Wash", "5.95", "1.8", "500",
+            "image2.png", "456789123456", "https://example.com/qrcode3", "Alex Lee"
+        ])
+
 
         return response
  
@@ -721,16 +730,17 @@ class ProductPreviewView(View):
                 df = pd.read_csv(abs_path)
             else:
                 df = pd.read_excel(abs_path)
-
+            
             df.columns = df.columns.str.strip().str.lower()
             def generate_unique_color():
                     return "#{:06x}".format(randint(0, 0xFFFFFF))
             tag = generate_unique_color()
             
             for _, row in df.iterrows():
+                print(row['fabric_article_supplier'])
 
                 try:
-                    product = Supplier.objects.create(
+                    product = Product.objects.create(
                         date=row['date'],
                         fabric_article_supplier=row['fabric_article_supplier'],
                         fabric_article_fexpo=row['fabric_article_fabric_expo'],
@@ -761,25 +771,27 @@ class ProductPreviewView(View):
                         tag=tag
                     )
                 except Exception as e:
+                    print(e)
                     messages.error(request, "Invalid data upload. Please check your file and try again.")
                     if default_storage.exists(file_path):
                         default_storage.delete(file_path)
                     request.session.pop('preview_data', None)
                     request.session.pop('temp_file_path', None)
                     return redirect('business_data:product-upload')
+                
+                messages.success(request, "Products has been successfully saved.")
 
-                if product:
-                    # email ids
-                    if row['email_id1']:
-                        try:
-                            validate_email(row['email_id1'])
-                            if not PersonEmail.objects.filter(email=row['email_id1']).exists():
-                                PersonEmail.objects.create(email=row['email_id1'], contact_info=product)
-                        except ValidationError:
-                            pass  # Invalid email, skip or handle as needed
+                # if product:
+                #     # email ids
+                #     if row['email_id1']:
+                #         try:
+                #             validate_email(row['email_id1'])
+                #             if not PersonEmail.objects.filter(email=row['email_id1']).exists():
+                #                 PersonEmail.objects.create(email=row['email_id1'], contact_info=product)
+                #         except ValidationError:
+                #             pass  # Invalid email, skip or handle as needed
                     
 
-                messages.success(request, "Products has been successfully saved.")
 
         if default_storage.exists(file_path):
             default_storage.delete(file_path)

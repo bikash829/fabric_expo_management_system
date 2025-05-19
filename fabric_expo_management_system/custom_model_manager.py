@@ -1,3 +1,4 @@
+from pprint import pprint
 from django.db import models
 
 class SoftDeleteQuerySet(models.QuerySet):
@@ -23,8 +24,15 @@ class SoftDeleteManager(models.Manager):
         qs = SoftDeleteQuerySet(self.model, using=self._db)
         # Only filter if model has is_deleted field
         if hasattr(self.model, 'is_deleted'):
-            return qs.filter(is_deleted=False)
+            query_set = qs.filter(is_deleted=False)
+            return query_set
         return qs
+    
+    def all_with_deleted(self):
+        return SoftDeleteQuerySet(self.model, using=self._db)
+
+    def only_deleted(self):
+        return SoftDeleteQuerySet(self.model, using=self._db).filter(is_deleted=True)
     
 
 class SoftDeleteModel(models.Model):

@@ -78,7 +78,7 @@ class Customer(ContactInfo, SoftDeleteModel):
         return f"{self.customer_name} ({self.company_name})"
     
 # supplier info
-class Supplier(ContactInfo, SoftDeleteModel):
+class Supplier(SoftDeleteModel,ContactInfo):
     mill_name = models.CharField(max_length=255)
     supplier_name = models.CharField(max_length=255)
     concern_person = models.CharField(max_length=255)

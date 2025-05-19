@@ -11,6 +11,7 @@ urlpatterns = [
     path('upload/', views.BuyerUploadView.as_view(), name='buyer-upload'),
     path('preview/', views.BuyerPreviewView.as_view(), name='buyer-preview'),
     path('buyer_list/',views.BuyerListView.as_view(),name='buyer_list'),
+    path('delete-buyers/',views.DeleteBuyerView.as_view(),name="delete-buyers"),
     # path('success/', lambda request: render(request, 'business_data/manage_buyers/success.html'), name='upload-success'),
     # End::buyer details """
     

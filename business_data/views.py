@@ -247,6 +247,21 @@ class BuyerListView(ListView):
     model = Buyer
     template_name = "business_data/manage_buyers/buyer_list.html"
 
+
+
+# delete customers 
+class DeleteBuyerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
+    model = Buyer
+    fields = ['is_deleted']
+    permission_required = 'business_data.delete_buyer'
+
+    def post(self, request, *args, **kwargs):
+        ids = request.POST.getlist('selectedIds[]')
+        if not ids:
+            return JsonResponse({'error': 'No IDs provided.'}, status=400)
+        Buyer.objects.filter(id__in=ids).soft_delete()
+        return JsonResponse({'message': 'Selected buyers deleted successfully.'})
+
 """End:: Buyer details"""
 
 """Begin::Customer Details"""

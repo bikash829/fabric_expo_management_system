@@ -28,7 +28,8 @@ class ContactInfo(models.Model):
 
 # multiple email choice 
 class PersonEmail(models.Model):
-    email = models.EmailField(unique=True)
+    # email = models.EmailField(unique=True)
+    email = models.EmailField()
     contact_info = models.ForeignKey(ContactInfo, related_name='emails', on_delete=models.CASCADE)
     
     def __str__(self):
@@ -49,14 +50,13 @@ class PersonPhone(models.Model):
     
 
 # Buyer info
-class Buyer(ContactInfo, SoftDeleteModel):
+class Buyer(SoftDeleteModel, ContactInfo):
     buyer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
     category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")
     is_international = models.BooleanField(default=True)  # <-- flag
     payment_term = models.CharField(max_length=100, blank=True)
     fabric_reference = models.CharField(max_length=255, blank=True)
-    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
 
 
     def __str__(self):
@@ -64,7 +64,7 @@ class Buyer(ContactInfo, SoftDeleteModel):
     
 
 # customer info 
-class Customer(ContactInfo, SoftDeleteModel):
+class Customer(SoftDeleteModel, ContactInfo ):
     customer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
     category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")

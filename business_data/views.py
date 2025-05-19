@@ -38,11 +38,12 @@ def extract_data(request,form):
 
     # Normalize column names
     df.columns = df.columns.str.strip().str.lower()
-        # Convert Timestamp objects to strings
+    # Convert Timestamp objects to strings
     for col in df.select_dtypes(include=['datetime', 'datetime64[ns]']).columns:
         df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d')
 
     data = df.to_dict(orient='records')
+    print(data)
     return data 
 
 
@@ -134,65 +135,77 @@ class BuyerPreviewView(View):
             def generate_unique_color():
                     return "#{:06x}".format(randint(0, 0xFFFFFF))
             tag = generate_unique_color()
-            
-            for _, row in df.iterrows():
 
-                try:
-                    buyer = Buyer.objects.create(
-                        date=row['date'],
-                        company_name=row['company_name'],
-                        organization_type=row['organization_type'],
-                        brand=row['brand'],
-                        category=row['category'],
-                        department=row['department'],
-                        buyer_name=row['buyer_name'],
-                        designation=row['designation'],
-                        country_of_origin=row['coo'],
-                        website=row['company_website'],
-                        payment_term=row['payment_term'],
-                        fabric_reference=row['fabric_reference_dealing_with'],
-                        mailing_address=row['mailing_address'],
-                        visiting_address=row['visiting_address'],
-                        linkedin_profile=row['linkedin_profile_link'],
-                        remarks=row['remarks'],
-                        concern_fe_rep=row['concern_fe_representative'],
-                        tag=tag
-                    )
-                except Exception as e:
-                    messages.error(request, "Invalid data upload. Please check your file and try again.")
-                    if default_storage.exists(file_path):
-                        default_storage.delete(file_path)
-                    request.session.pop('preview_data', None)
-                    request.session.pop('temp_file_path', None)
-                    return redirect('business_data:buyer-upload')
-
-                if buyer:
-                    if row['buyer_email_id']:
+            try: 
+                with transaction.atomic():
+                    for _, row in df.iterrows():
                         try:
-                            validate_email(row['buyer_email_id'])
-                            if not PersonEmail.objects.filter(email=row['buyer_email_id']).exists():
-                                PersonEmail.objects.create(email=row['buyer_email_id'], contact_info=buyer)
-                        except ValidationError:
-                            pass  # Invalid email, skip or handle as needed
-                    if row['whatsapp_number']:
-                        try:
-                            PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = buyer)
-                        except ValidationError:
-                            messages.error(request,ValidationError)
+                            buyer = Buyer.objects.create(
+                                date=row.get('date'),
+                                company_name=row.get('company_name'),
+                                organization_type=row.get('organization_type'),
+                                brand=row.get('brand'),
+                                category=row.get('category'),
+                                department=row.get('department'),
+                                buyer_name=row.get('buyer_name'),
+                                designation=row.get('designation'),
+                                country_of_origin=row.get('coo'),
+                                website=row.get('company_website'),
+                                payment_term=row.get('payment_term'),
+                                fabric_reference=row.get('fabric_reference_dealing_with'),
+                                mailing_address=row.get('mailing_address'),
+                                visiting_address=row.get('visiting_address'),
+                                linkedin_profile=row.get('linkedin_profile_link'),
+                                remarks=row.get('remarks'),
+                                concern_fe_rep=row.get('concern_fe_representative'),
+                                tag=tag
+                            )
+                        except Exception as e:
+                            messages.error(request, "Invalid data upload. Please check your file and try again.")
+                            if default_storage.exists(file_path):
+                                default_storage.delete(file_path)
+                            request.session.pop('preview_buyer_data', None)
+                            request.session.pop('temp_file_path', None)
+                            return redirect('business_data:buyer-upload')
 
-                    
-                    if row['phone_number']:
-                        try:
-                            PersonPhone.objects.create(phone=row['phone_number'], contact_info=buyer)
-                        except ValidationError:
-                            messages.error(request,ValidationError)
+                        if buyer:
+                            if row['buyer_email_id']:
+                                try:
+                                    validate_email(row['buyer_email_id'])
+                                    if not PersonEmail.objects.filter(email=row['buyer_email_id']).exists():
+                                        PersonEmail.objects.create(email=row['buyer_email_id'], contact_info=buyer)
+                                    else:
+                                        PersonEmail.objects.create(email=row['buyer_email_id'], contact_info=buyer)
+                                except ValidationError:
+                                    pass  # Invalid email, skip or handle as needed
+                            if row['whatsapp_number']:
+                                try:
+                                    PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = buyer)
+                                except ValidationError:
+                                    messages.error(request,ValidationError)
 
-                messages.success(request, "Buyers have been successfully saved.")
+                            
+                            if row['phone_number']:
+                                try:
+                                    PersonPhone.objects.create(phone=row['phone_number'], contact_info=buyer)
+                                except ValidationError:
+                                    messages.error(request,ValidationError)
+                    messages.success(request, "Buyers have been successfully saved.")
+
+            except Exception as e:
+                logger.error(f"Bulk import failed: {e}")
+                messages.error(request, "Bulk import failed. Please check your file and try again.")
+                if default_storage.exists(file_path):
+                    default_storage.delete(file_path)
+                request.session.pop('preview_buyer_data', None)
+                request.session.pop('temp_file_path', None)
+                return redirect('business_data:buyer-upload')
+
 
         if default_storage.exists(file_path):
             default_storage.delete(file_path)
 
-        request.session.pop('preview_data', None)
+        request.session.pop('preview_buyer_data', None)
         request.session.pop('temp_file_path', None)
 
         return redirect('business_data:buyer-upload')
@@ -237,8 +250,6 @@ class BuyerListView(ListView):
 """End:: Buyer details"""
 
 """Begin::Customer Details"""
-
-
 # upload customer data
 class CustomerUploadView(View):
     def get(self, request):
@@ -312,65 +323,84 @@ class CustomerPreviewView(View):
             def generate_unique_color():
                     return "#{:06x}".format(randint(0, 0xFFFFFF))
             tag = generate_unique_color()
-            
-            for _, row in df.iterrows():
 
-                try:
-                    customer = Customer.objects.create(
-                        date=row['date'],
-                        company_name=row['company_name'],
-                        organization_type=row['organization_type'],
-                        brand=row['brand'],
-                        # category=row['category'],
-                        department=row['department'],
-                        customer_name=row['customer_name'],
-                        designation=row['designation'],
-                        country_of_origin=row['coo'],
-                        website=row['company_website'],
-                        payment_term=row['payment_term'],
-                        fabric_reference=row['fabric_reference_dealing_with'],
-                        mailing_address=row['mailing_address'],
-                        visiting_address=row['visiting_address'],
-                        linkedin_profile=row['linkedin_profile_link'],
-                        remarks=row['remarks'],
-                        concern_fe_rep=row['concern_fe_representative'],
-                        tag=tag
-                    )
-                except Exception as e:
-                    messages.error(request, "Invalid data upload. Please check your file and try again.")
-                    if default_storage.exists(file_path):
-                        default_storage.delete(file_path)
-                    request.session.pop('preview_data', None)
-                    request.session.pop('temp_file_path', None)
-                    return redirect('business_data:customer-upload')
-
-                if customer:
-                    if row['customer_email_id']:
+            try:
+                with transaction.atomic():
+                    for _, row in df.iterrows():
                         try:
-                            validate_email(row['customer_email_id'])
-                            if not PersonEmail.objects.filter(email=row['customer_email_id']).exists():
-                                PersonEmail.objects.create(email=row['customer_email_id'], contact_info=customer)
-                        except ValidationError:
-                            pass  # Invalid email, skip or handle as needed
-                    if row['whatsapp_number']:
-                        try:
-                            PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = customer)
-                        except ValidationError:
-                            messages.error(request,ValidationError)
+                            customer = Customer.objects.create(
+                                date=row.get('date'),
+                                company_name=row.get('company_name'),
+                                organization_type=row.get('organization_type'),
+                                brand=row.get('brand'),
+                                # category=row['category'],
+                                department=row.get('department'),
+                                customer_name=row.get('customer_name'),
+                                designation=row.get('designation'),
+                                country_of_origin=row.get('coo'),
+                                website=row.get('company_website'),
+                                payment_term=row.get('payment_term'),
+                                fabric_reference=row.get('fabric_reference_dealing_with'),
+                                mailing_address=row.get('mailing_address'),
+                                visiting_address=row.get('visiting_address'),
+                                linkedin_profile=row.get('linkedin_profile_link'),
+                                remarks=row.get('remarks'),
+                                concern_fe_rep=row.get('concern_fe_representative'),
+                                tag=tag
+                            )
+                        # if any error occurs return the with error 
+                        except Exception as e:
+                            logger.error(f"Row import failed: {e}")
+                            messages.error(request, f"Row import failed: {e}")
+                            if default_storage.exists(file_path):
+                                default_storage.delete(file_path)
+                            request.session.pop('preview_customer_data', None)
+                            request.session.pop('temp_file_path', None)
+                            return redirect('business_data:customer-upload')
 
-                    
-                    if row['phone_number']:
-                        try:
-                            PersonPhone.objects.create(phone=row['phone_number'], contact_info=customer)
-                        except ValidationError:
-                            messages.error(request,ValidationError)
+                        # insert emails and other relational data
+                        if customer:
+                            if row['customer_email_id']:
+                                print(row.get('customer_email_id'))
+                                email = row.get('customer_email_id')
+                                try:
+                                    validate_email(email)
+                                    # if not PersonEmail.objects.filter(email=email).exists():
+                                        # print("Here you are ======================")
 
-                messages.success(request, "Customers have been successfully saved.")
+                                    PersonEmail.objects.create(email=email, contact_info=customer)
 
+                                except ValidationError:
+                                    pass  # Invalid email, skip or handle as needed
+                            if row['whatsapp_number']:
+                                try:
+                                    PersonPhone.objects.create(phone=row['whatsapp_number'],is_whatsapp=True, contact_info = customer)
+                                except ValidationError:
+                                    messages.error(request,ValidationError)
+
+                            
+                            if row['phone_number']:
+                                try:
+                                    PersonPhone.objects.create(phone=row['phone_number'], contact_info=customer)
+                                except ValidationError:
+                                    messages.error(request,ValidationError)
+
+                    messages.success(request, "Customers has been successfully saved.")
+            except Exception as e:
+                logger.error(f"Bulk import failed: {e}")
+                messages.error(request, "Bulk import failed. Please check your file and try again.")
+                if default_storage.exists(file_path):
+                    default_storage.delete(file_path)
+                request.session.pop('preview_customer_data', None)
+                request.session.pop('temp_file_path', None)
+                return redirect('business_data:supplier-upload')
+
+        
+        # request from another place 
         if default_storage.exists(file_path):
             default_storage.delete(file_path)
 
-        request.session.pop('preview_data', None)
+        request.session.pop('preview_customer_data', None)
         request.session.pop('temp_file_path', None)
 
         return redirect('business_data:customer-upload')
@@ -379,6 +409,21 @@ class CustomerPreviewView(View):
 class CustomerListView(ListView):
     model = Customer
     template_name= "business_data/manage_customers/customer_list.html"
+
+
+# delete customers 
+class DeleteCustomerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
+    model = Customer
+    fields = ['is_deleted']
+    permission_required = 'business_data.delete_customer'
+
+    def post(self, request, *args, **kwargs):
+        ids = request.POST.getlist('selectedIds[]')
+        print(ids)
+        if not ids:
+            return JsonResponse({'error': 'No IDs provided.'}, status=400)
+        Customer.objects.filter(id__in=ids).soft_delete()
+        return JsonResponse({'message': 'Selected customers deleted successfully.'})
 
 
 ### Generate demo csv for buyers
@@ -551,11 +596,11 @@ class SupplierPreviewView(View):
                                 tag=tag
                             )
                         except Exception as row_e:
-                            logger.error(f'Row import failed: {e}')
+                            logger.error(f'Row import failed: {row_e}')
                             messages.error(request, f"Row import failed: {row_e}")
                             if default_storage.exists(file_path):
                                 default_storage.delete(file_path)
-                            request.session.pop('preview_product_data', None)
+                            request.session.pop('preview_supplier_data', None)
                             request.session.pop('temp_file_path', None)
                             return redirect('business_data:supplier-upload')
 
@@ -566,6 +611,8 @@ class SupplierPreviewView(View):
                                     validate_email(row['email_id1'])
                                     if not PersonEmail.objects.filter(email=row['email_id1']).exists():
                                         PersonEmail.objects.create(email=row['email_id1'], contact_info=supplier)
+                                    else:
+                                        PersonEmail.objects.create(email=row['email_id1'], contact_info=supplier)
                                 except ValidationError:
                                     pass  # Invalid email, skip or handle as needed
                             if row['email_id2']:
@@ -573,12 +620,16 @@ class SupplierPreviewView(View):
                                     validate_email(row['email_id2'])
                                     if not PersonEmail.objects.filter(email=row['email_id2']).exists():
                                         PersonEmail.objects.create(email=row['email_id2'], contact_info=supplier)
+                                    else:
+                                        PersonEmail.objects.create(email=row['email_id2'], contact_info=supplier)
                                 except ValidationError:
                                     pass  # Invalid email, skip or handle as needed
                             if row['email_id3']:
                                 try:
                                     validate_email(row['email_id3'])
                                     if not PersonEmail.objects.filter(email=row['email_id3']).exists():
+                                        PersonEmail.objects.create(email=row['email_id3'], contact_info=supplier)
+                                    else:
                                         PersonEmail.objects.create(email=row['email_id3'], contact_info=supplier)
                                 except ValidationError:
                                     pass  # Invalid email, skip or handle as needed
@@ -609,14 +660,14 @@ class SupplierPreviewView(View):
                 messages.error(request, "Bulk import failed. Please check your file and try again.")
                 if default_storage.exists(file_path):
                     default_storage.delete(file_path)
-                request.session.pop('preview_product_data', None)
+                request.session.pop('preview_supplier_data', None)
                 request.session.pop('temp_file_path', None)
                 return redirect('business_data:supplier-upload')
 
         if default_storage.exists(file_path):
             default_storage.delete(file_path)
 
-        request.session.pop('preview_product_data', None)
+        request.session.pop('preview_supplier_data', None)
         request.session.pop('temp_file_path', None)
 
         return redirect('business_data:supplier-upload') 
@@ -627,8 +678,6 @@ class SupplierListView(ListView):
     model = Supplier
     template_name = "business_data/manage_suppliers/supplier_list.html"
 
-    # def get_queryset(self):
-    #     return Supplier.objects.filter(is_deleted=False)
 
 
 # soft delete supplier 

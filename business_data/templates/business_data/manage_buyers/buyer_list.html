@@ -144,6 +144,8 @@
     const table = $('#data_list').DataTable({
       responsive: true,
       // select: true,
+      order: [[1, 'desc']], // Sort second column (#ID) in descending order
+
     });
 
     // toggle select data_list

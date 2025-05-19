@@ -15,7 +15,10 @@ from fabric_expo_management_system import settings
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
-
+from twilio.twiml.messaging_response import MessagingResponse
+from django.utils.decorators import method_decorator
+from django_twilio.decorators import twilio_view
+from twilio.rest import Client
 
 # validators 
 from django.core.validators import validate_email
@@ -413,10 +416,7 @@ class SelectRecipientsView(View):
             'message_content': email_content
         })
     
-from twilio.twiml.messaging_response import MessagingResponse
-from django.utils.decorators import method_decorator
-from django_twilio.decorators import twilio_view
-from twilio.rest import Client
+
 class SendMessageView(View):
     def post(self,request,*args,**kwargs):
         whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
@@ -434,8 +434,6 @@ class SendMessageView(View):
             "https://demo.twilio.com/owl.png",
             "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
         ]
-
-        print(media_urls)
         
 
         account_sid = settings.TWILIO_ACCOUNT_SID

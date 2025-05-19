@@ -1,5 +1,6 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from fabric_expo_management_system.custom_model_manager import SoftDeleteModel
 # Contact info 
 class ContactInfo(models.Model):
     date = models.DateField(null=True,blank=True)
@@ -19,6 +20,7 @@ class ContactInfo(models.Model):
     concern_fe_rep = models.CharField(max_length=255, blank=True)
     created_at = models.DateField(auto_now_add=True)
     tag = models.CharField(max_length=50,null=True,blank=True)
+
 
 
     def __str__(self):
@@ -47,32 +49,36 @@ class PersonPhone(models.Model):
     
 
 # Buyer info
-class Buyer(ContactInfo):
+class Buyer(ContactInfo, SoftDeleteModel):
     buyer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
     category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")
     is_international = models.BooleanField(default=True)  # <-- flag
     payment_term = models.CharField(max_length=100, blank=True)
     fabric_reference = models.CharField(max_length=255, blank=True)
+    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
+
 
     def __str__(self):
         return f"{self.buyer_name} ({self.company_name})"
     
 
 # customer info 
-class Customer(ContactInfo):
+class Customer(ContactInfo, SoftDeleteModel):
     customer_name = models.CharField(max_length=255)
     designation = models.CharField(max_length=100, blank=True)
     category = models.CharField(max_length=100, blank=True,null=True, help_text="Apparel or Textile")
     is_local = models.BooleanField(default=True)  # <-- flag
     payment_term = models.CharField(max_length=100, blank=True)
     fabric_reference = models.CharField(max_length=255, blank=True)
+    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
+
 
     def __str__(self):
         return f"{self.customer_name} ({self.company_name})"
     
 # supplier info
-class Supplier(ContactInfo):
+class Supplier(ContactInfo, SoftDeleteModel):
     mill_name = models.CharField(max_length=255)
     supplier_name = models.CharField(max_length=255)
     concern_person = models.CharField(max_length=255)
@@ -86,6 +92,8 @@ class Supplier(ContactInfo):
     wechat_id = models.CharField(max_length=50, blank=True, null=True)
     payment_term = models.CharField(max_length=100)
     fabric_reference = models.CharField(max_length=255, blank=True)
+    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
+
 
 
     def __str__(self):
@@ -93,7 +101,7 @@ class Supplier(ContactInfo):
     
 
 # product info 
-class Product(models.Model):
+class Product(SoftDeleteModel):
     date = models.DateField()
     fabric_article_supplier = models.CharField(max_length=255)
     fabric_article_fexpo = models.CharField(max_length=255)
@@ -123,6 +131,7 @@ class Product(models.Model):
     qr_code = models.CharField(max_length=255, blank=True)
     concern_person = models.CharField(max_length=255)
     tag = models.CharField(max_length=50,null=True,blank=True)
+    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
  
 
     def __str__(self):
@@ -134,3 +143,50 @@ class ProductImage(models.Model):
     alt_text = models.CharField(max_length=255, blank=True, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

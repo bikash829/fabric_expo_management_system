@@ -25,6 +25,7 @@
           <label class="btn btn-outline-primary" for="select-all">Select All</label>
         </div>
         <button id="row_count" class="btn btn-info" disabled>Row count</button>
+        <button id="delete-data" class="btn btn-danger">Delete</button>
       </div>
 
       <div>
@@ -65,7 +66,7 @@
           </thead>
           <tbody>
               {% for item in object_list %}
-              <tr>
+              <tr data-id="{{item.id}}">
                   <td>{{forloop.counter}}</td>
                   <td>{{item.id}}</td>
                   <td>{{item.date}}</td>
@@ -187,6 +188,61 @@
     // Initial update of the row count button text
     updateRowCount();
       
+
+    // Handle "Send Data" button click event to send selected column data to backend
+    $('#delete-data').on('click', function(e) {
+      const selectedIds = [];
+      $('#data_list tbody tr.selected').each(function(e) {
+        selectedIds.push($(this).data('id'));
+      });   
+      
+
+      if (selectedIds.length === 0){
+        Swal.fire({
+          icon: 'info', 
+          text: "Please select desired recipients first!"
+        });
+      }else{
+        Swal.fire({
+            title: "Are you sure you want to delete the selected items?",
+            text: "This action cannot be undone. Once deleted.",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            $.ajax({
+              //url: "#",  // Replace with your backend endpoint
+              url: "{% url 'business_data:delete-products' %}",  
+              type: 'POST',
+              data: {
+                selectedIds: selectedIds,
+                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
+              },
+              success: function(response) {
+                Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  text: response.message,
+                  showConfirmButton: true,
+                }).then((result) => {
+                    location.reload();
+                });
+              },
+              error: function(xhr, status, error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+                });
+              }
+            });
+
+          } 
+        });
+        
+      }
+    });
 
 </script>
 {% endblock push_scripts %}

@@ -1,6 +1,8 @@
 import csv
 import os
 from random import randint
+from venv import logger
+from django.db import transaction
 
 from django.urls import reverse_lazy
 import pandas as pd
@@ -9,12 +11,13 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.validators import validate_email
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-
+from django.views.generic.edit import UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
 import phonenumber_field
 
@@ -735,68 +738,62 @@ class ProductPreviewView(View):
             def generate_unique_color():
                     return "#{:06x}".format(randint(0, 0xFFFFFF))
             tag = generate_unique_color()
-            
-            for _, row in df.iterrows():
-                print(row['fabric_article_supplier'])
-
-                try:
-                    product = Product.objects.create(
-                        date=row['date'],
-                        fabric_article_supplier=row['fabric_article_supplier'],
-                        fabric_article_fexpo=row['fabric_article_fabric_expo'],
-                        fabric_mill_supplier=row['fabric_mill_supplier'],
-                        rd_generated_date=row['rd_generated_date'],
-                        fabric_mill_source=row['fabric_mill_source'],
-                        coo=row['coo'],
-                        product_category=row['product_category'],
-                        mill_reference=row['mill_reference'],
-                        fabricexpo_reference=row['fabric_expo_reference'],
-                        season=row['season'],
-                        style=row['style'],
-                        po=row['po'],
-                        customer_name=row['customer_name'],
-                        composition=row['composition'],
-                        construction=row['construction'],
-                        weight=row['weight'],
-                        color=row['color'],
-                        cut_width=row['cut_width'],
-                        wash=row['wash'],
-                        price_per_yard=row['price_per_yard'],
-                        shrinkage_percent=row['shrinkage_percent'],
-                        stock_qty=row['stock_qty'],
-                        # <td>{{'item.images'=row[''],
-                        barcode=row['barcode'],
-                        qr_code=row['qr_code'],
-                        concern_person=row['concern_person'],
-                        tag=tag
-                    )
-                except Exception as e:
-                    print(e)
-                    messages.error(request, "Invalid data upload. Please check your file and try again.")
-                    if default_storage.exists(file_path):
-                        default_storage.delete(file_path)
-                    request.session.pop('preview_data', None)
-                    request.session.pop('temp_file_path', None)
-                    return redirect('business_data:product-upload')
-                
-                messages.success(request, "Products has been successfully saved.")
-
-                # if product:
-                #     # email ids
-                #     if row['email_id1']:
-                #         try:
-                #             validate_email(row['email_id1'])
-                #             if not PersonEmail.objects.filter(email=row['email_id1']).exists():
-                #                 PersonEmail.objects.create(email=row['email_id1'], contact_info=product)
-                #         except ValidationError:
-                #             pass  # Invalid email, skip or handle as needed
-                    
+            try:
+                with transaction.atomic():
+                    for _, row in df.iterrows():
+                        try:
+                            Product.objects.create(
+                                date=row.get('date'),
+                                fabric_article_supplier=row.get('fabric_article_supplier', ''),
+                                fabric_article_fexpo=row.get('fabric_article_fabric_expo', ''),
+                                fabric_mill_supplier=row.get('fabric_mill_supplier', ''),
+                                rd_generated_date=row.get('rd_generated_date', ''),
+                                fabric_mill_source=row.get('fabric_mill_source', ''),
+                                coo=row.get('coo', ''),
+                                product_category=row.get('product_category', ''),
+                                mill_reference=row.get('mill_reference', ''),
+                                fabricexpo_reference=row.get('fabric_expo_reference', ''),
+                                season=row.get('season', ''),
+                                style=row.get('style', ''),
+                                po=row.get('po', ''),
+                                customer_name=row.get('customer_name', ''),
+                                composition=row.get('composition', ''),
+                                construction=row.get('construction', ''),
+                                weight=row.get('weight', ''),
+                                color=row.get('color', ''),
+                                cut_width=row.get('cut_width', ''),
+                                wash=row.get('wash', ''),
+                                price_per_yard=row.get('price_per_yard', 0),
+                                shrinkage_percent=row.get('shrinkage_percent', 0),
+                                stock_qty=row.get('stock_qty', 0),
+                                barcode=row.get('barcode', ''),
+                                qr_code=row.get('qr_code', ''),
+                                concern_person=row.get('concern_person', ''),
+                                tag=tag
+                            )
+                        except Exception as row_e:
+                            logger.error("Row import failed: %s", row_e)
+                            messages.error(request, f"Row import failed: {row_e}")
+                            if default_storage.exists(file_path):
+                                default_storage.delete(file_path)
+                            request.session.pop('preview_product_data', None)
+                            request.session.pop('temp_file_path', None)
+                            return redirect('business_data:product-upload')
+                    messages.success(request, "Products have been successfully saved.")
+            except Exception as e:
+                logger.error("Bulk import failed: %s", e)
+                messages.error(request, "Bulk import failed. Please check your file and try again.")
+                if default_storage.exists(file_path):
+                    default_storage.delete(file_path)
+                request.session.pop('preview_product_data', None)
+                request.session.pop('temp_file_path', None)
+                return redirect('business_data:product-upload')
 
 
         if default_storage.exists(file_path):
             default_storage.delete(file_path)
 
-        request.session.pop('preview_data', None)
+        request.session.pop('preview_product_data', None)
         request.session.pop('temp_file_path', None)
 
         return redirect('business_data:product-upload') 
@@ -804,5 +801,24 @@ class ProductPreviewView(View):
 class ProductListView(ListView):
     model = Product
     template_name = "business_data/manage_products/product_list.html"
+
+    def get_queryset(self):
+        return Product.objects.filter(is_deleted=False)
+
+
+# delete products 
+class DeleteProductView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
+    model = Product
+    fields= ['is_deleted']
+    permission_required = 'business_data.delete_product'
+
+    def post(self, request, *args, **kwargs):
+        ids = request.POST.getlist('selectedIds[]')
+        if not ids:
+            return JsonResponse({'error': 'No IDs provided.'}, status=400)
+        Product.objects.filter(id__in=ids).soft_delete()
+        return JsonResponse({'message': 'Selected products deleted successfully.'})
+
+
 """End::Product Details"""
 

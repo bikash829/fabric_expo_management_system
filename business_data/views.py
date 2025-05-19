@@ -1,7 +1,9 @@
 import csv
 import os
 from random import randint
-from venv import logger
+import logging
+logger = logging.getLogger(__name__)
+
 from django.db import transaction
 
 from django.urls import reverse_lazy
@@ -15,11 +17,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
-import phonenumber_field
 
 from .forms import BuyerUploadForm, FileUploadForm
 
@@ -246,7 +246,6 @@ class GenerateCSVBuyer(View):
 class BuyerListView(ListView):
     model = Buyer
     template_name = "business_data/manage_buyers/buyer_list.html"
-
 
 
 # delete customers 
@@ -509,7 +508,6 @@ class GenerateCSVSupplier(View):
         return response
 
 
-
 # upload suppliers
 class SupplierUploadView(View):
     def get(self, request):
@@ -694,7 +692,6 @@ class SupplierListView(ListView):
     template_name = "business_data/manage_suppliers/supplier_list.html"
 
 
-
 # soft delete supplier 
 class DeleteSupplierView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
     model = Supplier
@@ -786,7 +783,6 @@ class ProductUploadView(View):
             'csv_generator_url': reverse_lazy('business_data:product_demo_csv'), 
         }
         return render(request, 'business_data/forms/upload.html', context) 
-
 
 
 # preview product list 
@@ -889,6 +885,7 @@ class ProductPreviewView(View):
 
         return redirect('business_data:product-upload') 
 # Product list 
+
 class ProductListView(ListView):
     model = Product
     template_name = "business_data/manage_products/product_list.html"

@@ -14,14 +14,19 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.validators import validate_email
 from django.http import HttpResponse, JsonResponse
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
+from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
 
 from .forms import BuyerUploadForm, FileUploadForm
+
+from faker import Faker
+from random import randint, choice, uniform
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -725,29 +730,69 @@ class GenerateCSVProduct(View):
             "images", "barcode", "qr_code", "concern_person"
         ])
 
-        writer.writerow([
-            "2025-05-16", "ABC Textiles Ltd", "ExpoTex 2025", "Global Mills Co.", "2025-04-01", "China",
-            "CN", "Denim", "GM1234", "ETX-567", "Spring/Summer", "ST-001", "PO12345", "Levi's", "98% Cotton, 2% Spandex",
-            "3x1 Right Hand Twill", "12 oz", "Indigo Blue", "58 in",
-            "Enzyme Wash", "7.50", "2.5", "1200",
-            "image1.png", "123456789012", "https://example.com/qrcode1", "John Doe"
-        ])
+        """begin::faker"""
+        fake = Faker()
+        categories = ["Denim", "Twill", "Chino", "Cotton", "Polyester"]
+        seasons = ["Spring/Summer", "Fall/Winter", "Resort"]
+        washes = ["Enzyme Wash", "Stone Wash", "No Wash", "Acid Wash"]
+        colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
+        images = ["image1.png", "image2.jpg", "image2.png"]
 
-        writer.writerow([
-            "2025-05-16", "XYZ Fabrics", "Global Fabric Expo", "TexSource India", "2025-03-20", "India",
-            "IN", "Twill", "TX5678", "GFE-789", "Fall/Winter", "ST-002", "PO67890", "Zara", "100% Cotton",
-            "2x2 Twill", "10 oz", "Charcoal Grey", "56 in",
-            "Stone Wash", "6.80", "3.0", "850",
-            "image2.jpg", "987654321098", "https://example.com/qrcode2", "Jane Smith"
-        ])
+        for _ in range(10):  # Change to any number you want
+            writer.writerow([
+                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.company(),
+                fake.company(),
+                fake.company(),
+                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.country(),
+                fake.country_code(),
+                choice(categories),
+                fake.bothify(text="??####"),
+                fake.bothify(text="??-###"),
+                choice(seasons),
+                fake.bothify(text="ST-###"),
+                fake.bothify(text="PO#####"),
+                fake.company(),
+                f"{randint(90, 100)}% Cotton, {randint(0, 10)}% Spandex",
+                fake.word().capitalize() + " Weave",
+                f"{randint(7, 14)} oz",
+                choice(colors),
+                f"{randint(50, 65)} in",
+                choice(washes),
+                round(uniform(3.0, 15.0), 2),
+                round(uniform(1.0, 5.0), 2),
+                randint(100, 5000),
+                choice(images),
+                fake.ean13(),
+                fake.url(),
+                fake.name()
+            ])
 
-        writer.writerow([
-            "2025-05-16", "Elite Textiles", "AsiaTex Show", "Premium Mills", "2025-02-15", "Bangladesh",
-            "BD", "Chino", "PM7890", "ATS-234", "Resort", "ST-003", "PO11223", "H&M", "97% Cotton, 3% Elastane",
-            "Fine Chino Weave", "8 oz", "Khaki", "60 in",
-            "No Wash", "5.95", "1.8", "500",
-            "image2.png", "456789123456", "https://example.com/qrcode3", "Alex Lee"
-        ])
+        """end::faker"""
+        # writer.writerow([
+        #     "2025-05-16", "ABC Textiles Ltd", "ExpoTex 2025", "Global Mills Co.", "2025-04-01", "China",
+        #     "CN", "Denim", "GM1234", "ETX-567", "Spring/Summer", "ST-001", "PO12345", "Levi's", "98% Cotton, 2% Spandex",
+        #     "3x1 Right Hand Twill", "12 oz", "Indigo Blue", "58 in",
+        #     "Enzyme Wash", "7.50", "2.5", "1200",
+        #     "image1.png", "123456789012", "https://example.com/qrcode1", "John Doe"
+        # ])
+
+        # writer.writerow([
+        #     "2025-05-16", "XYZ Fabrics", "Global Fabric Expo", "TexSource India", "2025-03-20", "India",
+        #     "IN", "Twill", "TX5678", "GFE-789", "Fall/Winter", "ST-002", "PO67890", "Zara", "100% Cotton",
+        #     "2x2 Twill", "10 oz", "Charcoal Grey", "56 in",
+        #     "Stone Wash", "6.80", "3.0", "850",
+        #     "image2.jpg", "987654321098", "https://example.com/qrcode2", "Jane Smith"
+        # ])
+
+        # writer.writerow([
+        #     "2025-05-16", "Elite Textiles", "AsiaTex Show", "Premium Mills", "2025-02-15", "Bangladesh",
+        #     "BD", "Chino", "PM7890", "ATS-234", "Resort", "ST-003", "PO11223", "H&M", "97% Cotton, 3% Elastane",
+        #     "Fine Chino Weave", "8 oz", "Khaki", "60 in",
+        #     "No Wash", "5.95", "1.8", "500",
+        #     "image2.png", "456789123456", "https://example.com/qrcode3", "Alex Lee"
+        # ])
 
 
         return response
@@ -886,11 +931,116 @@ class ProductPreviewView(View):
         return redirect('business_data:product-upload') 
 # Product list 
 
-class ProductListView(ListView):
-    model = Product
+class ProductListView(TemplateView):
+    # model = Product
     template_name = "business_data/manage_products/product_list.html"
 
+class ProductDataSourceView(View):
+    def get(self, request, *args, **kwargs):
+        draw = int(request.GET.get('draw', 1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        search_value = request.GET.get('search[value]', '')
+        order_column_index = request.GET.get('order[0][column]', 0)
+        order_dir = request.GET.get('order[0][dir]', 'desc')
 
+        columns = [
+            'id', 'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+            'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
+            'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
+            'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
+            'shrinkage_percent', 'stock_qty', 'images', 'barcode', 'qr_code', 'concern_person'
+        ]
+
+        order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
+        if order_dir == 'desc':
+            order_field = '-' + order_field
+
+        qs = Product.objects.all()
+
+        if search_value:
+            search_q = Q()
+            # List of fields to search (including id and all relevant fields)
+            search_fields = [
+            'id',
+            'date',
+            'fabric_article_supplier',
+            'fabric_article_fexpo',
+            'fabric_mill_supplier',
+            'rd_generated_date',
+            'fabric_mill_source',
+            'coo',
+            'product_category',
+            'mill_reference',
+            'fabricexpo_reference',
+            'season',
+            'style',
+            'po',
+            'customer_name',
+            'composition',
+            'construction',
+            'weight',
+            'color',
+            'cut_width',
+            'wash',
+            'price_per_yard',
+            'shrinkage_percent',
+            'stock_qty',
+            'barcode',
+            'qr_code',
+            'concern_person',
+            'tag',
+            ]
+            for col in search_fields:
+                search_q |= Q(**{f"{col}__icontains": search_value})
+            qs = qs.filter(search_q)
+
+        total_count = Product.objects.count()
+        filtered_count = qs.count()
+
+        qs = qs.order_by(order_field)[start:start+length]
+
+        data = []
+        for idx,obj in enumerate(qs,start=start+1):
+        
+            data.append([
+                idx,  # For Count column (can be filled on client side)
+                obj.id,
+                obj.date,
+                obj.fabric_article_supplier,
+                obj.fabric_article_fexpo,
+                obj.fabric_mill_supplier,
+                obj.rd_generated_date,
+                obj.fabric_mill_source,
+                obj.coo,
+                obj.product_category,
+                obj.mill_reference,
+                obj.fabricexpo_reference,
+                obj.season,
+                obj.style,
+                obj.po,
+                obj.customer_name,
+                obj.composition,
+                obj.construction,
+                obj.weight,
+                obj.color,
+                obj.cut_width,
+                obj.wash,
+                obj.price_per_yard,
+                obj.shrinkage_percent,
+                obj.stock_qty,
+                '',  # images (handle as needed)
+                obj.barcode,
+                obj.qr_code,
+                obj.concern_person,
+            ])
+
+        return JsonResponse({
+            'draw': draw,
+            'recordsTotal': total_count,
+            'recordsFiltered': filtered_count,
+            'data': data,
+        })
 # delete products 
 class DeleteProductView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
     model = Product

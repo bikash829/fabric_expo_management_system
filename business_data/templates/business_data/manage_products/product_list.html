@@ -154,6 +154,16 @@
     const table = $('#data_list').DataTable({
       responsive: true,
       // select: true,
+      serverSide: true,
+      ajax: '{% url "business_data:product_data_source" %}',
+      createdRow: function(row, data, dataIndex) {
+        $(row).attr('data-id', data[1]);
+      },
+      // columns: [
+      //  { data: 'date' },
+      //  { data: 'fabric_article_supplier' },
+      //   ...other fields...
+      // ]
     });
 
     // toggle select data_list
@@ -194,10 +204,14 @@
       const selectedIds = [];
       $('#data_list tbody tr.selected').each(function(e) {
         selectedIds.push($(this).data('id'));
-      });   
+      });
+      console.log(selectedIds)
+      
+      
       
 
       if (selectedIds.length === 0){
+        console.log(selectedIds)
         Swal.fire({
           icon: 'info', 
           text: "Please select desired recipients first!"
@@ -211,6 +225,7 @@
         }).then((result) => {
           /* Read more about isConfirmed, isDenied below */
           if (result.isConfirmed) {
+            console.log(selectedIds)
             $.ajax({
               //url: "#",  // Replace with your backend endpoint
               url: "{% url 'business_data:delete-products' %}",  

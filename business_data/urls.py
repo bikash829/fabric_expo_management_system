@@ -36,6 +36,7 @@ urlpatterns = [
     path('product-upload/', views.ProductUploadView.as_view(), name='product-upload'),
     path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
     path('product-list/',views.ProductListView.as_view(),name='product-list'),
+    path('data-source', views.ProductDataSourceView.as_view(), name='product_data_source'),
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""
 

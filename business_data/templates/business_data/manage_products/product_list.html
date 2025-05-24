@@ -32,7 +32,7 @@
         <table id="data_list" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                  <th>Count</th>
+                  {% comment %} <th>Count</th> {% endcomment %}
                   <th>#ID</th>
                   <th>{{'date'|pretty_label}}</th>
                   <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
@@ -64,7 +64,7 @@
                   
               </tr>
           </thead>
-          <tbody>
+          {% comment %} <tbody>
               {% for item in object_list %}
               <tr data-id="{{item.id}}">
                   <td>{{forloop.counter}}</td>
@@ -98,10 +98,10 @@
                   <td>{{item.concern_person}}</td>
               </tr>
               {% endfor %}
-          </tbody>
+          </tbody> {% endcomment %}
           <tfoot>
               <tr>
-                 <th>Count</th>
+                 {% comment %} <th>Count</th> {% endcomment %}
                 <th>#ID</th>
                 <th>{{'date'|pretty_label}}</th>
                 <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
@@ -156,6 +156,7 @@
       // select: true,
       serverSide: true,
       ajax: '{% url "business_data:product_data_source" %}',
+      processing: true,
       createdRow: function(row, data, dataIndex) {
         $(row).attr('data-id', data[1]);
       },

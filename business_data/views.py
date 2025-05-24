@@ -1011,7 +1011,7 @@ class ProductDataSourceView(View):
         for idx,obj in enumerate(qs,start=start+1):
         
             data.append([
-                idx,  # For Count column (can be filled on client side)
+                # idx,  # For Count column (can be filled on client side)
                 obj.id,
                 obj.date,
                 obj.fabric_article_supplier,

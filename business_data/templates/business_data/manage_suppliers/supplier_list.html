@@ -58,7 +58,7 @@
               </tr>
           </thead>
           <tbody>
-              {% for item in object_list %}
+              {% comment %} {% for item in object_list %}
               <tr  data-id="{{item.id}}">
                   <td>{{forloop.counter}}</td>
                   <td>{{item.id}}</td>
@@ -122,7 +122,7 @@
                 <th>{{'remarks'|pretty_label}}</th>
                 <th>{{'concern_fe_representative'|pretty_label}}</th>
                 
-              </tr>
+              </tr> {% endcomment %}
           </tfoot>
         </table>
       </div>
@@ -144,7 +144,35 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      // select: true,
+      serverSide: true,
+      ajax: '{% url "business_data:supplier_data_source" %}',
+      createdRow: function(row, data, dataIndex) {
+        $(row).attr('data-id', data.id);
+      },
+      columns: [
+        { data: 'count' },
+        { data: 'id' },
+        { data: 'date' },
+        { data: 'mill_name' },
+        { data: 'supplier_name' },
+        { data: 'concern_person_name' },
+        { data: 'concern_person_designation' },
+        { data: 'product_category' },
+        { data: 'product_range' },
+        { data: 'speciality' },
+        { data: 'coo' },
+        { data: 'email' },
+        { data: 'phone_number' },
+        { data: 'whatsapp_number' },
+        { data: 'wechat_number' },
+        { data: 'payment_term' },
+        { data: 'fabric_reference_dealing_with' },
+        { data: 'mailing_address' },
+        { data: 'factory_visiting_address' },
+        { data: 'linkedin_profile_link' },
+        { data: 'remarks' },
+        { data: 'concern_fe_representative' },
+      ]
     });
 
     // toggle select data_list

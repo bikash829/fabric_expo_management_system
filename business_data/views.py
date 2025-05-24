@@ -941,8 +941,8 @@ class ProductDataSourceView(View):
         start = int(request.GET.get('start', 0))
         length = int(request.GET.get('length', 10))
         search_value = request.GET.get('search[value]', '')
-        order_column_index = request.GET.get('order[0][column]', 0)
-        order_dir = request.GET.get('order[0][dir]', 'desc')
+        order_column_index = int(request.GET.get('order[0][column]', 0))
+        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
 
         columns = [
             'id', 'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
@@ -952,9 +952,16 @@ class ProductDataSourceView(View):
             'shrinkage_percent', 'stock_qty', 'images', 'barcode', 'qr_code', 'concern_person'
         ]
 
-        order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
-        if order_dir == 'desc':
-            order_field = '-' + order_field
+        # order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
+        # if order_dir == 'desc':
+        #     order_field = '-' + order_field
+        if 0 <= order_column_index < len(columns):
+            order_field = columns[order_column_index]
+            if order_dir == 'desc':
+                order_field = '-' + order_field
+        else:
+            order_field = 'id'  # fallback
+
 
         qs = Product.objects.all()
 

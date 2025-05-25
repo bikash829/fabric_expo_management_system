@@ -30,8 +30,9 @@
 
       <div>
         <table id="data_list" class="table table-striped" style="width:100%">
-          {% comment %} <thead>
+          <thead>
               <tr>
+                  <th>Count</th>
                   <th>#ID</th>
                   <th>{{'date'|pretty_label}}</th>
                   <th>{{'company_name'|pretty_label}}</th>
@@ -55,8 +56,8 @@
                   <th>{{'concern_fe_representative'|pretty_label}}</th>
                   
               </tr>
-          </thead> {% endcomment %}
-          {% comment %} <tbody>
+          </thead>
+          <tbody>
               {% for item in object_list %}
               <tr  data-id="{{item.id}}"> 
                   <td>{{forloop.counter}}</td>
@@ -95,9 +96,10 @@
                   <td>{{item.concern_fe_rep}}</td>
               </tr>
               {% endfor %}
-          </tbody> {% endcomment %}
-          {% comment %} <tfoot>
+          </tbody>
+          <tfoot>
               <tr>
+                <th>Count</th>
                 <th>#ID</th>
                 <th>{{'date'|pretty_label}}</th>
                 <th>{{'company_name'|pretty_label}}</th>
@@ -121,7 +123,7 @@
                 <th>{{'concern_fe_representative'|pretty_label}}</th>
                 
               </tr>
-          </tfoot> {% endcomment %}
+          </tfoot>
         </table>
       </div>
     </div>
@@ -142,33 +144,8 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      processing: true,
-      serverSide: true,
-      ajax      : "{% url 'business_data:buyer-data-source' %}",
-      columns   :[
-        { data: 'id', title: '#ID' },
-        { data: 'date', title: 'Date' },
-        { data: 'company_name', title: 'Company Name' },
-        { data: 'organization_type', title: 'Organization Type' },
-        { data: 'brand', title: 'Brand' },
-        { data: 'category', title: 'Category' },
-        { data: 'department', title: 'Department' },
-        { data: 'buyer_name', title: 'Buyer Name' },
-        { data: 'designation', title: 'Designation' },
-        { data: 'country_of_origin', title: 'COO' },
-        { data: 'website', title: 'Company Website' },
-        { data: 'emails', title: 'Buyer Email ID', render: function(data) { return Array.isArray(data) ? data.join(', ') : data; } },
-        { data: 'whatsapp_numbers', title: 'Whatsapp Number', render: function(data) { return Array.isArray(data) ? data.join(', ') : data; } },
-        { data: 'phones', title: 'Phone Number', render: function(data) { return Array.isArray(data) ? data.join(', ') : data; } },
-        { data: 'payment_term', title: 'Payment Term' },
-        { data: 'fabric_reference', title: 'Fabric Reference Dealing With' },
-        { data: 'mailing_address', title: 'Mailing Address' },
-        { data: 'visiting_address', title: 'Visiting Address' },
-        { data: 'linkedin_profile', title: 'Linkedin Profile Link' },
-        { data: 'remarks', title: 'Remarks' },
-        { data: 'concern_fe_rep', title: 'Concern FE Representative' }
-      ]
-
+      // select: true,
+      order: [[1, 'desc']], // Sort second column (#ID) in descending order
 
     });
 

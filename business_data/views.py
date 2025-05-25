@@ -494,21 +494,56 @@ class GenerateCSVSupplier(View):
             "wechat_number", "payment_term", "fabric_reference_dealing_with", "mailing_address",
             "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
         ])
-        writer.writerow([
-            "2025-05-15", "Sunshine Textiles", "Global Fibers Ltd.", "John Doe", "Procurement Manager", "Cotton",
-            "Lightweight", "Organic", "India", "john.doe@globalfibers.com", "doe.j@fibersmail.com", "jd.supply@sunshine.com",
-            "+91-9876543210", "+91-9123456789", "+91-9876543210",
-            "john_doe123", "Net 30", "Ref001", "123 Mill Road, Mumbai, India",
-            "456 Corporate Avenue, Mumbai, India", "https://linkedin.com/in/johndoe", "Reliable supplier with on-time delivery", "Fahim Rahman"
-        ])
 
-        writer.writerow([
-            "2025-05-15", "Evergreen Mills", "Textura Inc.", "Jane Smith", "Supply Chain Director", "Polyester",
-            "Heavyweight", "Water-resistant", "China", "jane.smith@textura.cn", "smith.jane@evergreen.com", "jsupplies@textura.cn",
-            "+86-1357924680", "+86-1398765432", "+86-1357924680",
-            "jane_smith88", "Net 45", "Ref009", "88 Textile Park, Hangzhou, China",
-            "12 Industry Street, Hangzhou, China", "https://linkedin.com/in/janesmith", "Interested in sustainable options", "Hasan Chowdhury"
-        ])
+        fake = Faker()
+        categories = ["Cotton", "Polyester", "Denim", "Linen", "Wool"]
+        ranges = ["Lightweight", "Heavyweight", "Mediumweight", "Stretch", "Non-stretch"]
+        specialities = ["Organic", "Water-resistant", "Sustainable", "Recycled", "Premium"]
+        designations = ["Procurement Manager", "Supply Chain Director", "Sales Lead", "Account Manager", "Operations Head"]
+        payment_terms = ["Net 30", "Net 45", "Advance", "LC at Sight"]
+        remarks_list = [
+            "Reliable supplier with on-time delivery",
+            "Interested in sustainable options",
+            "Excellent quality control",
+            "Flexible payment terms",
+            "Fast response time"
+        ]
+        for _ in range(1000):
+            name1 = fake.name()
+            name2 = fake.name()
+            email1 = fake.email()
+            email2 = fake.email()
+            email3 = fake.email()
+            phone1 = fake.phone_number()
+            phone2 = fake.phone_number()
+            whatsapp = fake.phone_number()
+            wechat = fake.user_name()
+
+            writer.writerow([
+                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.company(),
+                fake.company(),
+                name1,
+                choice(designations),
+                choice(categories),
+                choice(ranges),
+                choice(specialities),
+                fake.country(),
+                email1,
+                email2,
+                email3,
+                phone1,
+                phone2,
+                whatsapp,
+                wechat,
+                choice(payment_terms),
+                fake.bothify(text="Ref###"),
+                fake.address().replace('\n', ', '),
+                fake.address().replace('\n', ', '),
+                fake.url(),
+                choice(remarks_list),
+                name2
+            ])
 
         return response
 
@@ -695,6 +730,134 @@ class SupplierPreviewView(View):
 class SupplierListView(ListView):
     model = Supplier
     template_name = "business_data/manage_suppliers/supplier_list.html"
+
+
+# data-table source for supplier list 
+class SupplierDataSourceView(View):
+    def get(self, request, *args, **kwargs):
+        draw = int(request.GET.get('draw',1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        search_value = request.GET.get('search[value]', '')
+        order_col_index = request.GET.get('order[0][column]', 0)
+        order_dir = request.GET.get('order[0][dir]', 'asc')
+
+        # sorting columns
+        columns = [
+            'id',
+            'date',
+            'mill_name',
+            'supplier_name',
+            'concern_person',
+            'concern_person_designation',
+            'product_category',
+            'product_range',
+            'speciality',
+            'country_of_origin',
+            'emails__email',
+            'phones__phone',
+            'phones__phone',
+            'wechat_id',
+            'payment_term',
+            'fabric_reference',
+            'mailing_address',
+            'visiting_address',
+            'linkedin_profile',
+            'remarks',
+            'concern_fe_rep',
+        ]
+        # Sorting
+        # if order_col_index < 0 or order_col_index >= len(columns):
+        #     order_col_index = 0
+        order_column = columns[int(order_col_index)]
+        if order_dir == 'desc':
+            order_column = '-' + order_column
+
+
+        # get supplier list 
+        qs = Supplier.objects.all().prefetch_related('emails', 'phones')
+        
+        if search_value:
+            search_q = Q()
+            # List of fields to search (including id and all relevant fields)
+            search_fields = [
+                'id',
+                'date',
+                'mill_name',
+                'supplier_name',
+                'concern_person',
+                'concern_person_designation',
+                'product_category',
+                'product_range',
+                'speciality',
+                'country_of_origin',
+                'emails__email',
+                'phones__phone',
+                # 'personphone__is_whatsapp',
+                'wechat_id',
+                'payment_term',
+                'fabric_reference',
+                'mailing_address',
+                'visiting_address',
+                'linkedin_profile',
+                'remarks',
+                'concern_fe_rep',
+            ]
+
+            for col in search_fields:
+                search_q |= Q(**{f"{col}__icontains": search_value})
+            qs = qs.filter(search_q)
+
+        total_count = Supplier.objects.count()
+        filtered_count = qs.count()
+        
+        # Ordering and pagination
+        qs = qs.order_by(order_column)[start:start + length]
+
+        data = []
+        for obj in qs:
+            data.append({
+                'id': obj.id,
+                'date': obj.date,
+                'mill_name': getattr(obj, 'mill_name', ''),
+                'supplier_name': getattr(obj, 'supplier_name', ''),
+                'concern_person': getattr(obj, 'concern_person', ''),
+                'concern_person_designation': getattr(obj, 'concern_person_designation', ''),
+                'product_category': getattr(obj, 'product_category', ''),
+                'product_range': getattr(obj, 'product_range', ''),
+                'speciality': getattr(obj, 'speciality', ''),
+                'country_of_origin': getattr(obj, 'country_of_origin', ''),
+                'emails': ', '.join([p.email for p in obj.emails.all()]),
+                'phones': ', '.join([p.phone for p in obj.phones.all() if not p.is_whatsapp]),
+                'whatsapp_numbers': ', '.join([p.phone for p in obj.phones.all() if p.is_whatsapp]),
+                # 'emails': [p.email for p in obj.emails],
+                # 'phones': [p.phone for p in obj.phones if not p.is_whatsapp],
+                # 'whatsapp_numbers': [p.phone for p in obj.phones if p.is_whatsapp],
+                'wechat_id': getattr(obj, 'wechat_id', ''),
+                'payment_term': getattr(obj, 'payment_term', ''),
+                'fabric_reference': getattr(obj, 'fabric_reference', ''),
+                'mailing_address': getattr(obj, 'mailing_address', ''),
+                'visiting_address': getattr(obj, 'visiting_address', ''),
+                'linkedin_profile': getattr(obj, 'linkedin_profile', ''),
+                'remarks': getattr(obj, 'remarks', ''),
+                'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
+                'tag': getattr(obj, 'tag', ''),
+                # Add custom row attributes:
+                'DT_RowAttr': {
+                    'data-id': obj.id,
+                    # 'data-status': 'active' if obj.is_active else 'inactive',
+                }
+            })
+
+
+        return JsonResponse({
+            'draw': draw,
+            'recordsTotal': total_count,
+            'recordsFiltered': filtered_count,
+            'data': data,
+        })
+
+
 
 
 # soft delete supplier 
@@ -952,15 +1115,10 @@ class ProductDataSourceView(View):
             'shrinkage_percent', 'stock_qty', 'images', 'barcode', 'qr_code', 'concern_person'
         ]
 
-        # order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
-        # if order_dir == 'desc':
-        #     order_field = '-' + order_field
-        if 0 <= order_column_index < len(columns):
-            order_field = columns[order_column_index]
-            if order_dir == 'desc':
-                order_field = '-' + order_field
-        else:
-            order_field = 'id'  # fallback
+        order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
+        if order_dir == 'asc':
+            order_field = '-' + order_field
+
 
 
         qs = Product.objects.all()

@@ -28,6 +28,7 @@ urlpatterns = [
     path('supplier-upload/', views.SupplierUploadView.as_view(), name='supplier-upload'),
     path('supplier-preview/', views.SupplierPreviewView.as_view(), name='supplier-preview'),
     path('supplier-list/',views.SupplierListView.as_view(),name='supplier-list'),
+    path('data-source/',views.SupplierDataSourceView.as_view(),name="supplier-data-source"),
     path('delete-suppliers/',views.DeleteSupplierView.as_view(),name="delete-suppliers"),
     # End::Supplier details"""
 

@@ -11,7 +11,7 @@ urlpatterns = [
     path('upload/', views.BuyerUploadView.as_view(), name='buyer-upload'),
     path('preview/', views.BuyerPreviewView.as_view(), name='buyer-preview'),
     path('buyer_list/',views.BuyerListView.as_view(),name='buyer_list'),
-    path('data-source/',views.BuyerDataSourceView.as_view(),name="buyer-data-source"),
+    path('data-source/buyers/',views.BuyerDataSourceView.as_view(),name="buyer-data-source"),
     path('delete-buyers/',views.DeleteBuyerView.as_view(),name="delete-buyers"),
     # path('success/', lambda request: render(request, 'business_data/manage_buyers/success.html'), name='upload-success'),
     # End::buyer details """
@@ -21,7 +21,7 @@ urlpatterns = [
     path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
     path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
     path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
-    path('data-source/',views.CustomerDataSourceView.as_view(),name="customer-data-source"),
+    path('customer/data-source/',views.CustomerDataSourceView.as_view(),name="customer-data-source"),
     path('delete-customers/',views.DeleteCustomerView.as_view(),name="delete-customers"),
     # End::Customer details"""
 
@@ -30,7 +30,7 @@ urlpatterns = [
     path('supplier-upload/', views.SupplierUploadView.as_view(), name='supplier-upload'),
     path('supplier-preview/', views.SupplierPreviewView.as_view(), name='supplier-preview'),
     path('supplier-list/',views.SupplierListView.as_view(),name='supplier-list'),
-    path('data-source/',views.SupplierDataSourceView.as_view(),name="supplier-data-source"),
+    path('suppliers/data-source/',views.SupplierDataSourceView.as_view(),name="supplier-data-source"),
     path('delete-suppliers/',views.DeleteSupplierView.as_view(),name="delete-suppliers"),
     # End::Supplier details"""
 
@@ -39,7 +39,7 @@ urlpatterns = [
     path('product-upload/', views.ProductUploadView.as_view(), name='product-upload'),
     path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
     path('product-list/',views.ProductListView.as_view(),name='product-list'),
-    path('data-source/', views.ProductDataSourceView.as_view(), name='product_data_source'),
+    path('products/data-source/', views.ProductDataSourceView.as_view(), name='product_data_source'),
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""
 

@@ -269,8 +269,8 @@ class GenerateCSVBuyer(View):
         return response
         
 # Buyer list 
-class BuyerListView(ListView):
-    model = Buyer
+class BuyerListView(TemplateView):
+    # model = Buyer
     template_name = "business_data/manage_buyers/buyer_list.html"
 
 class BuyerDataSourceView(View):

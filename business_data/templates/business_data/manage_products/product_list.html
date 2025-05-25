@@ -226,7 +226,16 @@
         }).then((result) => {
           /* Read more about isConfirmed, isDenied below */
           if (result.isConfirmed) {
-            console.log(selectedIds)
+            // Show loader
+            Swal.fire({
+              title: 'Deleting...',
+              text: 'Please wait while we delete the selected items.',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
             $.ajax({
               //url: "#",  // Replace with your backend endpoint
               url: "{% url 'business_data:delete-products' %}",  

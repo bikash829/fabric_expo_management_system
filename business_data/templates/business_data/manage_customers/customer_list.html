@@ -32,13 +32,12 @@
         <table id="data_list" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                  <th>Count</th>
                   <th>#ID</th>
                   <th>{{'date'|pretty_label}}</th>
                   <th>{{'company_name'|pretty_label}}</th>
                   <th>{{'organization_type'|pretty_label}}</th>
                   <th>{{'brand'|pretty_label}}</th>
-                  <th>{{'category'|pretty_label}}</th>
+                  {% comment %} <th>{{'category'|pretty_label}}</th> {% endcomment %}
                   <th>{{'department'|pretty_label}}</th>
                   <th>{{'customer_name'|pretty_label}}</th>
                   <th>{{'designation'|pretty_label}}</th>
@@ -57,7 +56,7 @@
                   
               </tr>
           </thead>
-          <tbody>
+          {% comment %} <tbody>
               {% for item in object_list %}
               <tr data-id="{{item.id}}">
                   <td>{{forloop.counter}}</td>
@@ -96,16 +95,15 @@
                   <td>{{item.concern_fe_rep}}</td>
               </tr>
               {% endfor %}
-          </tbody>
+          </tbody> {% endcomment %}
           <tfoot>
               <tr>
-                <th>Count</th>
                 <th>#ID</th>
                 <th>{{'date'|pretty_label}}</th>
                 <th>{{'company_name'|pretty_label}}</th>
                 <th>{{'organization_type'|pretty_label}}</th>
                 <th>{{'brand'|pretty_label}}</th>
-                <th>{{'category'|pretty_label}}</th>
+                {% comment %} <th>{{'category'|pretty_label}}</th> {% endcomment %}
                 <th>{{'department'|pretty_label}}</th>
                 <th>{{'customer_name'|pretty_label}}</th>
                 <th>{{'designation'|pretty_label}}</th>
@@ -144,8 +142,50 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      // select: true,
-      order: [[1, 'desc']], // Sort second column (#ID) in descending order
+      ajax      : "{% url 'business_data:customer-data-source' %}",
+      columns   : [
+        {data: 'id'},
+        {data: 'date'},
+        {data: 'company_name'},
+        {data: 'organization_type'},
+        {data: 'brand'},
+        // {data: 'category'},
+        {data: 'department'},
+        {data: 'customer_name'},
+        {data: 'designation'},
+        {data: 'country_of_origin'},
+        {data: 'website'},
+        // Email column (example: show "N/A" if not provided)
+        { 
+          data: 'emails',
+          render: function(data) {
+            return data ? data : 'N/A';
+          }
+        },
+        // WhatsApp number column (example: show "N/A" if not provided)
+        { 
+          data: 'whatsapp_numbers',
+          render: function(data) {
+            return data ? data : 'N/A';
+          }
+        },
+        // Phone number column (example: show "N/A" if not provided)
+        { 
+          data: 'phones',
+          render: function(data) {
+            return data ? data : 'N/A';
+          }
+        },
+        {data: 'payment_term'},
+        {data: 'fabric_reference'},
+        {data: 'mailing_address'},
+        {data: 'visiting_address'},
+        {data: 'linkedin_profile'},
+        {data: 'remarks'},
+        {data: 'concern_fe_rep'},
+      ],
+      serverSide: true,
+      processing: true,
     });
 
     // toggle select data_list

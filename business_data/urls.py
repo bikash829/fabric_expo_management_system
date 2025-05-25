@@ -20,6 +20,7 @@ urlpatterns = [
     path('customer-upload/', views.CustomerUploadView.as_view(), name='customer-upload'),
     path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
     path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
+    path('data-source/',views.CustomerDataSourceView.as_view(),name="customer-data-source"),
     path('delete-customers/',views.DeleteCustomerView.as_view(),name="delete-customers"),
     # End::Customer details"""
 

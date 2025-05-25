@@ -425,9 +425,128 @@ class CustomerPreviewView(View):
         return redirect('business_data:customer-upload')
 
 
-class CustomerListView(ListView):
-    model = Customer
+class CustomerListView(TemplateView):
+    # model = Customer
     template_name= "business_data/manage_customers/customer_list.html"
+
+
+# customer data source 
+class CustomerDataSourceView(View):
+    def get(self, request, *args, **kwargs):
+        print("==========================here ")
+        draw = int(request.GET.get('draw',1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        search_value = request.GET.get('search[value]', '')
+        order_col_index = request.GET.get('order[0][column]', 0)
+        order_dir = request.GET.get('order[0][dir]', 'asc')
+
+
+        columns = [
+            'id',
+            'date',
+            'company_name',
+            'organization_type',
+            'brand',
+            # 'category',  # commented out in model creation
+            'department',
+            'customer_name',
+            'designation',
+            'country_of_origin',
+            'website',
+            'emails__email',
+            'phones__phone',
+            'phones__phone',
+            'payment_term',
+            'fabric_reference',
+            'mailing_address',
+            'visiting_address',
+            'linkedin_profile',
+            'remarks',
+            'concern_fe_rep',
+            'tag',
+        ]
+
+        order_column = columns[int(order_col_index)]
+        if order_dir == 'desc':
+            order_column = '-' + order_column
+
+        # get supplier list 
+        qs = Customer.objects.all()
+        
+        if search_value:
+            search_q = Q()
+            # List of fields to search (including id and all relevant fields)
+            search_fields = [
+                'id',
+                'date',
+                'company_name',
+                'organization_type',
+                'brand',
+                # 'category',
+                'department',
+                'customer_name',
+                'designation',
+                'country_of_origin',
+                'website',
+                'emails__email',
+                'phones__phone',
+                'payment_term',
+                'fabric_reference',
+                'mailing_address',
+                'visiting_address',
+                'linkedin_profile',
+                'remarks',
+                'concern_fe_rep',
+            ]
+
+            for col in search_fields:
+                search_q |= Q(**{f"{col}__icontains": search_value})
+            qs = qs.filter(search_q)
+
+        total_count = Product.objects.count()
+        filtered_count = qs.count()
+
+        # Ordering and pagination
+        qs = qs.order_by(order_column)[start:start + length]
+
+        data = []
+        for obj in qs:
+            data.append({
+                'id': obj.id,
+                'date': obj.date,
+                'company_name': getattr(obj, 'company_name', ''),
+                'organization_type': getattr(obj, 'organization_type', ''),
+                'brand': getattr(obj, 'brand', ''),
+                # 'category': getattr(obj, 'category', ''),
+                'department': getattr(obj, 'department', ''),
+                'customer_name': getattr(obj, 'customer_name', ''),
+                'designation': getattr(obj, 'designation', ''),
+                'country_of_origin': getattr(obj, 'country_of_origin', ''),
+                'website': getattr(obj, 'website', ''),
+                'emails': ', '.join([p.email for p in obj.emails.all()]),
+                'phones': ', '.join([p.phone for p in obj.phones.all() if not p.is_whatsapp]),
+                'whatsapp_numbers': ', '.join([p.phone for p in obj.phones.all() if p.is_whatsapp]),
+                'payment_term': getattr(obj, 'payment_term', ''),
+                'fabric_reference': getattr(obj, 'fabric_reference', ''),
+                'mailing_address': getattr(obj, 'mailing_address', ''),
+                'visiting_address': getattr(obj, 'visiting_address', ''),
+                'linkedin_profile': getattr(obj, 'linkedin_profile', ''),
+                'remarks': getattr(obj, 'remarks', ''),
+                'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
+                'tag': getattr(obj, 'tag', ''),
+                'DT_RowAttr': {
+                    'data-id': obj.id,
+                }
+            })
+        print("==========================here you are ")
+
+        return JsonResponse({
+            'draw': draw,
+            'recordsTotal': total_count,
+            'recordsFiltered': filtered_count,
+            'data': data,
+        })
 
 
 # delete customers 
@@ -445,7 +564,7 @@ class DeleteCustomerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin)
         return JsonResponse({'message': 'Selected customers deleted successfully.'})
 
 
-### Generate demo csv for buyers
+### Generate demo csv for customer
 class GenerateCSVCustomer(View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
@@ -460,19 +579,40 @@ class GenerateCSVCustomer(View):
             "company_website", "payment_term", "fabric_reference_dealing_with", "mailing_address",
             "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
         ])
-        writer.writerow([
-            "2025-05-13", "Acme Textiles", "Manufacturer", "Acme", "Textile", "Sales",
-            "John Doe", "Manager", "Bangladesh", "john.doe@acme.com", "+8801777777254", "+8801555555555",
-            "https://acme.com", "Net 30", "Cotton, Denim", "123 Main St, Dhaka", "456 Market Rd, Dhaka",
-            "https://linkedin.com/in/johndoe", "Top customer", "Alice Smith"
-        ])
-        writer.writerow([
-            "2025-05-13", "Beta Apparel", "Exporter", "Beta", "Apparel", "Export",
-            "Jane Smith", "Director", "India", "jane.smith@beta.com", "+919999999999", "+918888888888",
-            "https://beta.com", "Advance", "Knit, Woven", "789 Fashion Ave, Mumbai", "1011 Textile St, Mumbai",
-            "https://linkedin.com/in/janesmith", "Prefers organic", "Bob Lee"
-        ])
 
+        fake = Faker()
+        org_types = ["Manufacturer", "Exporter", "Retailer", "Wholesaler"]
+        categories = ["Textile", "Apparel", "Fashion", "Accessories"]
+        departments = ["Sales", "Export", "Procurement", "Design"]
+        designations = ["Manager", "Director", "Executive", "Lead"]
+        payment_terms = ["Net 30", "Advance", "LC at Sight"]
+        remarks_list = [
+            "Top customer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
+        ]
+        for _ in range(500):
+            writer.writerow([
+            fake.date_this_decade().strftime("%Y-%m-%d"),
+            fake.company(),
+            fake.random_element(org_types),
+            fake.company_suffix(),
+            fake.random_element(categories),
+            fake.random_element(departments),
+            fake.name(),
+            fake.random_element(designations),
+            fake.country(),
+            fake.email(),
+            fake.phone_number(),
+            fake.phone_number(),
+            fake.url(),
+            fake.random_element(payment_terms),
+            ", ".join([fake.word().capitalize() for _ in range(2)]),
+            fake.address().replace('\n', ', '),
+            fake.address().replace('\n', ', '),
+            fake.url(),
+            fake.random_element(remarks_list),
+            fake.name()
+            ])
+        
         return response
 
 """End::Customer Details"""

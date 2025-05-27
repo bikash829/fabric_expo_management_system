@@ -31,3 +31,10 @@
     padding: 10px; 
     border-radius:6px
 }
+
+.highlight-duplicate {
+  background-color: #fff9c4; /* light yellow */
+  color: #333;
+  border-radius: 3px;
+  padding: 2px 4px;
+}

@@ -26,6 +26,7 @@
           <div class="card-header">
             <div class="card-title">Preview Buyers Information</div>
           </div>
+          
           <!--end::Header-->
           <div class="p-3">
             <div class="pb-3">
@@ -35,6 +36,11 @@
                 <li class="list-group-item">File Name : {{file_info.name}}</li>
                 <li class="list-group-item">Uploaded at: {{file_info.uploaded_at}}</li>
               </ul>
+            </div>
+            <div class="py-2">
+              <div class="alert alert-warning" role="alert">
+                Matched data has been highlighted. Please cancel the operation and change or update the data from your datasheet if you don't want to upload those duplicate data. 
+              </div>
             </div>
               <form  method="post">
                 {% csrf_token %}
@@ -63,19 +69,155 @@
                           <th>LinkedIn Profile Link</th>
                           <th>Remarks</th>
                           <th>Concern FE Representative</th>
-                          {% comment %} <th>Action</th> {% endcomment %}
-                          {% comment %} <th>Action</th> {% endcomment %}
                       </tr>
                   </thead>
                   <tbody>
                       {% for item in buyers %}
                       <tr>
                           <td>{{forloop.counter}}</td>
-                          <td>{{item.date}}</td>
-                          <td>{{item.company_name}}</td>
-                          <td>{{item.organization_type}}</td>
-                          <td>{{item.brand}}</td>
-                          <td>{{item.category}}</td>
+                            <td>
+                            {% if item.duplicates.date %}
+                              <mark>{{ item.date }}</mark>
+                            {% else %}
+                              {{ item.date }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.company_name %}
+                              <mark>{{ item.company_name }}</mark>
+                            {% else %}
+                              {{ item.company_name }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.organization_type %}
+                              <mark>{{ item.organization_type }}</mark>
+                            {% else %}
+                              {{ item.organization_type }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.brand %}
+                              <mark>{{ item.brand }}</mark>
+                            {% else %}
+                              {{ item.brand }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.category %}
+                              <mark>{{ item.category }}</mark>
+                            {% else %}
+                              {{ item.category }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.department %}
+                              <mark>{{ item.department }}</mark>
+                            {% else %}
+                              {{ item.department }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.buyer_name %}
+                              <mark>{{ item.buyer_name }}</mark>
+                            {% else %}
+                              {{ item.buyer_name }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.designation %}
+                              <mark>{{ item.designation }}</mark>
+                            {% else %}
+                              {{ item.designation }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.country_of_origin %}
+                              <mark>{{ item.country_of_origin }}</mark>
+                            {% else %}
+                              {{ item.coo }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.buyer_email_id %}
+                              <mark>{{ item.buyer_email_id }}</mark>
+                            {% else %}
+                              {{ item.buyer_email_id }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.whatsapp_number %}
+                              <mark>{{ item.whatsapp_number }}</mark>
+                            {% else %}
+                              {{ item.whatsapp_number }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.phone_number %}
+                              <mark>{{ item.phone_number }}</mark>
+                            {% else %}
+                              {{ item.phone_number }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.website %}
+                              <mark>{{ item.website }}</mark>
+                            {% else %}
+                              {{ item.website }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.payment_term %}
+                              <mark>{{ item.payment_term }}</mark>
+                            {% else %}
+                              {{ item.payment_term }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabric_reference %}
+                              <mark>{{ item.fabric_reference }}</mark>
+                            {% else %}
+                              {{ item.fabric_reference }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.mailing_address %}
+                              <mark>{{ item.mailing_address }}</mark>
+                            {% else %}
+                              {{ item.mailing_address }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.visiting_address %}
+                              <mark>{{ item.visiting_address }}</mark>
+                            {% else %}
+                              {{ item.visiting_address }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.linkedin_profile %}
+                              <mark>{{ item.linkedin_profile }}</mark>
+                            {% else %}
+                              {{ item.linkedin_profile }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.remarks %}
+                              <mark>{{ item.remarks }}</mark>
+                            {% else %}
+                              {{ item.remarks }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.concern_fe_rep %}
+                              <mark>{{ item.concern_fe_rep }}</mark>
+                            {% else %}
+                              {{ item.concern_fe_rep }}
+                            {% endif %}
+                            </td>
+                          {% comment %} <td > {% if item.duplicates.organization_type %}class="highlight-duplicate"{% endif %} {{item.organization_type}}</td>
+                          <td > {% if item.duplicates.brand %}class="highlight-duplicate"{% endif %} {{item.brand}}</td>
+                          <td class="highlight-duplicate">{{item.category}}</td>
                           <td>{{item.department}}</td>
                           <td>{{item.buyer_name}}</td>
                           <td>{{item.designation}}</td>
@@ -90,7 +232,7 @@
                           <td>{{item.visiting_address}}</td>
                           <td>{{item.linkedin_profile_link}}</td>
                           <td>{{item.remarks}}</td>
-                          <td>{{item.concern_fe_representative}}</td>
+                          <td>{{item.concern_fe_representative}}</td> {% endcomment %}
                           {% comment %} <td></td> {% endcomment %}
                           {% comment %} <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}"> {% endcomment %}
                       </tr>

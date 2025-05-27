@@ -6,6 +6,8 @@ logger = logging.getLogger(__name__)
 
 from django.db import transaction
 
+from datetime import datetime
+
 from django.urls import reverse_lazy
 import pandas as pd
 from django.conf import settings
@@ -53,6 +55,58 @@ def extract_data(request,form):
 
 
 """Begin:: Buyer Details"""
+### Generate demo csv for buyers
+class GenerateCSVBuyer(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_buyer_details.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "date", "company_name", "organization_type", "brand", "category", "department",
+            "buyer_name", "designation", "country_of_origin", "buyer_email_id", "whatsapp_number", "phone_number",
+            "website", "payment_term", "fabric_reference", "mailing_address",
+            "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
+        ])
+
+        fake = Faker()
+        org_types = ["Manufacturer", "Exporter", "Retailer", "Wholesaler"]
+        categories = ["Textile", "Apparel", "Fashion", "Accessories"]
+        departments = ["Sales", "Export", "Procurement", "Design"]
+        designations = ["Manager", "Director", "Executive", "Lead"]
+        payment_terms = ["Net 30", "Advance", "LC at Sight"]
+        remarks_list = [
+            "Top buyer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
+        ]
+        for _ in range(10):
+            writer.writerow([
+            fake.date_this_decade().strftime("%Y-%m-%d"),
+            fake.company(),
+            fake.random_element(org_types),
+            fake.company_suffix(),
+            fake.random_element(categories),
+            fake.random_element(departments),
+            fake.name(),
+            fake.random_element(designations),
+            fake.country(),
+            fake.email(),
+            fake.phone_number(),
+            fake.phone_number(),
+            fake.url(),
+            fake.random_element(payment_terms),
+            ", ".join([fake.word().capitalize() for _ in range(2)]),
+            fake.address().replace('\n', ', '),
+            fake.address().replace('\n', ', '),
+            fake.url(),
+            fake.random_element(remarks_list),
+            fake.name()
+            ])
+
+        return response
+
+
 # upload buyer data
 class BuyerUploadView(View):
     def get(self, request):
@@ -100,6 +154,7 @@ class BuyerUploadView(View):
         }
         return render(request, 'business_data/manage_buyers/upload.html', context)
 
+
 # preview uploaded data
 class BuyerPreviewView(View):
     def get(self, request):
@@ -114,9 +169,71 @@ class BuyerPreviewView(View):
                 'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
             }
 
+        # List all fields you want to check for duplicates
+        fields_to_check = [
+            'date','company_name', 'organization_type', 'brand', 'category', 'department',
+            'buyer_name', 'designation', 'country_of_origin', 
+            'buyer_email_id', 'whatsapp_number', 'phone_number',
+            'payment_term', 'fabric_reference', 'mailing_address',
+            'visiting_address', 'linkedin_profile', 'remarks', 'concern_fe_rep','website',
+        ]
+        from pprint import pprint
+ 
+
+        # Build sets of existing values for each field
+        from collections import defaultdict
+        existing_values = defaultdict(set)
+
+        for field in fields_to_check:
+            # Direct model fields
+            if field in [f.name for f in Buyer._meta.get_fields() if not f.is_relation]:
+                existing_values[field] = set(Buyer.objects.values_list(field, flat=True))
+            # Related email field
+            elif field == 'buyer_email_id':
+                existing_values[field] = set(
+                    PersonEmail.objects.filter(contact_info_id__in=Buyer.objects.values('id')).values_list('email', flat=True)
+                )
+            # Related phone fields
+            elif field in ('phone_number', 'whatsapp_number'):
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(contact_info_id__in=Buyer.objects.values('id')).values_list('phone', flat=True)
+                )
+            if field == 'phone_number':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Buyer.objects.values_list('id', flat=True),
+                        is_whatsapp=False
+                    ).values_list('phone', flat=True)
+                )
+
+            elif field == 'whatsapp_number':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Buyer.objects.values_list('id', flat=True),
+                        is_whatsapp=True
+                    ).values_list('phone', flat=True)
+                )
+
+        # Mark duplicates for each cell
+        for row in preview_data:
+            row['duplicates'] = {}
+
+            for field in fields_to_check:
+                value = row.get(field)
+
+                # if field == 'buyer_email_id':
+                #     row['duplicates'][field] = value in existing_values[field] if value else False
+                if field == 'date':
+                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+                else:
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+
+
         context = {
             'buyers': preview_data,
             'file_info': file_info,
+            'has_duplicates': any(any(row['duplicates'].values()) for row in preview_data),
         }
 
         return render(request, 'business_data/manage_buyers/preview.html', context)
@@ -154,15 +271,15 @@ class BuyerPreviewView(View):
                                 department=row.get('department'),
                                 buyer_name=row.get('buyer_name'),
                                 designation=row.get('designation'),
-                                country_of_origin=row.get('coo'),
-                                website=row.get('company_website'),
+                                country_of_origin=row.get('country_of_origin'),
+                                website=row.get('website'),
                                 payment_term=row.get('payment_term'),
-                                fabric_reference=row.get('fabric_reference_dealing_with'),
+                                fabric_reference=row.get('fabric_reference'),
                                 mailing_address=row.get('mailing_address'),
                                 visiting_address=row.get('visiting_address'),
-                                linkedin_profile=row.get('linkedin_profile_link'),
+                                linkedin_profile=row.get('linkedin_profile'),
                                 remarks=row.get('remarks'),
-                                concern_fe_rep=row.get('concern_fe_representative'),
+                                concern_fe_rep=row.get('concern_fe_rep'),
                                 tag=tag
                             )
                         except Exception as e:
@@ -217,56 +334,7 @@ class BuyerPreviewView(View):
         # return redirect('business_data:upload-success')
 
 
-### Generate demo csv for buyers
-class GenerateCSVBuyer(View):
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(
-            content_type="text/csv",
-            headers={"Content-Disposition": 'attachment; filename="demo_buyer_details.csv"'},
-        )
 
-        writer = csv.writer(response)
-        writer.writerow([
-            "date", "company_name", "organization_type", "brand", "category", "department",
-            "buyer_name", "designation", "coo", "buyer_email_id", "whatsapp_number", "phone_number",
-            "company_website", "payment_term", "fabric_reference_dealing_with", "mailing_address",
-            "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
-        ])
-
-        fake = Faker()
-        org_types = ["Manufacturer", "Exporter", "Retailer", "Wholesaler"]
-        categories = ["Textile", "Apparel", "Fashion", "Accessories"]
-        departments = ["Sales", "Export", "Procurement", "Design"]
-        designations = ["Manager", "Director", "Executive", "Lead"]
-        payment_terms = ["Net 30", "Advance", "LC at Sight"]
-        remarks_list = [
-            "Top buyer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
-        ]
-        for _ in range(500):
-            writer.writerow([
-            fake.date_this_decade().strftime("%Y-%m-%d"),
-            fake.company(),
-            fake.random_element(org_types),
-            fake.company_suffix(),
-            fake.random_element(categories),
-            fake.random_element(departments),
-            fake.name(),
-            fake.random_element(designations),
-            fake.country(),
-            fake.email(),
-            fake.phone_number(),
-            fake.phone_number(),
-            fake.url(),
-            fake.random_element(payment_terms),
-            ", ".join([fake.word().capitalize() for _ in range(2)]),
-            fake.address().replace('\n', ', '),
-            fake.address().replace('\n', ', '),
-            fake.url(),
-            fake.random_element(remarks_list),
-            fake.name()
-            ])
-
-        return response
         
 # Buyer list 
 class BuyerListView(TemplateView):

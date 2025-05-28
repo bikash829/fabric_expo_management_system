@@ -72,29 +72,143 @@
                       {% for item in suppliers %}
                       <tr>
                           <td>{{forloop.counter}}</td>
-                          <td>{{item.date}}</td>
-                          <td>{{item.mill_name}}</td>
-                          <td>{{item.supplier_name}}</td>
-                          <td>{{item.concern_person}}</td>
-                          <td>{{item.concern_person_designation}}</td>
-                          <td>{{item.product_category}}</td>
-                          <td>{{item.product_range}}</td>
-                          <td>{{item.speciality}}</td>
-                          <td>{{item.coo}}</td>
-                          <td>{{item.email_id1}}</td>
-                          <td>{{item.email_id2}}</td>
-                          <td>{{item.email_id3}}</td>
-                          <td>{{item.phone_number1}}</td>
-                          <td>{{item.phone_number2}}</td>
-                          <td>{{item.whatsapp_number}}</td>
-                          <td>{{item.wechat_number}}</td>
-                          <td>{{item.payment_term}}</td>
-                          <td>{{item.fabric_reference_dealing_with}}</td>
-                          <td>{{item.mailing_address}}</td>
-                          <td>{{item.visiting_address}}</td>
-                          <td>{{item.linkedin_profile_link}}</td>
-                          <td>{{item.remarks}}</td>
-                          <td>{{item.concern_fe_representative}}</td>
+                            {% if item.duplicates.date %}
+                            <td><mark>{{ item.date }}</mark></td>
+                            {% else %}
+                            <td>{{ item.date }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.mill_name %}
+                            <td><mark>{{ item.mill_name }}</mark></td>
+                            {% else %}
+                            <td>{{ item.mill_name }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.supplier_name %}
+                            <td><mark>{{ item.supplier_name }}</mark></td>
+                            {% else %}
+                            <td>{{ item.supplier_name }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.concern_person %}
+                            <td><mark>{{ item.concern_person }}</mark></td>
+                            {% else %}
+                            <td>{{ item.concern_person }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.concern_person_designation %}
+                            <td><mark>{{ item.concern_person_designation }}</mark></td>
+                            {% else %}
+                            <td>{{ item.concern_person_designation }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.product_category %}
+                            <td><mark>{{ item.product_category }}</mark></td>
+                            {% else %}
+                            <td>{{ item.product_category }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.product_range %}
+                            <td><mark>{{ item.product_range }}</mark></td>
+                            {% else %}
+                            <td>{{ item.product_range }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.speciality %}
+                            <td><mark>{{ item.speciality }}</mark></td>
+                            {% else %}
+                            <td>{{ item.speciality }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.country_of_origin %}
+                            <td><mark>{{ item.country_of_origin }}</mark></td>
+                            {% else %}
+                            <td>{{ item.country_of_origin }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.email_id1 %}
+                            <td><mark>{{ item.email_id1 }}</mark></td>
+                            {% else %}
+                            <td>{{ item.email_id1 }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.email_id2 %}
+                            <td><mark>{{ item.email_id2 }}</mark></td>
+                            {% else %}
+                            <td>{{ item.email_id2 }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.email_id3 %}
+                            <td><mark>{{ item.email_id3 }}</mark></td>
+                            {% else %}
+                            <td>{{ item.email_id3 }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.phone_number1 %}
+                            <td><mark>{{ item.phone_number1 }}</mark></td>
+                            {% else %}
+                            <td>{{ item.phone_number1 }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.phone_number2 %}
+                            <td><mark>{{ item.phone_number2 }}</mark></td>
+                            {% else %}
+                            <td>{{ item.phone_number2 }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.whatsapp_number %}
+                            <td><mark>{{ item.whatsapp_number }}</mark></td>
+                            {% else %}
+                            <td>{{ item.whatsapp_number }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.wechat_number %}
+                            <td><mark>{{ item.wechat_number }}</mark></td>
+                            {% else %}
+                            <td>{{ item.wechat_number }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.payment_term %}
+                            <td><mark>{{ item.payment_term }}</mark></td>
+                            {% else %}
+                            <td>{{ item.payment_term }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.fabric_reference %}
+                            <td><mark>{{ item.fabric_reference }}</mark></td>
+                            {% else %}
+                            <td>{{ item.fabric_reference }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.mailing_address %}
+                            <td><mark>{{ item.mailing_address }}</mark></td>
+                            {% else %}
+                            <td>{{ item.mailing_address }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.visiting_address %}
+                            <td><mark>{{ item.visiting_address }}</mark></td>
+                            {% else %}
+                            <td>{{ item.visiting_address }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.linkedin_profile %}
+                            <td><mark>{{ item.linkedin_profile }}</mark></td>
+                            {% else %}
+                            <td>{{ item.linkedin_profile }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.remarks %}
+                            <td><mark>{{ item.remarks }}</mark></td>
+                            {% else %}
+                            <td>{{ item.remarks }}</td>
+                            {% endif %}
+
+                            {% if item.duplicates.concern_fe_rep %}
+                            <td><mark>{{ item.concern_fe_rep }}</mark></td>
+                            {% else %}
+                            <td>{{ item.concern_fe_rep }}</td>
+                            {% endif %}
                           {% comment %} <td></td> {% endcomment %}
                           {% comment %} <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}"> {% endcomment %}
                       </tr>

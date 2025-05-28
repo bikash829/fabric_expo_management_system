@@ -11,7 +11,7 @@ class ContactInfo(models.Model):
     country_of_origin = models.CharField(max_length=100, blank=True, null=True)
     # email = models.EmailField(blank=True, null=True)
     # phone_number = models.CharField(max_length=50, blank=True, null=True)
-    whatsapp_number = models.CharField(max_length=50, blank=True, null=True)
+    # whatsapp_number = models.CharField(max_length=50, blank=True, null=True)
     website = models.URLField(blank=True, null=True)
     mailing_address = models.TextField(blank=True, null=True)
     visiting_address = models.TextField(blank=True, null=True)

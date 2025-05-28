@@ -47,7 +47,7 @@
                           <th>Company Name</th>
                           <th>Organization Type</th>
                           <th>Brand</th>
-                          <th>Category (Apparel or Textile) </th>
+                          {% comment %} <th>Category (Apparel or Textile) </th> {% endcomment %}
                           <th>Department </th>
                           <th>Customer Name </th>
                           <th>Designation</th>
@@ -70,28 +70,147 @@
                   <tbody>
                       {% for item in customers %}
                       <tr>
-                          <td>{{forloop.counter}}</td>
-                          <td>{{item.date}}</td>
-                          <td>{{item.company_name}}</td>
-                          <td>{{item.organization_type}}</td>
-                          <td>{{item.brand}}</td>
-                          <td>{{item.category}}</td>
-                          <td>{{item.department}}</td>
-                          <td>{{item.customer_name}}</td>
-                          <td>{{item.designation}}</td>
-                          <td>{{item.coo}}</td>
-                          <td>{{item.customer_email_id}}</td>
-                          <td>{{item.whatsapp_number}}</td>
-                          <td>{{item.phone_number}}</td>
-                          <td>{{item.company_website}}</td>
-                          <td>{{item.payment_term}}</td>
-                          <td>{{item.fabric_reference_dealing_with}}</td>
-                          <td>{{item.mailing_address}}</td>
-                          <td>{{item.visiting_address}}</td>
-                          <td>{{item.linkedin_profile_link}}</td>
-                          <td>{{item.remarks}}</td>
-                          <td>{{item.concern_fe_representative}}</td>
-                          {% comment %} <td></td> {% endcomment %}
+                            <td>{{forloop.counter}}</td>
+                            <td>
+                              {% if item.duplicates.date %}
+                              <mark>{{ item.date }}</mark>
+                              {% else %}
+                              {{ item.date }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.company_name %}
+                              <mark>{{ item.company_name }}</mark>
+                              {% else %}
+                              {{ item.company_name }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.organization_type %}
+                              <mark>{{ item.organization_type }}</mark>
+                              {% else %}
+                              {{ item.organization_type }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.brand %}
+                              <mark>{{ item.brand }}</mark>
+                              {% else %}
+                              {{ item.brand }}
+                              {% endif %}
+                            </td>
+                            {% comment %} <td>
+                              {% if item.duplicates.category %}
+                              <mark>{{ item.category }}</mark>
+                              {% else %}
+                              {{ item.category }}
+                              {% endif %}
+                            </td> {% endcomment %}
+                            <td>
+                              {% if item.duplicates.department %}
+                              <mark>{{ item.department }}</mark>
+                              {% else %}
+                              {{ item.department }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.customer_name %}
+                              <mark>{{ item.customer_name }}</mark>
+                              {% else %}
+                              {{ item.customer_name }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.designation %}
+                              <mark>{{ item.designation }}</mark>
+                              {% else %}
+                              {{ item.designation }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.country_of_origin %}
+                              <mark>{{ item.country_of_origin }}</mark>
+                              {% else %}
+                              {{ item.country_of_origin }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.customer_email_id %}
+                              <mark>{{ item.customer_email_id }}</mark>
+                              {% else %}
+                              {{ item.customer_email_id }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.whatsapp_number %}
+                              <mark>{{ item.whatsapp_number }}</mark>
+                              {% else %}
+                              {{ item.whatsapp_number }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.phone_number %}
+                              <mark>{{ item.phone_number }}</mark>
+                              {% else %}
+                              {{ item.phone_number }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.website %}
+                              <mark>{{ item.website }}</mark>
+                              {% else %}
+                              {{ item.website }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.payment_term %}
+                              <mark>{{ item.payment_term }}</mark>
+                              {% else %}
+                              {{ item.payment_term }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.fabric_reference %}
+                              <mark>{{ item.fabric_reference }}</mark>
+                              {% else %}
+                              {{ item.fabric_reference }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.mailing_address %}
+                              <mark>{{ item.mailing_address }}</mark>
+                              {% else %}
+                              {{ item.mailing_address }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.visiting_address %}
+                              <mark>{{ item.visiting_address }}</mark>
+                              {% else %}
+                              {{ item.visiting_address }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.linkedin_profile %}
+                              <mark>{{ item.linkedin_profile }}</mark>
+                              {% else %}
+                              {{ item.linkedin_profile }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.remarks %}
+                              <mark>{{ item.remarks }}</mark>
+                              {% else %}
+                              {{ item.remarks }}
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if item.duplicates.concern_fe_rep %}
+                              <mark>{{ item.concern_fe_rep }}</mark>
+                              {% else %}
+                              {{ item.concern_fe_rep }}
+                              {% endif %}
+                            </td>
                           {% comment %} <input type="hidden" name="recipient_ids" value="{{ item.temp_id }}"> {% endcomment %}
                       </tr>
                       {% endfor %}
@@ -103,7 +222,7 @@
                           <th>Company Name</th>
                           <th>Organization Type</th>
                           <th>Brand</th>
-                          <th>Category (Apparel or Textile) </th>
+                          {% comment %} <th>Category (Apparel or Textile) </th> {% endcomment %}
                           <th>Department </th>
                           <th>Customer Name </th>
                           <th>Designation</th>

@@ -29,6 +29,8 @@ from .forms import BuyerUploadForm, FileUploadForm
 
 from faker import Faker
 from random import randint, choice, uniform
+from collections import defaultdict
+from pprint import pprint
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -50,7 +52,6 @@ def extract_data(request,form):
         df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d')
 
     data = df.to_dict(orient='records')
-    print(data)
     return data 
 
 
@@ -177,11 +178,8 @@ class BuyerPreviewView(View):
             'payment_term', 'fabric_reference', 'mailing_address',
             'visiting_address', 'linkedin_profile', 'remarks', 'concern_fe_rep','website',
         ]
-        from pprint import pprint
- 
 
         # Build sets of existing values for each field
-        from collections import defaultdict
         existing_values = defaultdict(set)
 
         for field in fields_to_check:
@@ -193,19 +191,13 @@ class BuyerPreviewView(View):
                 existing_values[field] = set(
                     PersonEmail.objects.filter(contact_info_id__in=Buyer.objects.values('id')).values_list('email', flat=True)
                 )
-            # Related phone fields
-            elif field in ('phone_number', 'whatsapp_number'):
-                existing_values[field] = set(
-                    PersonPhone.objects.filter(contact_info_id__in=Buyer.objects.values('id')).values_list('phone', flat=True)
-                )
-            if field == 'phone_number':
+            elif field == 'phone_number':
                 existing_values[field] = set(
                     PersonPhone.objects.filter(
                         contact_info_id__in=Buyer.objects.values_list('id', flat=True),
                         is_whatsapp=False
                     ).values_list('phone', flat=True)
                 )
-
             elif field == 'whatsapp_number':
                 existing_values[field] = set(
                     PersonPhone.objects.filter(
@@ -334,11 +326,8 @@ class BuyerPreviewView(View):
         # return redirect('business_data:upload-success')
 
 
-
-        
 # Buyer list 
 class BuyerListView(TemplateView):
-    # model = Buyer
     template_name = "business_data/manage_buyers/buyer_list.html"
 
 class BuyerDataSourceView(View):
@@ -435,6 +424,7 @@ class BuyerDataSourceView(View):
             'recordsFiltered': filtered_count,
             'data': data,
         })
+
 # delete customers 
 class DeleteBuyerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
     model = Buyer
@@ -451,6 +441,60 @@ class DeleteBuyerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
 """End:: Buyer details"""
 
 """Begin::Customer Details"""
+
+### Generate demo csv for customer
+class GenerateCSVCustomer(View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="demo_customer_details.csv"'},
+        )
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "date", "company_name", "organization_type", "brand", "category", "department",
+            "customer_name", "designation", "country_of_origin", "customer_email_id", "whatsapp_number", "phone_number",
+            "website", "payment_term", "fabric_reference", "mailing_address",
+            "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
+        ])
+
+        fake = Faker()
+        org_types = ["Manufacturer", "Exporter", "Retailer", "Wholesaler"]
+        categories = ["Textile", "Apparel", "Fashion", "Accessories"]
+        departments = ["Sales", "Export", "Procurement", "Design"]
+        designations = ["Manager", "Director", "Executive", "Lead"]
+        payment_terms = ["Net 30", "Advance", "LC at Sight"]
+        remarks_list = [
+            "Top customer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
+        ]
+        for _ in range(20):
+            writer.writerow([
+            fake.date_this_decade().strftime("%Y-%m-%d"),
+            fake.company(),
+            fake.random_element(org_types),
+            fake.company_suffix(),
+            fake.random_element(categories),
+            fake.random_element(departments),
+            fake.name(),
+            fake.random_element(designations),
+            fake.country(),
+            fake.email(),
+            fake.phone_number(),
+            fake.phone_number(),
+            fake.url(),
+            fake.random_element(payment_terms),
+            ", ".join([fake.word().capitalize() for _ in range(2)]),
+            fake.address().replace('\n', ', '),
+            fake.address().replace('\n', ', '),
+            fake.url(),
+            fake.random_element(remarks_list),
+            fake.name()
+            ])
+        
+        return response
+
+
+
 # upload customer data
 class CustomerUploadView(View):
     def get(self, request):
@@ -498,6 +542,58 @@ class CustomerPreviewView(View):
                 'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
             }
 
+        # List all fields you want to check for duplicates
+        fields_to_check = [
+            "date", "company_name", "organization_type", "brand", "category", "department",
+            "customer_name", "designation", "country_of_origin", "customer_email_id", "whatsapp_number", "phone_number",
+            "website", "payment_term", "fabric_reference", "mailing_address",
+            "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
+        ]
+
+        # Build sets of existing values for each field
+        existing_values = defaultdict(set)
+
+        for field in fields_to_check:
+            # Direct model fields
+            if field in [f.name for f in Customer._meta.get_fields() if not f.is_relation]:
+                existing_values[field] = set(Customer.objects.values_list(field, flat=True))
+            
+            # Related email field
+            elif field == 'customer_email_id':
+                existing_values[field] = set(
+                    PersonEmail.objects.filter(contact_info_id__in=Customer.objects.values('id')).values_list('email', flat=True)
+                )
+
+            elif field == 'phone_number':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Customer.objects.values_list('id', flat=True),
+                        is_whatsapp=False
+                    ).values_list('phone', flat=True)
+                )
+
+            elif field == 'whatsapp_number':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Customer.objects.values_list('id', flat=True),
+                        is_whatsapp=True
+                    ).values_list('phone', flat=True)
+                )
+
+        # Mark duplicates for each cell
+        for row in preview_data:
+            row['duplicates'] = {}
+
+            for field in fields_to_check:
+                value = row.get(field)
+
+                if field == 'date':
+                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+                else:
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+
+        
         context = {
             'customers': preview_data,
             'file_info': file_info,
@@ -538,15 +634,15 @@ class CustomerPreviewView(View):
                                 department=row.get('department'),
                                 customer_name=row.get('customer_name'),
                                 designation=row.get('designation'),
-                                country_of_origin=row.get('coo'),
-                                website=row.get('company_website'),
+                                country_of_origin=row.get('country_of_origin'),
+                                website=row.get('website'),
                                 payment_term=row.get('payment_term'),
-                                fabric_reference=row.get('fabric_reference_dealing_with'),
+                                fabric_reference=row.get('fabric_reference'),
                                 mailing_address=row.get('mailing_address'),
                                 visiting_address=row.get('visiting_address'),
-                                linkedin_profile=row.get('linkedin_profile_link'),
+                                linkedin_profile=row.get('linkedin_profile'),
                                 remarks=row.get('remarks'),
-                                concern_fe_rep=row.get('concern_fe_representative'),
+                                concern_fe_rep=row.get('concern_fe_rep'),
                                 tag=tag
                             )
                         # if any error occurs return the with error 
@@ -566,9 +662,6 @@ class CustomerPreviewView(View):
                                 email = row.get('customer_email_id')
                                 try:
                                     validate_email(email)
-                                    # if not PersonEmail.objects.filter(email=email).exists():
-                                        # print("Here you are ======================")
-
                                     PersonEmail.objects.create(email=email, contact_info=customer)
 
                                 except ValidationError:
@@ -608,7 +701,6 @@ class CustomerPreviewView(View):
 
 
 class CustomerListView(TemplateView):
-    # model = Customer
     template_name= "business_data/manage_customers/customer_list.html"
 
 
@@ -744,57 +836,6 @@ class DeleteCustomerView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin)
         return JsonResponse({'message': 'Selected customers deleted successfully.'})
 
 
-### Generate demo csv for customer
-class GenerateCSVCustomer(View):
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(
-            content_type="text/csv",
-            headers={"Content-Disposition": 'attachment; filename="demo_customer_details.csv"'},
-        )
-
-        writer = csv.writer(response)
-        writer.writerow([
-            "date", "company_name", "organization_type", "brand", "category", "department",
-            "customer_name", "designation", "coo", "customer_email_id", "whatsapp_number", "phone_number",
-            "company_website", "payment_term", "fabric_reference_dealing_with", "mailing_address",
-            "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
-        ])
-
-        fake = Faker()
-        org_types = ["Manufacturer", "Exporter", "Retailer", "Wholesaler"]
-        categories = ["Textile", "Apparel", "Fashion", "Accessories"]
-        departments = ["Sales", "Export", "Procurement", "Design"]
-        designations = ["Manager", "Director", "Executive", "Lead"]
-        payment_terms = ["Net 30", "Advance", "LC at Sight"]
-        remarks_list = [
-            "Top customer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
-        ]
-        for _ in range(500):
-            writer.writerow([
-            fake.date_this_decade().strftime("%Y-%m-%d"),
-            fake.company(),
-            fake.random_element(org_types),
-            fake.company_suffix(),
-            fake.random_element(categories),
-            fake.random_element(departments),
-            fake.name(),
-            fake.random_element(designations),
-            fake.country(),
-            fake.email(),
-            fake.phone_number(),
-            fake.phone_number(),
-            fake.url(),
-            fake.random_element(payment_terms),
-            ", ".join([fake.word().capitalize() for _ in range(2)]),
-            fake.address().replace('\n', ', '),
-            fake.address().replace('\n', ', '),
-            fake.url(),
-            fake.random_element(remarks_list),
-            fake.name()
-            ])
-        
-        return response
-
 """End::Customer Details"""
 
 """Begin::Supplier Details"""
@@ -809,10 +850,10 @@ class GenerateCSVSupplier(View):
 
         writer = csv.writer(response)
         writer.writerow([
-            "date", "mill_name", "supplier_name", "concern_person_name", "concern_person_designation", "product_category",
-            "product_range", "speciality", "coo", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2","whatsapp_number",
-            "wechat_number", "payment_term", "fabric_reference_dealing_with", "mailing_address",
-            "visiting_address", "linkedin_profile_link", "remarks", "concern_fe_representative"
+            "date", "mill_name", "supplier_name", "concern_person", "concern_person_designation", "product_category",
+            "product_range", "speciality", "country_of_origin", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2","whatsapp_number",
+            "wechat_number", "payment_term", "fabric_reference", "mailing_address",
+            "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
         ])
 
         fake = Faker()
@@ -828,7 +869,7 @@ class GenerateCSVSupplier(View):
             "Flexible payment terms",
             "Fast response time"
         ]
-        for _ in range(1000):
+        for _ in range(10):
             name1 = fake.name()
             name2 = fake.name()
             email1 = fake.email()
@@ -914,6 +955,80 @@ class SupplierPreviewView(View):
                 'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
             }
 
+        # List all fields you want to check for duplicates
+        fields_to_check = [
+            "date", "mill_name", "supplier_name", "concern_person", "concern_person_designation", "product_category",
+            "product_range", "speciality", "country_of_origin", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2", "whatsapp_number",
+            "wechat_number", "payment_term", "fabric_reference", "mailing_address",
+            "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
+        ]
+
+        # Build sets of existing values for each field
+        existing_values = defaultdict(set)
+
+        pprint(fields_to_check)
+
+        for field in fields_to_check:
+            # Direct model fields
+            if field in [f.name for f in Supplier._meta.get_fields() if not f.is_relation]:
+                existing_values[field] = set(Supplier.objects.values_list(field, flat=True))
+            
+            # Related email field
+            elif field == 'email_id1':
+                existing_values[field] = set(
+                    PersonEmail.objects.filter(contact_info_id__in=Supplier.objects.values('id')).values_list('email', flat=True)
+                )
+            # Related email field
+            elif field == 'email_id2':
+                existing_values[field] = set(
+                    PersonEmail.objects.filter(contact_info_id__in=Supplier.objects.values('id')).values_list('email', flat=True)
+                )
+            # Related email field
+            elif field == 'email_id3':
+                existing_values[field] = set(
+                    PersonEmail.objects.filter(contact_info_id__in=Supplier.objects.values('id')).values_list('email', flat=True)
+                )
+
+            elif field == 'phone_number1':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Supplier.objects.values_list('id', flat=True),
+                        is_whatsapp=False
+                    ).values_list('phone', flat=True)
+                )
+            elif field == 'phone_number2':
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Supplier.objects.values_list('id', flat=True),
+                        is_whatsapp=False
+                    ).values_list('phone', flat=True)
+                )
+
+            elif field == 'whatsapp_number':
+                print("=========================here you are ")
+                existing_values[field] = set(
+                    PersonPhone.objects.filter(
+                        contact_info_id__in=Supplier.objects.values_list('id', flat=True),
+                        is_whatsapp=True
+                    ).values_list('phone', flat=True)
+                )
+            print("=========================there  you are ")
+
+        # Mark duplicates for each cell
+        for row in preview_data:
+            row['duplicates'] = {}
+
+            for field in fields_to_check:
+                value = row.get(field)
+
+                if field == 'date':
+                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+                else:
+                    row['duplicates'][field] = value in existing_values[field] if value else False
+
+        # pprint(preview_data)
+
         context = {
             'suppliers': preview_data,
             'file_info': file_info,
@@ -949,23 +1064,23 @@ class SupplierPreviewView(View):
                                 date=row.get('date'),
                                 mill_name=row.get('mill_name'),
                                 supplier_name=row.get('supplier_name'),
-                                concern_person=row.get('concern_person_name'),
+                                concern_person=row.get('concern_person'),
                                 concern_person_designation=row.get('concern_person_designation'),
                                 product_category=row.get('product_category'),
                                 product_range=row.get('product_range'),
                                 speciality=row.get('speciality'),
-                                country_of_origin=row.get('coo'),
+                                country_of_origin=row.get('country_of_origin'),
                                 # email 
                                 # phone 
                                 # whatsapp 
                                 wechat_id=row.get('wechat_number'),
                                 payment_term=row.get('payment_term'),
-                                fabric_reference=row.get('fabric_reference_dealing_with'),
+                                fabric_reference=row.get('fabric_reference'),
                                 mailing_address=row.get('mailing_address'),
                                 visiting_address=row.get('visiting_address'),
-                                linkedin_profile=row.get('linkedin_profile_link'),
+                                linkedin_profile=row.get('linkedin_profile'),
                                 remarks=row.get('remarks'),
-                                concern_fe_rep=row.get('concern_fe_representative'),
+                                concern_fe_rep=row.get('concern_fe_rep'),
                                 tag=tag
                             )
                         except Exception as row_e:
@@ -1047,8 +1162,7 @@ class SupplierPreviewView(View):
 
 
 # supplier list 
-class SupplierListView(ListView):
-    model = Supplier
+class SupplierListView(TemplateView):
     template_name = "business_data/manage_suppliers/supplier_list.html"
 
 
@@ -1176,8 +1290,6 @@ class SupplierDataSourceView(View):
             'recordsFiltered': filtered_count,
             'data': data,
         })
-
-
 
 
 # soft delete supplier 

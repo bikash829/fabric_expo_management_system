@@ -852,7 +852,7 @@ class GenerateCSVSupplier(View):
         writer.writerow([
             "date", "mill_name", "supplier_name", "concern_person", "concern_person_designation", "product_category",
             "product_range", "speciality", "country_of_origin", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2","whatsapp_number",
-            "wechat_number", "payment_term", "fabric_reference", "mailing_address",
+            "wechat_id", "payment_term", "fabric_reference", "mailing_address",
             "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
         ])
 
@@ -959,15 +959,12 @@ class SupplierPreviewView(View):
         fields_to_check = [
             "date", "mill_name", "supplier_name", "concern_person", "concern_person_designation", "product_category",
             "product_range", "speciality", "country_of_origin", "email_id1","email_id2","email_id3",  "phone_number1","phone_number2", "whatsapp_number",
-            "wechat_number", "payment_term", "fabric_reference", "mailing_address",
+            "wechat_id", "payment_term", "fabric_reference", "mailing_address",
             "visiting_address", "linkedin_profile", "remarks", "concern_fe_rep"
         ]
 
         # Build sets of existing values for each field
         existing_values = defaultdict(set)
-
-        pprint(fields_to_check)
-
         for field in fields_to_check:
             # Direct model fields
             if field in [f.name for f in Supplier._meta.get_fields() if not f.is_relation]:
@@ -1005,14 +1002,13 @@ class SupplierPreviewView(View):
                 )
 
             elif field == 'whatsapp_number':
-                print("=========================here you are ")
                 existing_values[field] = set(
                     PersonPhone.objects.filter(
                         contact_info_id__in=Supplier.objects.values_list('id', flat=True),
                         is_whatsapp=True
                     ).values_list('phone', flat=True)
                 )
-            print("=========================there  you are ")
+            
 
         # Mark duplicates for each cell
         for row in preview_data:
@@ -1027,7 +1023,6 @@ class SupplierPreviewView(View):
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
 
-        # pprint(preview_data)
 
         context = {
             'suppliers': preview_data,
@@ -1073,7 +1068,7 @@ class SupplierPreviewView(View):
                                 # email 
                                 # phone 
                                 # whatsapp 
-                                wechat_id=row.get('wechat_number'),
+                                wechat_id=row.get('wechat_id'),
                                 payment_term=row.get('payment_term'),
                                 fabric_reference=row.get('fabric_reference'),
                                 mailing_address=row.get('mailing_address'),

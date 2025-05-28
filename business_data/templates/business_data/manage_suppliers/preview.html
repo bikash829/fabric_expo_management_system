@@ -162,10 +162,10 @@
                             <td>{{ item.whatsapp_number }}</td>
                             {% endif %}
 
-                            {% if item.duplicates.wechat_number %}
-                            <td><mark>{{ item.wechat_number }}</mark></td>
+                            {% if item.duplicates.wechat_id %}
+                            <td><mark>{{ item.wechat_id }}</mark></td>
                             {% else %}
-                            <td>{{ item.wechat_number }}</td>
+                            <td>{{ item.wechat_id }}</td>
                             {% endif %}
 
                             {% if item.duplicates.payment_term %}

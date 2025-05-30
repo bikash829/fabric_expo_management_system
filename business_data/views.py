@@ -1,4 +1,5 @@
 import csv
+from decimal import Decimal
 import os
 from random import randint
 import logging
@@ -1313,8 +1314,8 @@ class GenerateCSVProduct(View):
 
         writer = csv.writer(response)
         writer.writerow([
-            "date", "fabric_article_supplier", "fabric_article_fabric_expo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
-            "coo", "product_category", "mill_reference", "fabric_expo_reference","season","style",  "po","customer_name","composition",
+            "date", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
+            "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
             "construction", "weight", "color", "cut_width",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
             "images", "barcode", "qr_code", "concern_person"
@@ -1387,7 +1388,6 @@ class GenerateCSVProduct(View):
 
         return response
  
-
 # upload product details 
 class ProductUploadView(View):
     def get(self, request):
@@ -1434,6 +1434,79 @@ class ProductPreviewView(View):
                 'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
             }
 
+        # List all fields you want to check for duplicates
+        fields_to_check = [
+            "date", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
+            "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
+            "construction", "weight", "color", "cut_width",
+            "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
+            "images", "barcode", "qr_code", "concern_person"
+        ]
+
+        # Build sets of existing values for each field
+        existing_values = defaultdict(set)
+        for field in fields_to_check:
+            # Direct model fields
+            if field in [f.name for f in Product._meta.get_fields() if not f.is_relation]:
+                 
+                existing_values[field] = set(Product.objects.values_list(field, flat=True))
+            
+            # # Related email field
+            # elif field == 'email_id1':
+            #     existing_values[field] = set(
+            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
+            #     )
+            # # Related email field
+            # elif field == 'email_id2':
+            #     existing_values[field] = set(
+            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
+            #     )
+            # # Related email field
+            # elif field == 'email_id3':
+            #     existing_values[field] = set(
+            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
+            #     )
+
+            # elif field == 'phone_number1':
+            #     existing_values[field] = set(
+            #         PersonPhone.objects.filter(
+            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
+            #             is_whatsapp=False
+            #         ).values_list('phone', flat=True)
+            #     )
+            # elif field == 'phone_number2':
+            #     existing_values[field] = set(
+            #         PersonPhone.objects.filter(
+            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
+            #             is_whatsapp=False
+            #         ).values_list('phone', flat=True)
+            #     )
+
+            # elif field == 'whatsapp_number':
+            #     existing_values[field] = set(
+            #         PersonPhone.objects.filter(
+            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
+            #             is_whatsapp=True
+            #         ).values_list('phone', flat=True)
+            #     )
+
+
+        # Mark duplicates for each cell
+        for row in preview_data:
+            row['duplicates'] = {}
+
+            for field in fields_to_check:
+                value = row.get(field)
+
+                if field == 'date' or field == 'rd_generated_date':
+                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                elif field == 'barcode':
+                    value = str(value)
+                elif field == 'price_per_yard' or field == 'shrinkage_percent':
+                    value = round(Decimal(value), 2)
+                
+                row['duplicates'][field] = value in existing_values[field] if value else False
+
         context = {
             'products': preview_data,
             'file_info': file_info,
@@ -1467,14 +1540,14 @@ class ProductPreviewView(View):
                             Product.objects.create(
                                 date=row.get('date'),
                                 fabric_article_supplier=row.get('fabric_article_supplier', ''),
-                                fabric_article_fexpo=row.get('fabric_article_fabric_expo', ''),
+                                fabric_article_fexpo=row.get('fabric_article_fexpo', ''),
                                 fabric_mill_supplier=row.get('fabric_mill_supplier', ''),
                                 rd_generated_date=row.get('rd_generated_date', ''),
                                 fabric_mill_source=row.get('fabric_mill_source', ''),
                                 coo=row.get('coo', ''),
                                 product_category=row.get('product_category', ''),
                                 mill_reference=row.get('mill_reference', ''),
-                                fabricexpo_reference=row.get('fabric_expo_reference', ''),
+                                fabricexpo_reference=row.get('fabricexpo_reference', ''),
                                 season=row.get('season', ''),
                                 style=row.get('style', ''),
                                 po=row.get('po', ''),

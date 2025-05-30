@@ -77,33 +77,195 @@
                       {% for item in products %}
                       <tr>
                           <td>{{forloop.counter}}</td>
-                          <td>{{item.date}}</td>
-                          <td>{{item.fabric_article_supplier}}</td>
-                          <td>{{item.fabric_article_fabric_expo}}</td>
-                          <td>{{item.fabric_mill_supplier}}</td>
-                          <td>{{item.rd_generated_date}}</td>
-                          <td>{{item.fabric_mill_source}}</td>
-                          <td>{{item.coo}}</td>
-                          <td>{{item.product_category}}</td>
-                          <td>{{item.mill_reference}}</td>
-                          <td>{{item.fabric_expo_reference}}</td>
-                          <td>{{item.season}}</td>
-                          <td>{{item.style}}</td>
-                          <td>{{item.po}}</td>
-                          <td>{{item.customer_name}}</td>
-                          <td>{{item.composition}}</td>
-                          <td>{{item.construction}}</td>
-                          <td>{{item.weight}}</td>
-                          <td>{{item.color}}</td>
-                          <td>{{item.cut_width}}</td>
-                          <td>{{item.wash}}</td>
-                          <td>{{item.price_per_yard}}</td>
-                          <td>{{item.shrinkage_percent}}</td>
-                          <td>{{item.stock_qty}}</td>
-                          <td>{{'item.images'}}</td>
-                          <td>{{item.barcode}}</td>
-                          <td>{{item.qr_code}}</td>
-                          <td>{{item.concern_person}}</td>
+                            <td>
+                            {% if item.duplicates.date %}
+                              <mark>{{ item.date }}</mark>
+                            {% else %}
+                              {{ item.date }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabric_article_supplier %}
+                              <mark>{{ item.fabric_article_supplier }}</mark>
+                            {% else %}
+                              {{ item.fabric_article_supplier }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabric_article_fexpo %}
+                              <mark>{{ item.fabric_article_fexpo }}</mark>
+                            {% else %}
+                              {{ item.fabric_article_fexpo }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabric_mill_supplier %}
+                              <mark>{{ item.fabric_mill_supplier }}</mark>
+                            {% else %}
+                              {{ item.fabric_mill_supplier }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.rd_generated_date %}
+                              <mark>{{ item.rd_generated_date }}</mark>
+                            {% else %}
+                              {{ item.rd_generated_date }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabric_mill_source %}
+                              <mark>{{ item.fabric_mill_source }}</mark>
+                            {% else %}
+                              {{ item.fabric_mill_source }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.coo %}
+                              <mark>{{ item.coo }}</mark>
+                            {% else %}
+                              {{ item.coo }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.product_category %}
+                              <mark>{{ item.product_category }}</mark>
+                            {% else %}
+                              {{ item.product_category }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.mill_reference %}
+                              <mark>{{ item.mill_reference }}</mark>
+                            {% else %}
+                              {{ item.mill_reference }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.fabricexpo_reference %}
+                              <mark>{{ item.fabricexpo_reference }}</mark>
+                            {% else %}
+                              {{ item.fabricexpo_reference }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.season %}
+                              <mark>{{ item.season }}</mark>
+                            {% else %}
+                              {{ item.season }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.style %}
+                              <mark>{{ item.style }}</mark>
+                            {% else %}
+                              {{ item.style }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.po %}
+                              <mark>{{ item.po }}</mark>
+                            {% else %}
+                              {{ item.po }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.customer_name %}
+                              <mark>{{ item.customer_name }}</mark>
+                            {% else %}
+                              {{ item.customer_name }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.composition %}
+                              <mark>{{ item.composition }}</mark>
+                            {% else %}
+                              {{ item.composition }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.construction %}
+                              <mark>{{ item.construction }}</mark>
+                            {% else %}
+                              {{ item.construction }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.weight %}
+                              <mark>{{ item.weight }}</mark>
+                            {% else %}
+                              {{ item.weight }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.color %}
+                              <mark>{{ item.color }}</mark>
+                            {% else %}
+                              {{ item.color }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.cut_width %}
+                              <mark>{{ item.cut_width }}</mark>
+                            {% else %}
+                              {{ item.cut_width }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.wash %}
+                              <mark>{{ item.wash }}</mark>
+                            {% else %}
+                              {{ item.wash }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.price_per_yard %}
+                              <mark>{{ item.price_per_yard }}</mark>
+                            {% else %}
+                              {{ item.price_per_yard }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.shrinkage_percent %}
+                              <mark>{{ item.shrinkage_percent }}</mark>
+                            {% else %}
+                              {{ item.shrinkage_percent }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.stock_qty %}
+                              <mark>{{ item.stock_qty }}</mark>
+                            {% else %}
+                              {{ item.stock_qty }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.images %}
+                              <mark>{{ item.images }}</mark>
+                            {% else %}
+                              {{ item.images }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.barcode %}
+                              <mark>{{ item.barcode }}</mark>
+                            {% else %}
+                              {{ item.barcode }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.qr_code %}
+                              <mark>{{ item.qr_code }}</mark>
+                            {% else %}
+                              {{ item.qr_code }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.concern_person %}
+                              <mark>{{ item.concern_person }}</mark>
+                            {% else %}
+                              {{ item.concern_person }}
+                            {% endif %}
+                            </td>
                       </tr>
                       {% endfor %}
                   </tbody>

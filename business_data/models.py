@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 from fabric_expo_management_system.custom_model_manager import SoftDeleteModel
 # Contact info 
@@ -127,8 +128,8 @@ class Product(SoftDeleteModel):
     shrinkage_percent  = models.DecimalField(max_digits=5, decimal_places=2)
     stock_qty = models.PositiveIntegerField()
     # images = models.ImageField(upload_to='product_images/', blank=True, null=True)
-    barcode = models.CharField(max_length=255, blank=True)
-    qr_code = models.CharField(max_length=255, blank=True)
+    barcode = models.ImageField(upload_to='barcodes/', blank=True, null=True)
+    qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     concern_person = models.CharField(max_length=255)
     tag = models.CharField(max_length=50,null=True,blank=True)
     # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
@@ -136,6 +137,10 @@ class Product(SoftDeleteModel):
 
     def __str__(self):
         return f"{self.fabric_article_supplier} - {self.style}"
+    
+
+    def get_absolute_url(self):
+        return reverse('product-detail', kwargs={'pk': self.pk})
 
 
 class ProductImage(models.Model):

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.fabric_article_fexpo }} - QR Code Label</title>
+    <style>
+        @page {
+            size: 3.5in 2in; /* Exact label dimensions */
+            margin: 0; /* No margin for full bleed printing */
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0.1in; /* Reduced padding */
+            font-size: 9px; /* Slightly smaller font */
+            color: #333;
+            height: 2in; /* Fixed height */
+            width: 3.5in; /* Fixed width */
+            box-sizing: border-box;
+            overflow: hidden; /* Prevent any overflow */
+        }
+        .label-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            padding: 0.08in; /* Reduced padding */
+            height: calc(2in - 0.2in); /* Account for body padding */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .label-header {
+            font-size: 10px; /* Smaller header */
+            font-weight: 600;
+            margin-bottom: 0.05in; /* Reduced margin */
+            text-align: center;
+            color: #2c3e50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-grow: 1;
+            gap: 0.08in; /* Reduced gap */
+            min-height: 0; /* Important for flex children */
+        }
+        .qrcode-container {
+            flex: 0 0 0.7in; /* Slightly smaller QR area */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+            padding: 0.03in; /* Reduced padding */
+            background-color: white;
+            min-height: 0;
+        }
+        .qrcode-image {
+            width: 100%;
+            height: auto;
+            max-height: 0.7in; /* Constrain height */
+            image-rendering: crisp-edges;
+        }
+        .product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+            overflow: hidden;
+        }
+        .detail-row {
+            margin-bottom: 0.03in; /* Reduced margin */
+            overflow: hidden;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 8px; /* Smaller label text */
+            display: block;
+            white-space: nowrap;
+        }
+        .detail-value {
+            font-size: 8px; /* Smaller value text */
+            color: #222;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .no-qrcode {
+            border: 1px dashed #ddd;
+            padding: 0.05in; /* Reduced padding */
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            font-size: 8px; /* Smaller text */
+            border-radius: 2px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .footer {
+            font-size: 6px; /* Smaller footer text */
+            color: #777;
+            text-align: center;
+            margin-top: 0.05in; /* Reduced margin */
+            border-top: 1px dashed #eee;
+            padding-top: 0.03in; /* Reduced padding */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="label-container">
+        <div class="label-header">
+            {{ product.fabric_article_fexpo|truncatechars:22 }}
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="qrcode-container">
+                {% if product.qr_code %}
+                <img src="{{ product.qr_code.url }}" 
+                     alt="QR Code" 
+                     class="qrcode-image">
+                {% else %}
+                <div class="no-qrcode">
+                    No QR Code
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="product-details">
+                <div class="detail-row">
+                    <span class="detail-label">Supplier</span>
+                    <span class="detail-value">{{ product.fabric_mill_supplier|truncatechars:20 }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Origin</span>
+                    <span class="detail-value">{{ product.coo|truncatechars:15 }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Composition</span>
+                    <span class="detail-value">{{ product.composition|truncatechars:20 }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Stock</span>
+                    <span class="detail-value">{{ product.stock_qty }} yds</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            {{ COMPANY_NAME }} • {{ "now"|date:"m/d/Y" }}
+        </div>
+    </div>
+</body>
+</html>

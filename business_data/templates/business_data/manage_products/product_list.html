@@ -57,10 +57,11 @@
                   <th>{{'price (yards)'|pretty_label}}</th>
                   <th>{{'shrinkage%'|pretty_label}}</th>
                   <th>{{'available/ stock_qty'|pretty_label}}</th>
-                  <th>{{'images'|pretty_label}}</th>
+                  {% comment %} <th>{{'images'|pretty_label}}</th>
                   <th>{{'barcode'|pretty_label}}</th>
-                  <th>{{'qr_code'|pretty_label}}</th>
+                  <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                   <th>{{'concern_person'|pretty_label}}</th>
+                  <th>Action</th>
                   
               </tr>
           </thead>
@@ -126,10 +127,11 @@
                 <th>{{'price (yards)'|pretty_label}}</th>
                 <th>{{'shrinkage%'|pretty_label}}</th>
                 <th>{{'available/ stock_qty'|pretty_label}}</th>
-                <th>{{'images'|pretty_label}}</th>
+                {% comment %} <th>{{'images'|pretty_label}}</th>
                 <th>{{'barcode'|pretty_label}}</th>
-                <th>{{'qr_code'|pretty_label}}</th>
+                <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                 <th>{{'concern_person'|pretty_label}}</th>
+                <th>Action</th>
                 
               </tr>
           </tfoot>
@@ -158,8 +160,19 @@
       ajax: '{% url "business_data:product_data_source" %}',
       processing: true,
       createdRow: function(row, data, dataIndex) {
-        $(row).attr('data-id', data[1]);
+        $(row).attr('data-id', data[0]);
       },
+      columnDefs: [
+        {
+          targets: -1, // The last column (Action)
+          orderable: false,
+          searchable: false,
+          render: function(data, type, row, meta) {
+            var detailUrl = row[row.length - 1];
+            return `<a href="${detailUrl}" class="btn btn-link text-dark" target="_blank">View More Details</a>`;
+          }
+        }
+      ]
       // columns: [
       //  { data: 'date' },
       //  { data: 'fabric_article_supplier' },

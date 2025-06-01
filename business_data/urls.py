@@ -43,6 +43,8 @@ urlpatterns = [
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""
 
+    path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
+
 ]
 
 

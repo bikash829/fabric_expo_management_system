@@ -21,6 +21,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
+from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -1561,8 +1562,8 @@ class ProductPreviewView(View):
                                 price_per_yard=row.get('price_per_yard', 0),
                                 shrinkage_percent=row.get('shrinkage_percent', 0),
                                 stock_qty=row.get('stock_qty', 0),
-                                barcode=row.get('barcode', ''),
-                                qr_code=row.get('qr_code', ''),
+                                # barcode=row.get('barcode', ''),
+                                # qr_code=row.get('qr_code', ''),
                                 concern_person=row.get('concern_person', ''),
                                 tag=tag
                             )
@@ -1694,11 +1695,16 @@ class ProductDataSourceView(View):
                 obj.price_per_yard,
                 obj.shrinkage_percent,
                 obj.stock_qty,
-                '',  # images (handle as needed)
-                obj.barcode,
-                obj.qr_code,
+                # '',  # images (handle as needed)
+                # '',  # images (handle as needed)
+                # '',  # images (handle as needed)
+                # obj.barcode,
+                # obj.qr_code,
                 obj.concern_person,
+                obj.get_absolute_url(), 
             ])
+
+  
 
         return JsonResponse({
             'draw': draw,
@@ -1718,7 +1724,12 @@ class DeleteProductView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
             return JsonResponse({'error': 'No IDs provided.'}, status=400)
         Product.objects.filter(id__in=ids).soft_delete()
         return JsonResponse({'message': 'Selected products deleted successfully.'})
+    
 
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'business_data/manage_products/product_detail.html'  # Customize the path if needed
+    context_object_name = 'product'
 
 """End::Product Details"""
 

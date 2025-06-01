@@ -2,6 +2,16 @@ from django.db import models
 from django.urls import reverse
 from phonenumber_field.modelfields import PhoneNumberField
 from fabric_expo_management_system.custom_model_manager import SoftDeleteModel
+
+import os
+import qrcode
+import barcode
+from io import BytesIO
+from barcode.writer import ImageWriter
+from django.core.files import File
+from django.conf import settings
+
+
 # Contact info 
 class ContactInfo(models.Model):
     date = models.DateField(null=True,blank=True)
@@ -116,7 +126,6 @@ class Product(SoftDeleteModel):
     season = models.CharField(max_length=100)
     style = models.CharField(max_length=100)
     po = models.CharField(max_length=100)
-    # customer_name = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     customer_name = models.CharField(max_length=100,null=True)
     composition = models.CharField(max_length=255)
     construction = models.CharField(max_length=255)
@@ -132,7 +141,15 @@ class Product(SoftDeleteModel):
     qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     concern_person = models.CharField(max_length=255)
     tag = models.CharField(max_length=50,null=True,blank=True)
-    # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
+
+    @property
+    def total_value(self):
+        """
+        Returns the total value of the product (price_per_yard * stock_qty).
+        """
+        if self.price_per_yard is not None and self.stock_qty is not None:
+            return self.price_per_yard * self.stock_qty
+        return 0
  
 
     def __str__(self):
@@ -140,7 +157,32 @@ class Product(SoftDeleteModel):
     
 
     def get_absolute_url(self):
-        return reverse('product-detail', kwargs={'pk': self.pk})
+        return reverse('business_data:product-detail', kwargs={'pk': self.pk})
+
+    def generate_barcode_image(self):
+        code_value = f"PROD-{self.id}"
+        ean = barcode.get('code128', code_value, writer=ImageWriter())
+        buffer = BytesIO()
+        ean.write(buffer)
+        file_name = f"barcode_{self.id}.png"
+        self.barcode.save(file_name, File(buffer), save=False)
+
+    def generate_qr_code_image(self):
+        full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
+        qr = qrcode.make(full_url)
+        buffer = BytesIO()
+        qr.save(buffer, format='PNG')
+        file_name = f"qrcode_{self.id}.png"
+        self.qr_code.save(file_name, File(buffer), save=False)
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            self.generate_barcode_image()
+            self.generate_qr_code_image()
+            super().save(update_fields=['barcode', 'qr_code'])
+
 
 
 class ProductImage(models.Model):

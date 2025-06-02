@@ -1,0 +1,164 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.fabric_article_fexpo }} - Details Label</title>
+    <style>
+        @page {
+            size: 4in 3in;
+            margin: 0.1in;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            padding: 0.1in;
+        }
+        .label-header {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 3px;
+        }
+        .label-row {
+            display: flex;
+            margin-bottom: 3px;
+        }
+        .label-field {
+            font-weight: bold;
+            width: 40%;
+        }
+        .label-value {
+            width: 60%;
+        }
+        .code-container {
+            text-align: center;
+            margin: 5px 0;
+        }
+        .code-image {
+            max-height: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="label-header">{{ product.fabric_article_fexpo }}</div>
+    
+    <div class="label-row">
+        <div class="label-field">Supplier:</div>
+        <div class="label-value">{{ product.fabric_mill_supplier }}</div>
+    </div>
+    <div class="label-row">
+        <div class="label-field">Composition:</div>
+        <div class="label-value">{{ product.composition }}</div>
+    </div>
+    <div class="label-row">
+        <div class="label-field">Construction:</div>
+        <div class="label-value">{{ product.construction }}</div>
+    </div>
+    <div class="label-row">
+        <div class="label-field">Weight:</div>
+        <div class="label-value">{{ product.weight }}</div>
+    </div>
+    <div class="label-row">
+        <div class="label-field">Color:</div>
+        <div class="label-value">{{ product.color }}</div>
+    </div>
+    <div class="label-row">
+        <div class="label-field">Stock Qty:</div>
+        <div class="label-value">{{ product.stock_qty }} yards</div>
+    </div>
+    
+    <div class="code-container">
+        {% if product.barcode %}
+        <img src="{{ product.barcode.url }}" alt="Barcode" class="code-image">
+        {% endif %}
+        {% if product.qr_code %}
+        <img src="{{ product.qr_code.url }}" alt="QR Code" class="code-image">
+        {% endif %}
+    </div>
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @page {
+            size: 4in 3in;
+            margin: 0.1in;
+        }
+    .sticker {
+      width: auto;
+      border: 1px solid #000;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    .sticker-header {
+      text-align: center;
+      font-weight: bold;
+    }
+    .sticker-subheader {
+      text-align: center;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+  .sticker-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
+  .sticker-table td {
+    border: 1px solid black;
+    padding: 4px;
+    vertical-align: top;
+  }
+    .label {
+      width: 45%;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="sticker">
+    <div class="sticker-header">{{product.fabric_mill_supplier}}</div>
+    <div class="sticker-subheader">{{product.mill_reference}}</div>
+
+    <table class="sticker-table">
+      <tr>
+        <td class="label">Article No</td>
+        <td>: {{ product.fabric_article_supplier }}</td>
+      </tr>
+      <tr>
+        <td class="label">Construction</td>
+        <td>: {{ product.construction }}</td>
+      </tr>
+      <tr>
+        <td class="label">Composition</td>
+        <td>: {{ product.composition }}</td>
+      </tr>
+      <tr>
+        <td class="label">Weave Type</td>
+        <td>: 2/2 MATT</td> <!-- If dynamic, use a model field -->
+      </tr>
+      <tr>
+        <td class="label">Process</td>
+        <td>: {{ product.wash }}</td>
+      </tr>
+      <tr>
+        <td class="label">Finish Width (Inch)</td>
+        <td>: {{ product.cut_width }}"</td>
+      </tr>
+      <tr>
+        <td class="label">GSM</td>
+        <td>: {{ product.weight }}</td>
+      </tr>
+      <tr>
+        <td class="label">Finish Type</td>
+        <td>: SOFT</td> <!-- If you have a field for this, replace accordingly -->
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

@@ -1,0 +1,318 @@
+{% extends "core/_base.html" %}
+
+{% block push_css %}
+ <style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2c3e50;
+    }
+    
+    .product-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .product-tag {
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .detail-label {
+        font-size: 0.85rem;
+    }
+    
+    .section-title {
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 3rem;
+        height: 2px;
+        background: var(--primary-color);
+    }
+    
+    .code-image {
+        transition: transform 0.3s ease;
+    }
+    
+    .code-image:hover {
+        transform: scale(1.03);
+    }
+</style>
+{% endblock push_css %}
+
+{% block content %}
+    <div class="container py-4">
+        <div class="card shadow-sm border-0 overflow-hidden mb-4">
+            <div class="card-header product-header text-white position-relative">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3 class="h5 mb-1">
+                            <span class="fw-semibold">Fabric Article:</span> 
+                            <span id="fabric-article-fexpo">{{ product.fabric_article_fexpo }}</span>
+                        </h3>
+                        <p class="small mb-0 opacity-75">
+                            <span class="fw-medium">Supplier:</span> 
+                            <span id="fabric-article-supplier">{{ product.fabric_article_supplier }}</span>
+                        </p>
+                    </div>
+                    <span class="badge bg-white text-dark bg-opacity-25 rounded-pill product-tag" id="product-tag">
+                        {% if product.stock_qty > 0 %}In Stock{% else %}Out of Stock{% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <h5 class="section-title fw-semibold mb-3">Basic Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Date Added</label>
+                                    <p class="mb-0" id="date">{{ product.date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Supplier</label>
+                                    <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_mill_supplier }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Source</label>
+                                    <p class="mb-0" id="fabric-mill-source">{{ product.fabric_mill_source }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Country of Origin</label>
+                                    <p class="mb-0" id="coo">{{ product.coo }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="section-title fw-semibold mt-4 mb-3">Product Specifications</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Composition</label>
+                                    <p class="mb-0" id="composition">{{ product.composition }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Construction</label>
+                                    <p class="mb-0" id="construction">{{ product.construction }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Weight</label>
+                                    <p class="mb-0" id="weight">{{ product.weight }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Color</label>
+                                    <p class="mb-0" id="color">{{ product.color }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <h5 class="section-title fw-semibold mb-3">Inventory Details</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Stock Quantity</label>
+                                    <p class="mb-0" id="stock-qty">{{ product.stock_qty }} yards</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Price per Yard</label>
+                                    <p class="mb-0" id="price-per-yard">BDT {{ product.price_per_yard }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Total Value</label>
+                                    <p class="mb-0" id="total-value">BDT {{ product.total_value|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Concern Person</label>
+                                    <p class="mb-0" id="concern-person">{{ product.concern_person }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5 class="section-title fw-semibold mb-3">Identification</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="card code-image h-100">
+                                            <div class="card-body text-center">
+                                                {% if product.barcode %}
+                                                <img src="{{ product.barcode.url }}" alt="Barcode" class="img-fluid mb-2" style="max-height: 120px;">
+                                                {% else %}
+                                                <div class="bg-light p-4 mb-2">
+                                                    <i class="fas fa-barcode fa-4x text-muted"></i>
+                                                </div>
+                                                {% endif %}
+                                                <p class="small text-muted mb-0">Barcode</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card code-image h-100">
+                                            <div class="card-body text-center">
+                                                {% if product.qr_code %}
+                                                <img src="{{ product.qr_code.url }}" alt="QR Code" class="img-fluid mb-2" style="max-height: 120px;">
+                                                {% else %}
+                                                <div class="bg-light p-4 mb-2">
+                                                    <i class="fas fa-qrcode fa-4x text-muted"></i>
+                                                </div>
+                                                {% endif %}
+                                                <p class="small text-muted mb-0">QR Code</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                    {% comment %} <a href="#" class="btn btn-primary px-4">
+                        <i class="fas fa-edit me-2"></i> Edit
+                    </a> {% endcomment %}
+                    <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#printLabelModal">
+                        <i class="fas fa-print me-2"></i> Print Label
+                    </button>
+                    {% comment %} <a href="#" class="btn btn-outline-secondary px-4">
+                        <i class="fas fa-history me-2"></i> History
+                    </a> {% endcomment %}
+                    <a href="{% url 'business_data:product-list' %}" class="btn btn-outline-dark ms-auto px-4">
+                        <i class="fas fa-arrow-left me-2"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+<!-- Print Label Modal -->
+<div class="modal fade" id="printLabelModal" tabindex="-1" aria-labelledby="printLabelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="printLabelModalLabel">Print Options</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Label Type</label>
+                    <select class="form-select" id="labelTypeSelect">
+                        <option value="barcode">Barcode Label</option>
+                        <option value="qrcode">QR Code Label</option>
+                        <option value="details">Product Details Label</option>
+                    </select>
+                </div>
+                {% comment %} <div class="mb-3">
+                    <label class="form-label">Quantity (copies)</label>
+                    <input type="number" class="form-control" id="labelQuantity" value="1" min="1" max="10">
+                </div> {% endcomment %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="printLabelBtn">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Print Label Modal -->
+    {% comment %} <div class="modal fade" id="printLabelModal" tabindex="-1" aria-labelledby="printLabelModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="printLabelModalLabel">Print Options</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Label Type</label>
+                        <select class="form-select">
+                            <option value="barcode">Barcode Label</option>
+                            <option value="qrcode">QR Code Label</option>
+                            <option value="details">Product Details Label</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" value="1" min="1">
+                    </div> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Print</button>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+{% endblock %}
+
+{% block push_scripts %}
+{% comment %} <script>
+    // Dynamic tag styling
+    document.addEventListener('DOMContentLoaded', function() {
+        const tag = document.getElementById('product-tag');
+        if (tag.textContent.includes('In Stock')) {
+            tag.classList.add('bg-success', 'bg-opacity-10', 'text-success');
+        } else {
+            tag.classList.add('bg-danger', 'bg-opacity-10', 'text-danger');
+        }
+    });
+
+</script> {% endcomment %}
+<script>
+    // Dynamic tag styling
+    document.addEventListener('DOMContentLoaded', function() {
+        const tag = document.getElementById('product-tag');
+        if (tag.textContent.includes('In Stock')) {
+            tag.classList.add('bg-success', 'bg-opacity-10', 'text-success');
+        } else {
+            tag.classList.add('bg-danger', 'bg-opacity-10', 'text-danger');
+        }
+
+        // Print label functionality
+        document.getElementById('printLabelBtn').addEventListener('click', function() {
+            const labelType = document.getElementById('labelTypeSelect').value;
+            // const quantity = document.getElementById('labelQuantity').value;
+            const productId = {{ product.id }};
+            console.log("HEre you are ")
+            
+            // Open print URL in new tab for each copy
+            // for (let i = 0; i < quantity; i++) {
+            window.open(`/business_data/products/${productId}/print/${labelType}/`, '_blank');
+            //}
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('printLabelModal')).hide();
+        });
+    });
+</script>
+
+
+{% endblock push_scripts %}

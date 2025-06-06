@@ -274,18 +274,6 @@
 {% endblock %}
 
 {% block push_scripts %}
-{% comment %} <script>
-    // Dynamic tag styling
-    document.addEventListener('DOMContentLoaded', function() {
-        const tag = document.getElementById('product-tag');
-        if (tag.textContent.includes('In Stock')) {
-            tag.classList.add('bg-success', 'bg-opacity-10', 'text-success');
-        } else {
-            tag.classList.add('bg-danger', 'bg-opacity-10', 'text-danger');
-        }
-    });
-
-</script> {% endcomment %}
 <script>
     $(function() {
         // Dynamic tag styling

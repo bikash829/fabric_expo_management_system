@@ -1773,20 +1773,12 @@ class ProductLabelPrintView(View):
         pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
         
         response = HttpResponse(pdf, content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="{product.fabric_article_fexpo}_{label_type}_label.pdf"'
+        response['Content-Disposition'] = f'inline; filename="{product.fabric_article_fexpo}_{label_type}_label.pdf"'
         return response
     
 
 
-# print qr codes 
-def print_selected_qrcodes(request):
-    ids = request.GET.getlist('ids[]')
-    print(ids)
-    products = Product.objects.filter(id__in=ids)
-    pass 
-    # return render(request, 'business_data/manage_products/print_selected_qrcodes.html', {'products': products})
-
-
+# generate qrcode list 
 class ProductQRCodePDFView(View):
     def get(self, request, *args, **kwargs):
         product_ids = request.GET.getlist('ids[]')
@@ -1794,17 +1786,36 @@ class ProductQRCodePDFView(View):
         if not product_ids:
             return HttpResponse("No product IDs provided.", status=400)
 
-        # products = Product.objects.filter(id__in=product_ids)
-        products = Product.objects.filter(id__in=product_ids).values('id', 'qr_code')
+        products = Product.objects.filter(id__in=product_ids).only('id', 'qr_code')
 
-  
-
-        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products})
+        # return render(request,'business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_qrcode':True})
+        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_qrcode':True})
 
         pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
         
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="product_qrcodes.pdf"'
+        return response
+
+
+# generate barcode list 
+class ProductBarCodePDFView(View):
+    def get(self, request, *args, **kwargs):
+        product_ids = request.GET.getlist('ids[]')
+
+        if not product_ids:
+            return HttpResponse("No product IDs provided.", status=400)
+
+        # products = Product.objects.filter(id__in=product_ids)
+        products = Product.objects.filter(id__in=product_ids).only('id','barcode')
+
+        # return render(request,'business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_barcode':True})
+        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products,'is_barcode':True})
+
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="product_barcodes.pdf"'
         return response
 
 """End::Product Details"""

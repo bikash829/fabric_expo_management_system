@@ -287,29 +287,22 @@
 
 </script> {% endcomment %}
 <script>
-    // Dynamic tag styling
-    document.addEventListener('DOMContentLoaded', function() {
-        const tag = document.getElementById('product-tag');
-        if (tag.textContent.includes('In Stock')) {
-            tag.classList.add('bg-success', 'bg-opacity-10', 'text-success');
+    $(function() {
+        // Dynamic tag styling
+        const $tag = $('#product-tag');
+        if ($tag.text().includes('In Stock')) {
+            $tag.addClass('bg-success bg-opacity-10 text-success');
         } else {
-            tag.classList.add('bg-danger', 'bg-opacity-10', 'text-danger');
+            $tag.addClass('bg-danger bg-opacity-10 text-danger');
         }
 
         // Print label functionality
-        document.getElementById('printLabelBtn').addEventListener('click', function() {
-            const labelType = document.getElementById('labelTypeSelect').value;
-            // const quantity = document.getElementById('labelQuantity').value;
-            const productId = {{ product.id }};
-            console.log("HEre you are ")
-            
-            // Open print URL in new tab for each copy
-            // for (let i = 0; i < quantity; i++) {
+        $('#printLabelBtn').on('click', function() {
+            const labelType = $('#labelTypeSelect').val();
+            const productId = "{{ product.id }}";
             window.open(`/business_data/products/${productId}/print/${labelType}/`, '_blank');
-            //}
-            
             // Close modal
-            bootstrap.Modal.getInstance(document.getElementById('printLabelModal')).hide();
+            $('#printLabelModal').modal('hide');
         });
     });
 </script>

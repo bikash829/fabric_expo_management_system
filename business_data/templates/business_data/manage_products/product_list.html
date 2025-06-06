@@ -22,12 +22,12 @@
       <div>
         <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
           <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
-          <label class="btn btn-outline-primary" for="select-all">Select All</label>
+          <label class="btn btn-outline-primary mt-2" for="select-all">Select All</label>
         </div>
-        <button id="row_count" class="btn btn-info" disabled>Row count</button>
-        <button id="print_qr_codes" class="btn btn-secondary" disabled>Print QR Codes</button>
-        <button id="print_barcodes" class="btn btn-secondary" disabled>Print Barcodes</button>
-        <button id="delete-data" class="btn btn-danger">Delete</button>
+        <button id="row_count" class="btn btn-info mt-2" disabled>Row count</button>
+        <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
+        <button id="print_barcodes" class="btn btn-secondary mt-2" disabled>Print Barcodes</button>
+        <button id="delete-data" class="btn btn-danger mt-2">Delete</button>
       </div>
 
       <div>
@@ -323,7 +323,7 @@
             return;
         }
         // Open the print page in a new tab
-        const url = "{% url 'business_data:print_selected_qrcodes' %}?ids[]=" + selectedIds.join('&ids[]=');
+        const url = "{% url 'business_data:print_selected_barcodes' %}?ids[]=" + selectedIds.join('&ids[]=');
         window.open(url, '_blank');
     });
 

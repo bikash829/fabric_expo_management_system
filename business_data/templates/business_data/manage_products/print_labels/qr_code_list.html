@@ -82,12 +82,11 @@
     <div class="grid">
         {% for product in products %}
         <div class="label">
-            {% if product.qr_code %}
-                <img class="qr-img" src="{{ product.qr_code.url }}" alt="QR Code">
+            {% if is_qrcode %}
+                <img class="qr-img" src="{{product.qr_code.url}}" alt="QR Code">
                 <div class="product-name">PROD-{{ product.id }}</div>
-            {% elif product.barcode %}
+            {% elif is_barcode %}
                 <img class="qr-img" src="{{ product.barcode.url }}" alt="Barcode">
-                <div class="product-name">PROD-{{ product.id }}</div>
             {% endif %}
 
         </div>

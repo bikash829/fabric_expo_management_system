@@ -49,6 +49,7 @@ urlpatterns = [
     path('label/details/<int:pk>/', views.print_product_details_label, name='print_product_details_label'),
     path('products/<int:pk>/print/<str:label_type>/', views.ProductLabelPrintView.as_view(), name='print-product-label'),
     path('product-list/print-qr-codes/',views.ProductQRCodePDFView.as_view(), name='print_selected_qrcodes'),
+    path('product-list/print-barcodes/',views.ProductBarCodePDFView.as_view(), name='print_selected_barcodes'),
 
 ]
 

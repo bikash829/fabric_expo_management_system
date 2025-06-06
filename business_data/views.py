@@ -33,6 +33,8 @@ from faker import Faker
 from random import randint, choice, uniform
 from collections import defaultdict
 from pprint import pprint
+from weasyprint import HTML
+from django.template.loader import render_to_string
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -1330,7 +1332,7 @@ class GenerateCSVProduct(View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(10):  # Change to any number you want
+        for _ in range(100):  # Change to any number you want
             writer.writerow([
                 fake.date_this_decade().strftime("%Y-%m-%d"),
                 fake.company(),
@@ -1746,8 +1748,6 @@ def print_product_details_label(request, pk):
     return render(request, 'business_data/manage_products/labels/product_details_label.html', {'product': product})
 
 
-from weasyprint import HTML
-from django.template.loader import render_to_string
 # import tempfile
 class ProductLabelPrintView(View):
     def get(self, request, pk, label_type):
@@ -1778,6 +1778,34 @@ class ProductLabelPrintView(View):
     
 
 
+# print qr codes 
+def print_selected_qrcodes(request):
+    ids = request.GET.getlist('ids[]')
+    print(ids)
+    products = Product.objects.filter(id__in=ids)
+    pass 
+    # return render(request, 'business_data/manage_products/print_selected_qrcodes.html', {'products': products})
+
+
+class ProductQRCodePDFView(View):
+    def get(self, request, *args, **kwargs):
+        product_ids = request.GET.getlist('ids[]')
+
+        if not product_ids:
+            return HttpResponse("No product IDs provided.", status=400)
+
+        # products = Product.objects.filter(id__in=product_ids)
+        products = Product.objects.filter(id__in=product_ids).values('id', 'qr_code')
+
+  
+
+        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products})
+
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="product_qrcodes.pdf"'
+        return response
 
 """End::Product Details"""
 

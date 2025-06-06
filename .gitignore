@@ -97,4 +97,7 @@ resources/
 /media/bulk_messages_data/whatsapp_attachment/
 /media/bulk_messages_data/wechat_attachment/
 static/
+media/barcodes/
+media/qrcodes/
+media/temp/
 note.md

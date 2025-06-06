@@ -22,10 +22,12 @@
       <div>
         <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
           <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
-          <label class="btn btn-outline-primary" for="select-all">Select All</label>
+          <label class="btn btn-outline-primary mt-2" for="select-all">Select All</label>
         </div>
-        <button id="row_count" class="btn btn-info" disabled>Row count</button>
-        <button id="delete-data" class="btn btn-danger">Delete</button>
+        <button id="row_count" class="btn btn-info mt-2"  disabled>Row count</button>
+        <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
+        <button id="print_barcodes" class="btn btn-secondary mt-2" disabled>Print Barcodes</button>
+        <button id="delete-data" class="btn btn-danger mt-2">Delete</button>
       </div>
 
       <div>
@@ -57,10 +59,11 @@
                   <th>{{'price (yards)'|pretty_label}}</th>
                   <th>{{'shrinkage%'|pretty_label}}</th>
                   <th>{{'available/ stock_qty'|pretty_label}}</th>
-                  <th>{{'images'|pretty_label}}</th>
+                  {% comment %} <th>{{'images'|pretty_label}}</th>
                   <th>{{'barcode'|pretty_label}}</th>
-                  <th>{{'qr_code'|pretty_label}}</th>
+                  <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                   <th>{{'concern_person'|pretty_label}}</th>
+                  <th>Action</th>
                   
               </tr>
           </thead>
@@ -126,10 +129,11 @@
                 <th>{{'price (yards)'|pretty_label}}</th>
                 <th>{{'shrinkage%'|pretty_label}}</th>
                 <th>{{'available/ stock_qty'|pretty_label}}</th>
-                <th>{{'images'|pretty_label}}</th>
+                {% comment %} <th>{{'images'|pretty_label}}</th>
                 <th>{{'barcode'|pretty_label}}</th>
-                <th>{{'qr_code'|pretty_label}}</th>
+                <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                 <th>{{'concern_person'|pretty_label}}</th>
+                <th>Action</th>
                 
               </tr>
           </tfoot>
@@ -147,127 +151,12 @@
 <!-- Datatable-->
 <script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
 <script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
-
 <script>
-
-    // Datatable 
-    const table = $('#data_list').DataTable({
-      responsive: true,
-      // select: true,
-      serverSide: true,
-      ajax: '{% url "business_data:product_data_source" %}',
-      processing: true,
-      createdRow: function(row, data, dataIndex) {
-        $(row).attr('data-id', data[1]);
-      },
-      // columns: [
-      //  { data: 'date' },
-      //  { data: 'fabric_article_supplier' },
-      //   ...other fields...
-      // ]
-    });
-
-    // toggle select data_list
-    $('#data_list tbody').on('click', 'tr', function() {
-      $(this).toggleClass('selected');
-      updateRowCount();
-    });
-
-    // Show row count 
-    function updateRowCount() {
-      const count = table.rows('.selected').data().length;
-      $('#row_count').text(count + ' row(s) selected');
-    }
-    
-    // Handle "Select All" checkbox click event
-    $('#select-all').on('click', function() {
-      var rows = table.rows({ 'search': 'applied' }).nodes();
-      if (this.checked) {
-          $(rows).addClass('selected');
-      } else {
-          $(rows).removeClass('selected');
-      }
-      updateRowCount();
-    });
-
-    // Handle individual row click event to update "Select All" checkbox state
-    $('#data_list tbody').on('click', 'tr', function() {
-      var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
-      $('#select-all').prop('checked', allChecked);
-    });
-    
-    // Initial update of the row count button text
-    updateRowCount();
-      
-
-    // Handle "Send Data" button click event to send selected column data to backend
-    $('#delete-data').on('click', function(e) {
-      const selectedIds = [];
-      $('#data_list tbody tr.selected').each(function(e) {
-        selectedIds.push($(this).data('id'));
-      });
-      console.log(selectedIds)
-      
-      
-      
-
-      if (selectedIds.length === 0){
-        console.log(selectedIds)
-        Swal.fire({
-          icon: 'info', 
-          text: "Please select desired recipients first!"
-        });
-      }else{
-        Swal.fire({
-            title: "Are you sure you want to delete the selected items?",
-            text: "This action cannot be undone. Once deleted.",
-          showCancelButton: true,
-          confirmButtonText: "Delete",
-        }).then((result) => {
-          /* Read more about isConfirmed, isDenied below */
-          if (result.isConfirmed) {
-            // Show loader
-            Swal.fire({
-              title: 'Deleting...',
-              text: 'Please wait while we delete the selected items.',
-              allowOutsideClick: false,
-              allowEscapeKey: false,
-              didOpen: () => {
-                Swal.showLoading();
-              }
-            });
-            $.ajax({
-              //url: "#",  // Replace with your backend endpoint
-              url: "{% url 'business_data:delete-products' %}",  
-              type: 'POST',
-              data: {
-                selectedIds: selectedIds,
-                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
-              },
-              success: function(response) {
-                Swal.fire({
-                  position: "center",
-                  icon: "success",
-                  text: response.message,
-                  showConfirmButton: true,
-                }).then((result) => {
-                    location.reload();
-                });
-              },
-              error: function(xhr, status, error) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong!",
-                });
-              }
-            });
-
-          } 
-        });
-        
-      }
-    });
-
+    const dataSourceUrl = "{% url 'business_data:product_data_source' %}";
+    const deleteUrl = "{% url 'business_data:delete-products' %}";
+    const printQRCodesUrl = "{% url 'business_data:print_selected_qrcodes' %}";
+    const printBarcodesUrl = "{% url 'business_data:print_selected_barcodes' %}";
+    const csrfToken = "{{ csrf_token }}";
 </script>
+<script src="{% static 'business_data/product-list.js' %}"></script>
 {% endblock push_scripts %}

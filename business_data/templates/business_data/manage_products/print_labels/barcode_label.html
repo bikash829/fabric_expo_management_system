@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.fabric_article_fexpo }} - Product Label</title>
+    <style>
+        @page {
+            size: 3.5in 2in; /* Standard label size */
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0.15in;
+            font-size: 10px;
+            color: #333;
+        }
+        .label-container {
+            border: 1px solid #e0e0e0; /* Light border for visual guidance */
+            border-radius: 3px;
+            padding: 0.1in;
+            height: calc(2in - 0.3in); /* Account for padding */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .label-header {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 0.05in;
+            text-align: center;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 0.05in;
+        }
+        .barcode-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0.05in 0;
+        }
+        .barcode-image {
+            max-height: 0.6in;
+            width: auto;
+            image-rendering: crisp-edges; /* For better barcode scanning */
+        }
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            margin-top: 0.05in;
+        }
+        .product-field {
+            font-weight: bold;
+        }
+        .no-barcode {
+            border: 1px dashed #ccc;
+            padding: 0.1in;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+        .company-logo {
+            text-align: center;
+            font-size: 8px;
+            color: #666;
+            margin-top: 0.05in;
+        }
+    </style>
+</head>
+<body>
+    <div class="label-container">
+        <div class="label-header">
+            {{ product.fabric_article_fexpo|truncatechars:20 }}
+        </div>
+        
+        <div class="barcode-container">
+            {% if product.barcode %}
+            <img src="{{ product.barcode.url }}" 
+                 alt="Barcode" 
+                 class="barcode-image">
+            {% else %}
+            <div class="no-barcode">
+                No Barcode Available
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="product-details">
+            <div>
+                <span class="product-field">Supplier:</span> {{ product.fabric_mill_supplier|truncatechars:15 }}
+            </div>
+            <div>
+                <span class="product-field">Qty:</span> {{ product.stock_qty }} yds
+            </div>
+        </div>
+        
+        <div class="product-details">
+            <div>
+                <span class="product-field">Comp:</span> {{ product.composition|truncatechars:12 }}
+            </div>
+            <div>
+                <span class="product-field">Color:</span> {{ product.color|truncatechars:10 }}
+            </div>
+        </div>
+        
+        <div class="company-logo">
+            {{ COMPANY_NAME }} • {{ COMPANY_CONTACT }}
+        </div>
+    </div>
+</body>
+</html>

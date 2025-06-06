@@ -18,9 +18,10 @@ from django.core.files.storage import default_storage
 from django.core.validators import validate_email
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic.list import ListView
+from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -32,6 +33,8 @@ from faker import Faker
 from random import randint, choice, uniform
 from collections import defaultdict
 from pprint import pprint
+from weasyprint import HTML
+from django.template.loader import render_to_string
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -1329,7 +1332,7 @@ class GenerateCSVProduct(View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(10):  # Change to any number you want
+        for _ in range(100):  # Change to any number you want
             writer.writerow([
                 fake.date_this_decade().strftime("%Y-%m-%d"),
                 fake.company(),
@@ -1561,8 +1564,8 @@ class ProductPreviewView(View):
                                 price_per_yard=row.get('price_per_yard', 0),
                                 shrinkage_percent=row.get('shrinkage_percent', 0),
                                 stock_qty=row.get('stock_qty', 0),
-                                barcode=row.get('barcode', ''),
-                                qr_code=row.get('qr_code', ''),
+                                # barcode=row.get('barcode', ''),
+                                # qr_code=row.get('qr_code', ''),
                                 concern_person=row.get('concern_person', ''),
                                 tag=tag
                             )
@@ -1694,11 +1697,16 @@ class ProductDataSourceView(View):
                 obj.price_per_yard,
                 obj.shrinkage_percent,
                 obj.stock_qty,
-                '',  # images (handle as needed)
-                obj.barcode,
-                obj.qr_code,
+                # '',  # images (handle as needed)
+                # '',  # images (handle as needed)
+                # '',  # images (handle as needed)
+                # obj.barcode,
+                # obj.qr_code,
                 obj.concern_person,
+                obj.get_absolute_url(), 
             ])
+
+  
 
         return JsonResponse({
             'draw': draw,
@@ -1718,7 +1726,97 @@ class DeleteProductView(UpdateView,LoginRequiredMixin, PermissionRequiredMixin):
             return JsonResponse({'error': 'No IDs provided.'}, status=400)
         Product.objects.filter(id__in=ids).soft_delete()
         return JsonResponse({'message': 'Selected products deleted successfully.'})
+    
 
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'business_data/manage_products/product_detail.html'  # Customize the path if needed
+    context_object_name = 'product'
+
+
+
+def print_barcode_label(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, 'business_data/manage_products/labels/barcode_label.html', {'product': product})
+
+def print_qrcode_label(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, 'business_data/manage_products/labels/qrcode_label.html', {'product': product})
+
+def print_product_details_label(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    return render(request, 'business_data/manage_products/labels/product_details_label.html', {'product': product})
+
+
+# import tempfile
+class ProductLabelPrintView(View):
+    def get(self, request, pk, label_type):
+        product = Product.objects.get(pk=pk)
+        
+        # Render different templates based on label type
+        if label_type == 'barcode':
+            template = 'business_data/manage_products/print_labels/barcode_label.html'
+        elif label_type == 'qrcode':
+            template = 'business_data/manage_products/print_labels/qrcode_label.html'
+        else:  # default to details
+            template = 'business_data/manage_products/print_labels/details_label.html'
+        
+
+        # base_url = request.build_absolute_uri('/')[:-1]  # Gets domain without trailing slash
+        context = {
+            'product': product,
+            # 'base_url': base_url
+        }
+
+        html_string = render_to_string(template, context)
+        
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{product.fabric_article_fexpo}_{label_type}_label.pdf"'
+        return response
+    
+
+
+# generate qrcode list 
+class ProductQRCodePDFView(View):
+    def get(self, request, *args, **kwargs):
+        product_ids = request.GET.getlist('ids[]')
+
+        if not product_ids:
+            return HttpResponse("No product IDs provided.", status=400)
+
+        products = Product.objects.filter(id__in=product_ids).only('id', 'qr_code')
+
+        # return render(request,'business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_qrcode':True})
+        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_qrcode':True})
+
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="product_qrcodes.pdf"'
+        return response
+
+
+# generate barcode list 
+class ProductBarCodePDFView(View):
+    def get(self, request, *args, **kwargs):
+        product_ids = request.GET.getlist('ids[]')
+
+        if not product_ids:
+            return HttpResponse("No product IDs provided.", status=400)
+
+        # products = Product.objects.filter(id__in=product_ids)
+        products = Product.objects.filter(id__in=product_ids).only('id','barcode')
+
+        # return render(request,'business_data/manage_products/print_labels/qr_code_list.html', {'products': products, 'is_barcode':True})
+        html_string = render_to_string('business_data/manage_products/print_labels/qr_code_list.html', {'products': products,'is_barcode':True})
+
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="product_barcodes.pdf"'
+        return response
 
 """End::Product Details"""
 

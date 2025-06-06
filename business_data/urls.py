@@ -40,8 +40,16 @@ urlpatterns = [
     path('product-preview/', views.ProductPreviewView.as_view(), name='product-preview'),
     path('product-list/',views.ProductListView.as_view(),name='product-list'),
     path('products/data-source/', views.ProductDataSourceView.as_view(), name='product_data_source'),
+    path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""
+
+    path('label/barcode/<int:pk>/', views.print_barcode_label, name='print_barcode_label'),
+    path('label/qrcode/<int:pk>/', views.print_qrcode_label, name='print_qrcode_label'),
+    path('label/details/<int:pk>/', views.print_product_details_label, name='print_product_details_label'),
+    path('products/<int:pk>/print/<str:label_type>/', views.ProductLabelPrintView.as_view(), name='print-product-label'),
+    path('product-list/print-qr-codes/',views.ProductQRCodePDFView.as_view(), name='print_selected_qrcodes'),
+    path('product-list/print-barcodes/',views.ProductBarCodePDFView.as_view(), name='print_selected_barcodes'),
 
 ]
 

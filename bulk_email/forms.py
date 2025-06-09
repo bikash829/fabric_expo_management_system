@@ -37,14 +37,15 @@ class TempEmailRecipientImportForm(ModelForm):
 from django_ckeditor_5.widgets import CKEditor5Widget
 # create email form 
 class EmailCreationForm(ModelForm):
-    # template_name = "form_template/full_width_form.html"
-    attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+    # attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["body"].required = True
     class Meta:
         model = EmailTemplate
-        fields = ['name', 'subject', 'body','attachment']
+        # fields = ['name', 'subject', 'body','attachment']
+        fields = ['name', 'subject', 'body']
 
         labels = {
             'name': 'Template Name',

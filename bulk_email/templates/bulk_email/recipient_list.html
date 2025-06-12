@@ -101,7 +101,12 @@
     // Datatable 
     const table = $('#recipients').DataTable({
       responsive: true,
-      // select: true,
+      lengthMenu: [
+        [50, 100, 500, 1000, 5000, 10000],
+        [50, 100, 500, 1000, 5000, 10000]
+      ],
+      pageLength: 50 // Default rows per page
+          // select: true,
     });
 
     // toggle select recipients

@@ -181,7 +181,7 @@ LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
 
 """"console backend"""
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
@@ -209,3 +209,13 @@ TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"
 # Ckeditor 5 
 # Define a constant in settings.py to specify file upload permissions
 # CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"  # Possible values: "staff", "authenticated", "any"
+
+
+# celery config 
+# Celery Configuration Options
+CELERY_TIMEZONE = "Asia/Dhaka"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"

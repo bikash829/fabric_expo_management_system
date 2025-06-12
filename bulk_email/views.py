@@ -1,4 +1,4 @@
-from django.utils import timezone
+from pprint import pprint
 import uuid
 import time
 from django.http import HttpResponse, JsonResponse
@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
 from bulk_email.forms import EmailAttachmentForm, EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
-from fabric_expo_management_system import settings
 from .models import EmailAttachment, EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView,DetailView
@@ -22,7 +21,6 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 from django.db.models import F
 import os
-from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.exceptions import ValidationError
 
 """begin::manage email recipients """
@@ -460,104 +458,28 @@ class SelectRecipientsView(View):
 import mimetypes
 from premailer import transform
 from bulk_core.utils import replace_hsl_with_rgb
+from .tasks import send_mail_queue
 class SendEmailView(View):
     def post(self,request,*args,**kwargs):
-        email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
+
+        draft_id = kwargs.get('draft_id')
         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
-        recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
         session_id = str(uuid.uuid4())
-        sender = request.user
+        sender_id = request.user.id
 
-        # Open a single SMTP connection for efficiency
-        connection = get_connection()
-        connection.open()
-
-        # Track success and failure
-        success_count = 0
-        failure_count = 0
-
-        # Loop through each recipient
-        for recipient in recipients:
-            # Plain text fallback
-            text_body = f"""Dear {recipient.name},\n
-
-                            {email_content.body}\n\n
-
-                            Best Regards,\n
-                            Fabric Expo Management\n
-                        """
-
-            # HTML Email (Better Formatting)
-            html_body = f"""
-                            <html>
-                            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                                <p>Dear {recipient.name},</p>
-                                <p>{email_content.body}</p>
-                                <p style="margin-top: 20px;">Best Regards,<br>
-                                <strong>Fabric Expo Management</strong></p>
-                            </body>
-                            </html>
-                        """
-            
-            # Transform HSL to RGB
-            html_body = transform(replace_hsl_with_rgb(html_body))
-            
-            # Create email
-            email_message = EmailMultiAlternatives(
-                subject=email_content.subject,
-                # body=text_body,  # Plain text version
-                from_email=settings.EMAIL_HOST_USER,
-                # from_email="admin@email.com",
-                to=[recipient.email],
-                connection=connection,  # Use open connection
+        send_mail_queue.delay(
+            recipient_ids=recipient_ids,
+            draft_id=draft_id, 
+            sender_id = sender_id,
+            session_id = session_id,
             )
-            
-            # Attach HTML version for better formatting
-            email_message.attach_alternative(html_body, "text/html")
-            # Attach files
-            attachments = EmailAttachment.objects.filter(template=email_content)
-            for attachment in attachments:
-                file_path = attachment.attachment.path
-                file_name = attachment.attachment.name
-                mime_type, _ = mimetypes.guess_type(file_path)
-                with open(file_path, 'rb') as f:
-                    email_message.attach(file_name, f.read(), mime_type)
-            # Send the email
-            try:
-                email_message.send()
-                success_count += 1
 
-                # Log successful email
-                SentMail.objects.create(
-                    recipient_to=recipient,
-                    email=email_content,
-                    sent_by=sender,
-                    sent_at=timezone.now(),  # Set current time
-                    session_id=session_id,  # Generate unique ID
-                    status=True,
-                )
-            except Exception as e:
-                # Log failed email
-                failure_count += 1
-                SentMail.objects.create(
-                    email=email_content,
-                    recipient_to=recipient,
-                    sent_by=sender,
-                    sent_at=timezone.now(),  # Set current time
-                    session_id=session_id,  # Generate unique ID
-                    error_message=str(e),
-                    status=False,
-                )
-            
-           
+        # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
+        return JsonResponse({'message': "Email sending is processing. We will notify you after completion."})
+    
 
-        # Close the connection after all emails are sent
-        connection.close()
-        
-        # Add success message
-        # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
-        return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
-        
+class EmailQueueView(View):
+    pass 
 """end::sending email"""
 
 

@@ -131,6 +131,12 @@ def get_sidebar_items(request):
                             'icon': "fa-regular fa-folder-open",
                         },
                         {
+                            'name': 'Email Queue',
+                            'code_name': 'email_queue',
+                            'url': reverse('bulk_email:email_queue'),
+                            'icon': "fa-solid fa-envelope-open-text",
+                        },
+                        {
                             'name': 'Sent Records',
                             'code_name': 'sent_records',
                             'url': reverse('bulk_email:sent_email_session'),

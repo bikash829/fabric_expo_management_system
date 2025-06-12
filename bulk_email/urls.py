@@ -28,6 +28,7 @@ urlpatterns = [
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name='select_recipients'),
     path('send_email/<int:draft_id>/',views.SendEmailView.as_view(),name='send_email'),
     path('sent_email_session/',views.SenTEmailSessionListView.as_view(),name='sent_email_session'),
+    path('email_queue/',views.EmailQueueView.as_view(),name='email_queue'),
 
     # path('email_progress/',views.email_progress,name='email_progress'),
 ]

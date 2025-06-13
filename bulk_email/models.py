@@ -104,3 +104,17 @@ class SentMail(models.Model):
 
     def __str__(self):
         return self.email
+    
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+class EmailSession(models.Model):
+    session_id = models.CharField(max_length=255, unique=True)
+    # sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    draft = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=[('processing', 'Processing'), ('done', 'Done'), ('failed', 'Failed')], default='processing')
+    success_count = models.PositiveIntegerField(default=0)
+    failure_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)

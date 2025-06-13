@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "phonenumber_field",
     'django_twilio',
     'django_ckeditor_5',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -180,14 +181,14 @@ LOGIN_REDIRECT_URL = 'admin_dashboard:welcome'
 LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
 
 """"console backend"""
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = config("EMAIL")
-EMAIL_HOST_PASSWORD = config("EMAIL_PASS")
-EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = config("EMAIL")
+# EMAIL_HOST_PASSWORD = config("EMAIL_PASS")
+# EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 
 
 # django.contrib.auth.tokens.PasswordResetTokenGenerator
@@ -196,10 +197,7 @@ EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 PASSWORD_RESET_TIMEOUT = 300
 
 
-# Redis as Celery Broker
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
+
 
 # twilio credentials
 TWILIO_ACCOUNT_SID=config('TWILIO_ACCOUNT_SID')
@@ -218,4 +216,9 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = 'django-db'
+# Redis as Celery Broker
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'

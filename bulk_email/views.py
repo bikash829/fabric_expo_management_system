@@ -8,9 +8,9 @@ from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
 from bulk_email.forms import EmailAttachmentForm, EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
-from .models import EmailAttachment, EmailRecipient, EmailTemplate, SentMail,TempEmailRecipient
+from .models import EmailAttachment, EmailRecipient, EmailSession, EmailTemplate, SentMail,TempEmailRecipient
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView
+from django.views.generic import ListView,DetailView, TemplateView
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 import csv
@@ -20,6 +20,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 from django.db.models import F
+from django.db.models import Q
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+
 import os
 from django.core.exceptions import ValidationError
 
@@ -467,6 +470,13 @@ class SendEmailView(View):
         session_id = str(uuid.uuid4())
         sender_id = request.user.id
 
+        EmailSession.objects.create(
+            session_id=session_id,
+            sender_id=sender_id,
+            draft_id=draft_id,
+            status='processing'
+        )
+
         send_mail_queue.delay(
             recipient_ids=recipient_ids,
             draft_id=draft_id, 
@@ -476,10 +486,68 @@ class SendEmailView(View):
 
         # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
         return JsonResponse({'message': "Email sending is processing. We will notify you after completion."})
-    
+        # return redirect('bulk_email:email_queue')
 
-class EmailQueueView(View):
-    pass 
+
+class EmailSessionListView(LoginRequiredMixin,TemplateView):
+    template_name = 'bulk_email/email_queue.html'
+
+class EmailSessionAjaxData(View):
+    def get(self, request, *args, **kwargs):
+        draw = int(request.GET.get('draw', 1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        search_value = request.GET.get('search[value]', '')
+        order_column_index = int(request.GET.get('order[0][column]', 0))
+        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
+
+
+        columns = [
+            'id', 'created_at', 'draft__subject', 'success_count', 'failure_count', 'status'
+        ]
+
+        order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
+        if order_dir == 'asc':
+            order_field = '-' + order_field
+
+
+
+        qs = EmailSession.objects.all()
+
+        if search_value:
+            search_q = Q()
+            # List of fields to search (including id and all relevant fields)
+            search_fields = columns
+            for col in search_fields:
+                search_q |= Q(**{f"{col}__icontains": search_value})
+            qs = qs.filter(search_q)
+
+        total_count = EmailSession.objects.count()
+        filtered_count = qs.count()
+
+        qs = qs.order_by(order_field)[start:start+length]
+
+        data = []
+        for obj in qs:
+            data.append({
+                # idx,  # For Count column (can be filled on client side)
+                'id' : obj.id,
+                'created_at' : obj.created_at.strftime('%Y-%m-%d %H:%M'),
+                'subject': obj.draft.subject,
+                'success': obj.success_count,
+                'failed': obj.failure_count,
+                'status': obj.get_status_display(),
+            })
+
+  
+
+        return JsonResponse({
+            'draw': draw,
+            'recordsTotal': total_count,
+            'recordsFiltered': filtered_count,
+            'data': data,
+        })
+
 """end::sending email"""
 
 

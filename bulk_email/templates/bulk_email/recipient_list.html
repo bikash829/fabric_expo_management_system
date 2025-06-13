@@ -171,6 +171,7 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
               },
               success: function(response) {
+                window.location.href = "{% url 'bulk_email:email_queue' %}";
                 Swal.fire({
                   position: "top-end",
                   icon: "success",

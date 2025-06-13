@@ -28,7 +28,9 @@ urlpatterns = [
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name='select_recipients'),
     path('send_email/<int:draft_id>/',views.SendEmailView.as_view(),name='send_email'),
     path('sent_email_session/',views.SenTEmailSessionListView.as_view(),name='sent_email_session'),
-    path('email_queue/',views.EmailQueueView.as_view(),name='email_queue'),
+    path('email_queue/',views.EmailSessionListView.as_view(),name='email_queue'),
+    path('email-session-data-source/',views.EmailSessionAjaxData.as_view(),name='email_session_ajax_data'),
+    # path('email-status/<str:session_id>/', views.email_status_view, name='email_status'),
 
     # path('email_progress/',views.email_progress,name='email_progress'),
 ]

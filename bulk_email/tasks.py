@@ -6,10 +6,11 @@ from premailer import transform
 from bulk_core.utils import replace_hsl_with_rgb
 from django.core.mail import EmailMultiAlternatives, get_connection
 from fabric_expo_management_system import settings
-from .models import EmailAttachment, SentMail, EmailRecipient, EmailTemplate
+from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, EmailTemplate
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from time import sleep
 
 
 # def parse_csv(file):
@@ -30,6 +31,7 @@ from django.contrib.auth import get_user_model
 
 @shared_task
 def send_mail_queue(**kwargs):
+    sleep(20)
     User = get_user_model()
     email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
     recipients = EmailRecipient.objects.filter(id__in=kwargs['recipient_ids'])
@@ -73,8 +75,8 @@ def send_mail_queue(**kwargs):
         email_message = EmailMultiAlternatives(
             subject=email_content.subject,
             # body=text_body,  # Plain text version
-            from_email=settings.EMAIL_HOST_USER,
-            # from_email="admin@email.com",
+            # from_email=settings.EMAIL_HOST_USER,
+            from_email="admin@email.com",
             to=[recipient.email],
             connection=connection,  # Use open connection
         )
@@ -119,4 +121,13 @@ def send_mail_queue(**kwargs):
     
     # Close the connection after all emails are sent
     connection.close()
-    print(f"Email has been sent with {success_count} success and {failure_count} failed attempts.")
+
+    EmailSession.objects.update_or_create(
+        session_id=kwargs['session_id'],
+        defaults={
+            'status': 'done' if success_count >= 1 else 'failed',
+            'success_count': success_count,
+            'failure_count': failure_count
+        }
+    )
+    # print(f"Email has been sent with {success_count} success and {failure_count} failed attempts.")

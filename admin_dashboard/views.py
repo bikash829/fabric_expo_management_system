@@ -75,7 +75,7 @@ class ChangeUserView(LoginRequiredMixin,UpdateView,PermissionRequiredMixin):
 
 
 # manage permissions
-class ManageUserPermissionView(LoginRequiredMixin,UpdateView,PermissionRequiredMixin):
+class ManageUserPermissionView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = "auth.change_permission"
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/manage_permissions.html"

@@ -97,7 +97,7 @@ def get_sidebar_items(request):
             )
 
     # can_view_active_inactive_users 
-    if request.user.has_perm('accounts.can_view_active_inactive_users'):
+    if request.user.has_perm('accounts.can_view_active_inactive_users') or request.user.has_perm('accounts.can_activate_deactivate_account'):
         sidebar_items['manage_user']['children'].extend([
             {
                 'name': 'Inactive Accounts',
@@ -110,194 +110,474 @@ def get_sidebar_items(request):
                 'icon': 'fa-solid fa-user-check',
             }
         ])
-        # view user 
-        if request.user.has_perm('accounts.view_user'):
-            sidebar_items['manage_user']['children'].append(
-                {
-                    'name': 'All Staff',
-                    'url': reverse('admin_dashboard:staff_list'),
-                    'icon': 'fa-solid fa-user-group',
-                }
-            )
+    # view user 
+    if request.user.has_perm('accounts.view_user'):
+        sidebar_items['manage_user']['children'].append(
+            {
+                'name': 'All Staff',
+                'url': reverse('admin_dashboard:staff_list'),
+                'icon': 'fa-solid fa-user-group',
+            }
+        )
     """end::section 2 Manage Users"""
 
 
     """ begin::section 3 bulk messaging"""
-    sidebar_items.update({
-        'bulk_messaging_divider' : {
-            'divider_header': 'Bulk Messaging',
-            'code_name': 'bulk_messaging_divider',
-            'url': None,
-        },
-        'manage_category' : {
-            'name': 'Manage Category',
-            'code_name': 'manage_category',
-            'url': None,
-            'icon': 'fa-solid fa-layer-group',
-            'children':[
-                {
-                    'name': 'Create Category',
-                    'code_name': 'create_category',
-                    'url': reverse('bulk_core:create_category'),
-                    'icon': "fa-solid fa-plus",
-                },
-                {
-                    'name': 'Category List',
-                    'code_name': 'category_list',
-                    'url': reverse('bulk_core:category_list'),
-                    'icon': "fa-solid fa-list-ol",
-                },
-            ]
-        },
-        'import_recipients' : {
-            'name': 'Import Recipients',
-            'code_name': 'import_recipients',
-            'url': None,
-            'icon': 'fa-solid fa-file-circle-plus',
-            'children':[
-                {
-                    'name': 'Import Email CSV',
-                    'code_name': 'import_email',
-                    'url': reverse('bulk_email:import_recipients'),
-                    'icon': "fa-solid fa-at",
-                },
-                {
-                    'name': 'Import Whatsapp CSV',
-                    'code_name': 'import_whatsapp',
-                    'url': reverse('bulk_whatsapp:import_recipients'),
-                    'icon': "fa-solid fa-address-book",
-                },
-                {
-                    'name': 'Import WeChat CSV',
-                    'code_name': 'import_wechat',
-                    'url': reverse('bulk_wechat:import_recipients'),
-                    'icon': "fa-brands fa-weixin",
-                },
-            ]
-        },
-        'view_recipients' : {
-            'name': 'View Recipients',
-            'code_name': 'view_recipients',
-            'url': None,
-            'icon': 'fa-solid fa-eye',
-            'children':[
-                {
-                    'name': 'Email Recipients',
-                    'code_name': 'email_recipients_list',
-                    'url': reverse('bulk_email:recipient_list'),
-                    # 'icon': "bi bi-circle-fill",
-                    'icon': "bi bi-record-circle-fill",
-                },
-                {
-                    'name': 'WA Recipients',
-                    'code_name': 'whatsapp_recipients_list',
-                    'url': reverse('bulk_whatsapp:recipient_list'),
-                    # 'icon': "bi bi-circle-fill",
-                    'icon': "bi bi-record-circle-fill",
-                },
-                {
-                    'name': 'WeChat Recipients',
-                    'code_name': 'wechat_recipients_list',
-                    'url': reverse('bulk_wechat:recipient_list'),
-                    # 'icon': "bi bi-circle-fill",
-                    'icon': "bi bi-record-circle-fill",
-                },
-            ]
-        },
-        'send_bulk_message' : {
-            'name': 'Send Bulk Message',
-            'code_name': 'send_bulk_message',
-            'url': None,
-            'icon': 'fa-solid fa-paper-plane',
-            'children':[
-                {
-                    'name': 'Send Mail',
-                    'code_name': 'send_mail',
-                    # 'url': reverse('bulk_email:email_category'),
-                    'url': None,
-                    'icon': "fa-solid fa-envelope",
-                    'children':[
-                        {
-                            'name': 'Create Email',
-                            'code_name': 'create_email',
-                            'url': reverse('bulk_email:create_email'),
-                            'icon': "fa-solid fa-pen-to-square",
-                        },
-                        {
-                            'name': 'Email Drafts',
-                            'code_name': 'select_email_draft',
-                            'url': reverse('bulk_email:draft_list'),
-                            'icon': "fa-regular fa-folder-open",
-                        },
-                        {
-                            'name': 'Email Queue',
-                            'code_name': 'email_queue',
-                            'url': reverse('bulk_email:email_queue'),
-                            'icon': "fa-solid fa-envelope-open-text",
-                        },
-                        {
-                            'name': 'Sent Records',
-                            'code_name': 'sent_records',
-                            'url': reverse('bulk_email:sent_email_session'),
-                            'icon': "fa-solid fa-envelope-circle-check",
-                        },
-                    ]
-                },
-                {
-                    'name': 'Send wa Message',
-                    'code_name': 'send_wh_msg',
-                    'url': None,
-                    'icon': "fa-brands fa-whatsapp",
-                    'children':[
-                        {
-                            'name': 'Create Message',
-                            'code_name': 'create_wa_message',
-                            'url': reverse('bulk_whatsapp:create_message'),
-                            'icon': "fa-solid fa-pen-to-square",
-                        },
-                        {
-                            'name': 'WA draft',
-                            'code_name': 'select_wa_draft',
-                            'url': reverse('bulk_whatsapp:draft_list'),
-                            'icon': "fa-regular fa-folder-open",
-                        },
-                        {
-                            'name': 'Sent Records',
-                            'code_name': 'sent_wa_records',
-                            'url': reverse('bulk_whatsapp:sent_message_session'),
-                            'icon': "fa-solid fa-check",
-                        },
-                    ]
-                },
-                {
-                    'name': 'Send WeChat Message',
-                    'code_name': 'send_wechat_msg',
-                    'url': None,
-                    'icon': "fa-brands fa-weixin",
-                    'children':[
-                        {
-                            'name': 'Create Message',
-                            'code_name': 'create_wc_message',
-                            'url': reverse('bulk_wechat:create_message'),
-                            'icon': "fa-solid fa-pen-to-square",
-                        },
-                        {
-                            'name': 'WC draft',
-                            'code_name': 'select_wc_draft',
-                            'url':  reverse('bulk_wechat:draft_list'),
-                            'icon': "fa-regular fa-folder-open",
-                        },
-                        {
-                            'name': 'Sent Records',
-                            'code_name': 'sent_wc_records',
-                            'url': "#",
-                            'icon': "fa-solid fa-check",
-                        },
-                    ]
-                },
-            ]
+    # message_elements = {
+    #     'import_recipients' : {
+    #         'name': 'Import Recipients',
+    #         'code_name': 'import_recipients',
+    #         'url': None,
+    #         'icon': 'fa-solid fa-file-circle-plus',
+    #         'children':[
+    #             {
+    #                 'name': 'Import Email CSV',
+    #                 'code_name': 'import_email',
+    #                 'url': reverse('bulk_email:import_recipients'),
+    #                 'icon': "fa-solid fa-at",
+    #             },
+    #             {
+    #                 'name': 'Import Whatsapp CSV',
+    #                 'code_name': 'import_whatsapp',
+    #                 'url': reverse('bulk_whatsapp:import_recipients'),
+    #                 'icon': "fa-solid fa-address-book",
+    #             },
+    #             {
+    #                 'name': 'Import WeChat CSV',
+    #                 'code_name': 'import_wechat',
+    #                 'url': reverse('bulk_wechat:import_recipients'),
+    #                 'icon': "fa-brands fa-weixin",
+    #             },
+    #         ]
+    #     },
+    #     'view_recipients' : {
+    #         'name': 'View Recipients',
+    #         'code_name': 'view_recipients',
+    #         'url': None,
+    #         'icon': 'fa-solid fa-eye',
+    #         'children':[
+    #             {
+    #                 'name': 'Email Recipients',
+    #                 'code_name': 'email_recipients_list',
+    #                 'url': reverse('bulk_email:recipient_list'),
+    #                 # 'icon': "bi bi-circle-fill",
+    #                 'icon': "bi bi-record-circle-fill",
+    #             },
+    #             {
+    #                 'name': 'WA Recipients',
+    #                 'code_name': 'whatsapp_recipients_list',
+    #                 'url': reverse('bulk_whatsapp:recipient_list'),
+    #                 # 'icon': "bi bi-circle-fill",
+    #                 'icon': "bi bi-record-circle-fill",
+    #             },
+    #             {
+    #                 'name': 'WeChat Recipients',
+    #                 'code_name': 'wechat_recipients_list',
+    #                 'url': reverse('bulk_wechat:recipient_list'),
+    #                 # 'icon': "bi bi-circle-fill",
+    #                 'icon': "bi bi-record-circle-fill",
+    #             },
+    #         ]
+    #     },
+    #     'send_bulk_message' : {
+    #         'name': 'Send Bulk Message',
+    #         'code_name': 'send_bulk_message',
+    #         'url': None,
+    #         'icon': 'fa-solid fa-paper-plane',
+    #         'children':[
+    #             {
+    #                 'name': 'Send Mail',
+    #                 'code_name': 'send_mail',
+    #                 # 'url': reverse('bulk_email:email_category'),
+    #                 'url': None,
+    #                 'icon': "fa-solid fa-envelope",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Email',
+    #                         'code_name': 'create_email',
+    #                         'url': reverse('bulk_email:create_email'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'Email Drafts',
+    #                         'code_name': 'select_email_draft',
+    #                         'url': reverse('bulk_email:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Email Queue',
+    #                         'code_name': 'email_queue',
+    #                         'url': reverse('bulk_email:email_queue'),
+    #                         'icon': "fa-solid fa-envelope-open-text",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_records',
+    #                         'url': reverse('bulk_email:sent_email_session'),
+    #                         'icon': "fa-solid fa-envelope-circle-check",
+    #                     },
+    #                 ]
+    #             },
+    #             {
+    #                 'name': 'Send wa Message',
+    #                 'code_name': 'send_wh_msg',
+    #                 'url': None,
+    #                 'icon': "fa-brands fa-whatsapp",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Message',
+    #                         'code_name': 'create_wa_message',
+    #                         'url': reverse('bulk_whatsapp:create_message'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'WA draft',
+    #                         'code_name': 'select_wa_draft',
+    #                         'url': reverse('bulk_whatsapp:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_wa_records',
+    #                         'url': reverse('bulk_whatsapp:sent_message_session'),
+    #                         'icon': "fa-solid fa-check",
+    #                     },
+    #                 ]
+    #             },
+    #             {
+    #                 'name': 'Send WeChat Message',
+    #                 'code_name': 'send_wechat_msg',
+    #                 'url': None,
+    #                 'icon': "fa-brands fa-weixin",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Message',
+    #                         'code_name': 'create_wc_message',
+    #                         'url': reverse('bulk_wechat:create_message'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'WC draft',
+    #                         'code_name': 'select_wc_draft',
+    #                         'url':  reverse('bulk_wechat:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_wc_records',
+    #                         'url': "#",
+    #                         'icon': "fa-solid fa-check",
+    #                     },
+    #                 ]
+    #             },
+    #         ]
+    #     }
+    # }
+
+    message_elements = dict()
+
+    """begin::manage recipient category"""
+    message_elements['manage_category'] = {
+        'name': 'Manage Category',
+        'code_name': 'manage_category',
+        'url': None,
+        'icon': 'fa-solid fa-layer-group',
+        'children':[]
+    }
+
+    # check if the user has permission to add recipient category
+    if request.user.has_perm('bulk_core.add_recipientcategory'):
+        message_elements['manage_category']['children'].append(
+            {
+                'name': 'Create Category',
+                'code_name': 'create_category',
+                'url': reverse('bulk_core:create_category'),
+                'icon': "fa-solid fa-plus",
+            }
+        )
+    
+    # check if the user has permission to view recipient category
+    if request.user.has_perm('bulk_core.view_recipientcategory'):
+        message_elements['manage_category']['children'].append(
+            {
+                'name': 'Category List',
+                'code_name': 'category_list',
+                'url': reverse('bulk_core:category_list'),
+                'icon': "fa-solid fa-list-ol",
+            }
+        )
+
+    # remove parent if the child element is empty
+    if not message_elements['manage_category']['children']:
+        message_elements.pop('manage_category')
+
+    """end::manage recipient category"""
+    
+    """begin::import recipients """
+    message_elements['import_recipients'] = {
+        'name': 'Import Recipients',
+        'code_name': 'import_recipients',
+        'url': None,
+        'icon': 'fa-solid fa-file-circle-plus',
+        'children':[]
+    }
+
+    # add email recipient permission 
+    if request.user.has_perm('bulk_email.add_emailrecipient'):
+        message_elements['import_recipients']['children'].append(
+            {
+                'name': 'Import Email CSV',
+                'code_name': 'import_email',
+                'url': reverse('bulk_email:import_recipients'),
+                'icon': "fa-solid fa-at",
+            }
+        )
+    
+    # add whatsapp recipient permission 
+    if request.user.has_perm('bulk_whatsapp.add_whatsapprecipient'):
+        message_elements['import_recipients']['children'].append(
+            {
+                'name': 'Import Whatsapp CSV',
+                'code_name': 'import_whatsapp',
+                'url': reverse('bulk_whatsapp:import_recipients'),
+                'icon': "fa-solid fa-address-book",
+            }
+        )
+    
+    # add wechat recipient permission 
+    if request.user.has_perm('bulk_wechat.add_wechatrecipient'):
+        message_elements['import_recipients']['children'].append(
+            {
+                'name': 'Import WeChat CSV',
+                'code_name': 'import_wechat',
+                'url': reverse('bulk_wechat:import_recipients'),
+                'icon': "fa-brands fa-weixin",
+            }
+        )
+
+    # remove import recipient parent element 
+    if not message_elements['import_recipients']['children']:
+        message_elements.pop('import_recipients')
+    """end::import recipients """
+
+
+    """begin::View recipients"""
+    message_elements['view_recipients'] = {
+        'name': 'View Recipients',
+        'code_name': 'view_recipients',
+        'url': None,
+        'icon': 'fa-solid fa-eye',
+        'children':[]
+    }
+
+    # view email recipient permission 
+    if request.user.has_perm('bulk_email.view_emailrecipient'):
+        message_elements['view_recipients']['children'].append(
+            {
+                'name': 'Email Recipients',
+                'code_name': 'email_recipients_list',
+                'url': reverse('bulk_email:recipient_list'),
+                # 'icon': "bi bi-circle-fill",
+                'icon': "bi bi-record-circle-fill",
+            }
+        )
+
+    # view whatsapp recipient permission 
+    if request.user.has_perm('bulk_whatsapp.view_whatsapprecipient'):
+        message_elements['view_recipients']['children'].append(
+            {
+                'name': 'WA Recipients',
+                'code_name': 'whatsapp_recipients_list',
+                'url': reverse('bulk_whatsapp:recipient_list'),
+                # 'icon': "bi bi-circle-fill",
+                'icon': "bi bi-record-circle-fill",
+            }
+        )
+
+    # view wechat recipient permission 
+    if request.user.has_perm('bulk_wechat.view_wechatrecipient'):
+        message_elements['view_recipients']['children'].append(
+            {
+                'name': 'WeChat Recipients',
+                'code_name': 'wechat_recipients_list',
+                'url': reverse('bulk_wechat:recipient_list'),
+                # 'icon': "bi bi-circle-fill",
+                'icon': "bi bi-record-circle-fill",
+            }
+        )
+
+    # remove view recipient's parent element 
+    if not message_elements['view_recipients']['children']:
+        message_elements.pop('view_recipients')
+    """end::View recipients"""
+
+
+    """begin::Bulk messaging"""
+    # parent messaging element
+    message_elements['send_bulk_message'] = {
+        'name': 'Send Bulk Message',
+        'code_name': 'send_bulk_message',
+        'url': None,
+        'icon': 'fa-solid fa-paper-plane',
+        'children':[]
+    }
+
+    # sub-parent send mail element 
+    message_elements['send_bulk_message']['children'].append({
+        'name': 'Send Mail',
+        'code_name': 'send_mail',
+        # 'url': reverse('bulk_email:email_category'),
+        'url': None,
+        'icon': "fa-solid fa-envelope",
+        'children':[]
+    }) 
+
+    # sub-parent element 
+    for index,item in enumerate(message_elements['send_bulk_message']['children']):
+        # send mail section 
+        if item['code_name'] == 'send_mail':
+            # check permission add_email template
+            if request.user.has_perm('bulk_email.add_emailtemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Create Email',
+                        'code_name': 'create_email',
+                        'url': reverse('bulk_email:create_email'),
+                        'icon': "fa-solid fa-pen-to-square",
+                    },
+                )
+
+            # remove empty sub-parent element
+            if not item['children']:
+                message_elements['send_bulk_message']['children'].pop(index)
+
+
+
+
+
+    # sub-parent whatsapp element 
+
+    # remove sub-parent whatsapp element
+
+    # sub-parent wechat element 
+
+    # remove sub-parent wechat element
+
+    # remove view recipient's parent element 
+    if not message_elements['send_bulk_message']['children']:
+        message_elements.pop('send_bulk_message')
+    """begin::End messaging"""
+
+    #     'send_bulk_message' : {
+    #         'name': 'Send Bulk Message',
+    #         'code_name': 'send_bulk_message',
+    #         'url': None,
+    #         'icon': 'fa-solid fa-paper-plane',
+    #         'children':[
+    #             {
+    #                 'name': 'Send Mail',
+    #                 'code_name': 'send_mail',
+    #                 # 'url': reverse('bulk_email:email_category'),
+    #                 'url': None,
+    #                 'icon': "fa-solid fa-envelope",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Email',
+    #                         'code_name': 'create_email',
+    #                         'url': reverse('bulk_email:create_email'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'Email Drafts',
+    #                         'code_name': 'select_email_draft',
+    #                         'url': reverse('bulk_email:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Email Queue',
+    #                         'code_name': 'email_queue',
+    #                         'url': reverse('bulk_email:email_queue'),
+    #                         'icon': "fa-solid fa-envelope-open-text",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_records',
+    #                         'url': reverse('bulk_email:sent_email_session'),
+    #                         'icon': "fa-solid fa-envelope-circle-check",
+    #                     },
+    #                 ]
+    #             },
+    #             {
+    #                 'name': 'Send wa Message',
+    #                 'code_name': 'send_wh_msg',
+    #                 'url': None,
+    #                 'icon': "fa-brands fa-whatsapp",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Message',
+    #                         'code_name': 'create_wa_message',
+    #                         'url': reverse('bulk_whatsapp:create_message'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'WA draft',
+    #                         'code_name': 'select_wa_draft',
+    #                         'url': reverse('bulk_whatsapp:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_wa_records',
+    #                         'url': reverse('bulk_whatsapp:sent_message_session'),
+    #                         'icon': "fa-solid fa-check",
+    #                     },
+    #                 ]
+    #             },
+    #             {
+    #                 'name': 'Send WeChat Message',
+    #                 'code_name': 'send_wechat_msg',
+    #                 'url': None,
+    #                 'icon': "fa-brands fa-weixin",
+    #                 'children':[
+    #                     {
+    #                         'name': 'Create Message',
+    #                         'code_name': 'create_wc_message',
+    #                         'url': reverse('bulk_wechat:create_message'),
+    #                         'icon': "fa-solid fa-pen-to-square",
+    #                     },
+    #                     {
+    #                         'name': 'WC draft',
+    #                         'code_name': 'select_wc_draft',
+    #                         'url':  reverse('bulk_wechat:draft_list'),
+    #                         'icon': "fa-regular fa-folder-open",
+    #                     },
+    #                     {
+    #                         'name': 'Sent Records',
+    #                         'code_name': 'sent_wc_records',
+    #                         'url': "#",
+    #                         'icon': "fa-solid fa-check",
+    #                     },
+    #                 ]
+    #             },
+    #         ]
+    #     }
+
+
+
+
+    ### create divider if it's not empty
+    if message_elements: 
+        sidebar_items['bulk_messaging_divider'] = {
+                'divider_header': 'Bulk Messaging',
+                'code_name': 'bulk_messaging_divider',
+                'url': None,
         }
-    })
+        sidebar_items.update(message_elements)
+
+
+
+
+
     """ end::section 3 bulk messaging """
 
     """ begin:: section 4 manage business data """

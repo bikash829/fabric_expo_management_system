@@ -1,5 +1,14 @@
-# utils.py
 from django.urls import reverse
+
+
+# check permissions 
+def build_children(request, perms_and_items):
+    """Helper to build children based on permissions."""
+    children = []
+    for perm, item in perms_and_items:
+        if request.user.has_perm(perm):
+            children.append(item)
+    return children
 
 # Create sidebar items
 def mark_active_sidebar_items(items, current_path):
@@ -123,157 +132,6 @@ def get_sidebar_items(request):
 
 
     """ begin::section 3 bulk messaging"""
-    # message_elements = {
-    #     'import_recipients' : {
-    #         'name': 'Import Recipients',
-    #         'code_name': 'import_recipients',
-    #         'url': None,
-    #         'icon': 'fa-solid fa-file-circle-plus',
-    #         'children':[
-    #             {
-    #                 'name': 'Import Email CSV',
-    #                 'code_name': 'import_email',
-    #                 'url': reverse('bulk_email:import_recipients'),
-    #                 'icon': "fa-solid fa-at",
-    #             },
-    #             {
-    #                 'name': 'Import Whatsapp CSV',
-    #                 'code_name': 'import_whatsapp',
-    #                 'url': reverse('bulk_whatsapp:import_recipients'),
-    #                 'icon': "fa-solid fa-address-book",
-    #             },
-    #             {
-    #                 'name': 'Import WeChat CSV',
-    #                 'code_name': 'import_wechat',
-    #                 'url': reverse('bulk_wechat:import_recipients'),
-    #                 'icon': "fa-brands fa-weixin",
-    #             },
-    #         ]
-    #     },
-    #     'view_recipients' : {
-    #         'name': 'View Recipients',
-    #         'code_name': 'view_recipients',
-    #         'url': None,
-    #         'icon': 'fa-solid fa-eye',
-    #         'children':[
-    #             {
-    #                 'name': 'Email Recipients',
-    #                 'code_name': 'email_recipients_list',
-    #                 'url': reverse('bulk_email:recipient_list'),
-    #                 # 'icon': "bi bi-circle-fill",
-    #                 'icon': "bi bi-record-circle-fill",
-    #             },
-    #             {
-    #                 'name': 'WA Recipients',
-    #                 'code_name': 'whatsapp_recipients_list',
-    #                 'url': reverse('bulk_whatsapp:recipient_list'),
-    #                 # 'icon': "bi bi-circle-fill",
-    #                 'icon': "bi bi-record-circle-fill",
-    #             },
-    #             {
-    #                 'name': 'WeChat Recipients',
-    #                 'code_name': 'wechat_recipients_list',
-    #                 'url': reverse('bulk_wechat:recipient_list'),
-    #                 # 'icon': "bi bi-circle-fill",
-    #                 'icon': "bi bi-record-circle-fill",
-    #             },
-    #         ]
-    #     },
-    #     'send_bulk_message' : {
-    #         'name': 'Send Bulk Message',
-    #         'code_name': 'send_bulk_message',
-    #         'url': None,
-    #         'icon': 'fa-solid fa-paper-plane',
-    #         'children':[
-    #             {
-    #                 'name': 'Send Mail',
-    #                 'code_name': 'send_mail',
-    #                 # 'url': reverse('bulk_email:email_category'),
-    #                 'url': None,
-    #                 'icon': "fa-solid fa-envelope",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Email',
-    #                         'code_name': 'create_email',
-    #                         'url': reverse('bulk_email:create_email'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'Email Drafts',
-    #                         'code_name': 'select_email_draft',
-    #                         'url': reverse('bulk_email:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Email Queue',
-    #                         'code_name': 'email_queue',
-    #                         'url': reverse('bulk_email:email_queue'),
-    #                         'icon': "fa-solid fa-envelope-open-text",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_records',
-    #                         'url': reverse('bulk_email:sent_email_session'),
-    #                         'icon': "fa-solid fa-envelope-circle-check",
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'Send wa Message',
-    #                 'code_name': 'send_wh_msg',
-    #                 'url': None,
-    #                 'icon': "fa-brands fa-whatsapp",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Message',
-    #                         'code_name': 'create_wa_message',
-    #                         'url': reverse('bulk_whatsapp:create_message'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'WA draft',
-    #                         'code_name': 'select_wa_draft',
-    #                         'url': reverse('bulk_whatsapp:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_wa_records',
-    #                         'url': reverse('bulk_whatsapp:sent_message_session'),
-    #                         'icon': "fa-solid fa-check",
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'Send WeChat Message',
-    #                 'code_name': 'send_wechat_msg',
-    #                 'url': None,
-    #                 'icon': "fa-brands fa-weixin",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Message',
-    #                         'code_name': 'create_wc_message',
-    #                         'url': reverse('bulk_wechat:create_message'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'WC draft',
-    #                         'code_name': 'select_wc_draft',
-    #                         'url':  reverse('bulk_wechat:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_wc_records',
-    #                         'url': "#",
-    #                         'icon': "fa-solid fa-check",
-    #                     },
-    #                 ]
-    #             },
-    #         ]
-    #     }
-    # }
-
     message_elements = dict()
 
     """begin::manage recipient category"""
@@ -589,126 +447,16 @@ def get_sidebar_items(request):
             if not message_elements['send_bulk_message']['children'][index]['children']:
                 remove_elements.append(index)
     
-    # remove_elements 
+    # remove sub-elements 
     message_elements['send_bulk_message']['children'] = [
         item for idx,item in enumerate(message_elements['send_bulk_message']['children']) if idx not in remove_elements
     ]
     
-
-
-
-
-
-
-    # # sub-parent whatsapp element 
-
-    # # remove sub-parent whatsapp element
-
-    # # sub-parent wechat element 
-
-    # # remove sub-parent wechat element
-
     # remove view recipient's parent element 
     if not message_elements['send_bulk_message']['children']:
         message_elements.pop('send_bulk_message')
+
     """begin::End messaging"""
-
-    #     'send_bulk_message' : {
-    #         'name': 'Send Bulk Message',
-    #         'code_name': 'send_bulk_message',
-    #         'url': None,
-    #         'icon': 'fa-solid fa-paper-plane',
-    #         'children':[
-    #             {
-    #                 'name': 'Send Mail',
-    #                 'code_name': 'send_mail',
-    #                 # 'url': reverse('bulk_email:email_category'),
-    #                 'url': None,
-    #                 'icon': "fa-solid fa-envelope",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Email',
-    #                         'code_name': 'create_email',
-    #                         'url': reverse('bulk_email:create_email'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'Email Drafts',
-    #                         'code_name': 'select_email_draft',
-    #                         'url': reverse('bulk_email:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Email Queue',
-    #                         'code_name': 'email_queue',
-    #                         'url': reverse('bulk_email:email_queue'),
-    #                         'icon': "fa-solid fa-envelope-open-text",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_records',
-    #                         'url': reverse('bulk_email:sent_email_session'),
-    #                         'icon': "fa-solid fa-envelope-circle-check",
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'Send wa Message',
-    #                 'code_name': 'send_wh_msg',
-    #                 'url': None,
-    #                 'icon': "fa-brands fa-whatsapp",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Message',
-    #                         'code_name': 'create_wa_message',
-    #                         'url': reverse('bulk_whatsapp:create_message'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'WA draft',
-    #                         'code_name': 'select_wa_draft',
-    #                         'url': reverse('bulk_whatsapp:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_wa_records',
-    #                         'url': reverse('bulk_whatsapp:sent_message_session'),
-    #                         'icon': "fa-solid fa-check",
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'Send WeChat Message',
-    #                 'code_name': 'send_wechat_msg',
-    #                 'url': None,
-    #                 'icon': "fa-brands fa-weixin",
-    #                 'children':[
-    #                     {
-    #                         'name': 'Create Message',
-    #                         'code_name': 'create_wc_message',
-    #                         'url': reverse('bulk_wechat:create_message'),
-    #                         'icon': "fa-solid fa-pen-to-square",
-    #                     },
-    #                     {
-    #                         'name': 'WC draft',
-    #                         'code_name': 'select_wc_draft',
-    #                         'url':  reverse('bulk_wechat:draft_list'),
-    #                         'icon': "fa-regular fa-folder-open",
-    #                     },
-    #                     {
-    #                         'name': 'Sent Records',
-    #                         'code_name': 'sent_wc_records',
-    #                         'url': "#",
-    #                         'icon': "fa-solid fa-check",
-    #                     },
-    #                 ]
-    #             },
-    #         ]
-    #     }
-
-
-
 
     ### create divider if it's not empty
     if message_elements: 
@@ -719,152 +467,109 @@ def get_sidebar_items(request):
         }
         sidebar_items.update(message_elements)
 
-
-
-
-
     """ end::section 3 bulk messaging """
 
     """ begin:: section 4 manage business data """
-    sidebar_items.update({
-        'manager_buyers' : {
-            'divider_header': 'Manage Business Data',
-            'code_name': 'manager_buyers',
-            'url': None,
-        },
-    })
+    business_data_elements = dict()
 
-    # manage buyers 
-    if (
-    request.user.has_perm('master_data.view_buyer') or
-    request.user.has_perm('master_data.add_buyer') or
-    request.user.has_perm('master_data.change_buyer') or
-    request.user.has_perm('master_data.delete_buyer')
-    ):
-        sidebar_items['manage_buyers'] = {
+    aside_items = {
+        'manage_buyers':{
             'name': 'Manage Buyers',
             'code_name': 'manage_buyers',
             'url': None,
             'icon': 'fa-solid fa-briefcase',
-            'children':[]
-        }
-    
-    if request.user.has_perm('master_data.add_buyer'):
-        sidebar_items['manage_buyers']['children'].append(
-            {
-                'name': 'Add Buyers',
-                'url': reverse('business_data:buyer-upload'),
-                'icon': 'fa-solid fa-user-plus',
-            },
-        )
-    if request.user.has_perm('master_data.view_buyer'):
-        sidebar_items['manage_buyers']['children'].append(
-            {
-                'name': 'View Buyers',
-                'url': reverse('business_data:buyer_list'),
-                'icon': 'fa-solid fa-eye',
-            },
-        )
-
-    # manage customers 
-    if (
-    request.user.has_perm('master_data.view_customer') or
-    request.user.has_perm('master_data.add_customer') or
-    request.user.has_perm('master_data.change_customer') or
-    request.user.has_perm('master_data.delete_customer')
-    ):
-        sidebar_items['manage_customers'] = {
+            'perms_and_items': [
+                ('business_data.add_buyer',{
+                    'name': 'Add Buyers',
+                    'url': reverse('business_data:buyer-upload'),
+                    'icon': 'fa-solid fa-user-plus',
+                }),
+                ('business_data.view_buyer',{
+                    'name': 'View Buyers',
+                    'url': reverse('business_data:buyer_list'),
+                    'icon': 'fa-solid fa-eye',
+                })
+            ]
+        },
+        'manage_customers':{
             'name': 'Manage Customers',
             'code_name': 'manage_customers',
             'url': None,
             'icon': 'fa-solid fa-users',
-            'children':[]
-        }
-
-    if request.user.has_perm('master_data.add_customer'):
-            sidebar_items['manage_customers']['children'].append(
-                {
+            'perms_and_items': [
+                ('business_data.add_customer',{
                     'name': 'Add Customers',
                     'url': reverse('business_data:customer-upload'),
                     'icon': 'fa-solid fa-user-plus',
-                },
-            )
-        
-    if request.user.has_perm('master_data.view_customer'):
-        sidebar_items['manage_customers']['children'].append(
-            {
-                'name': 'View Customers',
-                'url': reverse('business_data:customer-list'),
-                'icon': 'fa-solid fa-eye',
-            },
-        )
-
-    # manage suppliers 
-    if (
-    request.user.has_perm('master_data.view_supplier') or
-    request.user.has_perm('master_data.add_supplier') or
-    request.user.has_perm('master_data.change_supplier') or
-    request.user.has_perm('master_data.delete_supplier')
-    ):
-        sidebar_items['manage_suppliers'] = {
+                }),
+                ('business_data.view_customer',{
+                    'name': 'View Customers',
+                    'url': reverse('business_data:customer-list'),
+                    'icon': 'fa-solid fa-eye',
+                })
+            ]
+        },
+        'manage_suppliers':{
             'name': 'Manage Suppliers',
             'code_name': 'manage_suppliers',
             'url': None,
             'icon': 'fa-solid fa-truck',
-            'children':[]
-        }
-        
-    if request.user.has_perm('master_data.add_supplier'):
-        sidebar_items['manage_suppliers']['children'].append(
-            {
-                'name': 'Add Supplier',
-                'url': reverse('business_data:supplier-upload'),
-                'icon': 'fa-solid fa-plus',
-            },
-        )
-    if request.user.has_perm('master_data.view_supplier'):
-        sidebar_items['manage_suppliers']['children'].append(
-            {
-                'name': 'View Suppliers',
-                'url': reverse('business_data:supplier-list'),
-                'icon': 'fa-solid fa-eye',
-            },
-        )
-
-
-    # manage products 
-    if (
-    request.user.has_perm('master_data.view_product') or
-    request.user.has_perm('master_data.add_product') or
-    request.user.has_perm('master_data.change_product') or
-    request.user.has_perm('master_data.delete_product')
-    ):
-        sidebar_items['manage_products'] = {
+            'perms_and_items': [
+                ('business_data.add_supplier',{
+                    'name': 'Add Supplier',
+                    'url': reverse('business_data:supplier-upload'),
+                    'icon': 'fa-solid fa-plus',
+                }),
+                ('business_data.view_supplier',{
+                    'name': 'View Suppliers',
+                    'url': reverse('business_data:supplier-list'),
+                    'icon': 'fa-solid fa-eye',
+                })
+            ]
+        },
+        'manage_products':{
             'name': 'Manage Products',
             'code_name': 'manage_products',
             'url': None,
             'icon': 'fa-solid fa-box',
-            'children':[]
+            'perms_and_items': [
+                ('business_data.add_product',{
+                    'name': 'Add Product',
+                    'url': reverse('business_data:product-upload'),
+                    'icon': 'fa-solid fa-plus',
+                }),
+                ('business_data.view_product',{
+                    'name': 'View Products',
+                    'url': reverse('business_data:product-list'),
+                    'icon': 'fa-solid fa-eye',
+                })
+            ]
+        },
+    }
+
+    # Build sub-parents with their permitted children for business data
+    for sub in aside_items.values():
+        children = build_children(request, sub['perms_and_items'])
+        if children:
+            business_data_elements.update({
+                 sub['code_name'] : {
+                    'name' : sub['name'],
+                    'code_name': sub['code_name'],
+                    'url': sub['url'],
+                    'icon': sub['icon'],
+                    'children': children                     
+                 }
+            })
+
+
+    ### create divider if it's not empty
+    if business_data_elements: 
+        sidebar_items['manager_buyers'] = {
+                'divider_header': 'Bulk Messaging',
+                'code_name': 'bulk_messaging_divider',
+                'url': None,
         }
-
-    if request.user.has_perm('master_data.add_product'):
-        sidebar_items['manage_products']['children'].append(
-            {
-                'name': 'Add Product',
-                'url': reverse('business_data:product-upload'),
-                'icon': 'fa-solid fa-plus',
-            },
-        )
-
-    if request.user.has_perm('master_data.view_product'):
-        sidebar_items['manage_products']['children'].append(
-            {
-                'name': 'View Products',
-                'url': reverse('business_data:product-list'),
-                'icon': 'fa-solid fa-eye',
-            },
-        )
-
+        sidebar_items.update(business_data_elements)
 
     """ end:: section 4 manage business data """
 

@@ -432,6 +432,26 @@ def get_sidebar_items(request):
         'children':[]
     }) 
 
+    # sub-parent send whatsapp message element 
+    message_elements['send_bulk_message']['children'].append({
+        'name': 'Send wa Message',
+        'code_name': 'send_wh_msg',
+        'url': None,
+        'icon': "fa-brands fa-whatsapp",
+        'children':[]
+    })
+
+    # sub-parent send wechat message element 
+    message_elements['send_bulk_message']['children'].append({
+        'name': 'Send WeChat Message',
+        'code_name': 'send_wechat_msg',
+        'url': None,
+        'icon': "fa-brands fa-weixin",
+        'children':[]
+    }) 
+
+
+    remove_elements = []
     # sub-parent element 
     for index,item in enumerate(message_elements['send_bulk_message']['children']):
         # send mail section 
@@ -447,21 +467,146 @@ def get_sidebar_items(request):
                     },
                 )
 
+            # check permission view_email template/draft 
+            if request.user.has_perm('bulk_email.view_emailtemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Email Drafts',
+                        'code_name': 'select_email_draft',
+                        'url': reverse('bulk_email:draft_list'),
+                        'icon': "fa-regular fa-folder-open",
+                    },
+                )
+
+            # check permission view_queued email 
+            if request.user.has_perm('bulk_email.view_emailsession'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Email Queue',
+                        'code_name': 'email_queue',
+                        'url': reverse('bulk_email:email_queue'),
+                        'icon': "fa-solid fa-envelope-open-text",
+                    }
+                )
+            
+            # check permission view_log email 
+            if request.user.has_perm('bulk_email.view_sentmail'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Sent Records',
+                        'code_name': 'sent_records',
+                        'url': reverse('bulk_email:sent_email_session'),
+                        'icon': "fa-solid fa-envelope-circle-check",
+                    }
+                )
+
             # remove empty sub-parent element
-            if not item['children']:
-                message_elements['send_bulk_message']['children'].pop(index)
+            if not message_elements['send_bulk_message']['children'][index]['children']:
+                # message_elements['send_bulk_message']['children'].pop(index)
+                remove_elements.append(index)
+
+            
+                
+
+        # send whatsapp message section 
+        if item['code_name'] == 'send_wh_msg':
+            # check permission add_whatsapp template
+            if request.user.has_perm('bulk_whatsapp.add_whatsapptemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Create Message',
+                        'code_name': 'create_wa_message',
+                        'url': reverse('bulk_whatsapp:create_message'),
+                        'icon': "fa-solid fa-pen-to-square",
+                    }
+                )
+            
+            # check permission view_whatsapp template/draft
+            if request.user.has_perm('bulk_whatsapp.view_whatsapptemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'WA draft',
+                        'code_name': 'select_wa_draft',
+                        'url': reverse('bulk_whatsapp:draft_list'),
+                        'icon': "fa-regular fa-folder-open",
+                    }
+                )
+            
+            # check permission view_sentwhatsapp template
+            if request.user.has_perm('bulk_whatsapp.view_sentmessage'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Sent Records',
+                        'code_name': 'sent_wa_records',
+                        'url': reverse('bulk_whatsapp:sent_message_session'),
+                        'icon': "fa-solid fa-check",
+                    }
+                )
+
+            # remove empty sub-parent element
+            if not message_elements['send_bulk_message']['children'][index]['children']:
+                remove_elements.append(index)
+          
+             
+        
+        # send wechat message section 
+        if item['code_name'] == 'send_wechat_msg':
+            # check permission add_wechat template
+            if request.user.has_perm('bulk_wechat.add_wechattemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Create Message',
+                        'code_name': 'create_wc_message',
+                        'url': reverse('bulk_wechat:create_message'),
+                        'icon': "fa-solid fa-pen-to-square",
+                    }
+                )
+            
+            # check permission view_wechat template/draft
+            if request.user.has_perm('bulk_wechat.view_wechattemplate'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'WC draft',
+                        'code_name': 'select_wc_draft',
+                        'url':  reverse('bulk_wechat:draft_list'),
+                        'icon': "fa-regular fa-folder-open",
+                    }
+                )
+            
+            # check permission view_sent message log
+            if request.user.has_perm('bulk_wechat.view_sentwcmessage'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Sent Records',
+                        'code_name': 'sent_wc_records',
+                        'url': "#",
+                        'icon': "fa-solid fa-check",
+                    }
+                )
+            
+
+            # remove empty sub-parent element
+            if not message_elements['send_bulk_message']['children'][index]['children']:
+                remove_elements.append(index)
+    
+    # remove_elements 
+    message_elements['send_bulk_message']['children'] = [
+        item for idx,item in enumerate(message_elements['send_bulk_message']['children']) if idx not in remove_elements
+    ]
+    
 
 
 
 
 
-    # sub-parent whatsapp element 
 
-    # remove sub-parent whatsapp element
+    # # sub-parent whatsapp element 
 
-    # sub-parent wechat element 
+    # # remove sub-parent whatsapp element
 
-    # remove sub-parent wechat element
+    # # sub-parent wechat element 
+
+    # # remove sub-parent wechat element
 
     # remove view recipient's parent element 
     if not message_elements['send_bulk_message']['children']:

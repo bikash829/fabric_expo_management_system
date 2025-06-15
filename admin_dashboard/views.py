@@ -177,7 +177,7 @@ class StaffListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
     template_name = "admin_dashboard/manage_user/staff_list.html"
 
     def get_queryset(self):
-        return self.model.objects.filter(is_superuser=False)
+        return self.model.objects.filter(is_superuser=False).exclude(pk=self.request.user.pk)
 
 """end:: Manage User"""
 

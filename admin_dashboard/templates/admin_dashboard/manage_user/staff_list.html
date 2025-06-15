@@ -38,8 +38,14 @@
                     <td>{{item.email}}</td>
                     <td>{{item.email}}</td>
                     <td>{{item.get_gender_display}}</td>
-                    <td>{{""}}</td>
-                    <td>{{item.is_superuser}}</td>
+                    <td>
+                      {% for group in item.groups.all %}
+                        <span >{{ group.name }}</span>{% if not forloop.last %}, {% endif %}
+                      {% empty %}
+                        <span class="text-muted">No Group</span>
+                      {% endfor %}
+                    </td>
+                    <td>{% if item.is_superuser %}Yes{% else %}No{% endif %}</td>
                     <td>{{item.date_of_birth}}</td>
                     <td>{% if item.is_active %}Active {% else %}Inactive{% endif %}</td>
                     <td>

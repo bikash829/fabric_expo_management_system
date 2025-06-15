@@ -107,7 +107,8 @@
 
             <div class="card-footer">
               <button type="submit" class="btn btn-primary">Update Permissions</button>
-              <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
+              {% comment %} <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button> {% endcomment %}
+              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'admin_dashboard:staff_list' %}'">Back</button>
             </div>
           </form>
           <!--end::form-->

@@ -1,5 +1,4 @@
-from django.http import JsonResponse,HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render,HttpResponse,redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -9,22 +8,17 @@ from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermiss
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from accounts.models import User
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 
-# Create your views here.
+
 class IndexView(LoginRequiredMixin,TemplateView):
     template_name= "admin_dashboard/pages/dashboard.html"
     login_url = reverse_lazy('accounts:login')
-    
-
-class MyView(TemplateView):
-    template_name= "admin_dashboard/pages/dashboard.html"
-
 
 
 """begin:: Manage User"""
 # Create new staff
-class CreateUserView(LoginRequiredMixin,FormView,PermissionRequiredMixin):
+class CreateUserView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     permission_required = "accounts.add_user"
     template_name="admin_dashboard/manage_user/create_user.html"
     form_class = StaffUserCreationForm
@@ -40,7 +34,7 @@ class CreateUserView(LoginRequiredMixin,FormView,PermissionRequiredMixin):
 
 
 # show staff details 
-class StaffDetailsView(DetailView,LoginRequiredMixin,PermissionRequiredMixin):
+class StaffDetailsView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     permission_required = "accounts.view_user"
     model= get_user_model()
     template_name = "admin_dashboard/manage_user/profile.html"
@@ -49,7 +43,7 @@ class StaffDetailsView(DetailView,LoginRequiredMixin,PermissionRequiredMixin):
 
 
 # Edit staff
-class ChangeUserView(LoginRequiredMixin,UpdateView,PermissionRequiredMixin):
+class ChangeUserView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = "accounts.change_user"
     model=User
     template_name="admin_dashboard/manage_user/edit_staff.html"
@@ -63,8 +57,6 @@ class ChangeUserView(LoginRequiredMixin,UpdateView,PermissionRequiredMixin):
         if self.object.date_of_birth:
             initial['date_of_birth'] = self.object.date_of_birth.strftime('%Y-%m-%d')
         return initial
-    
-    
     
     def form_valid(self, form):
         # This method is called when valid form data has been POSTed.
@@ -81,9 +73,6 @@ class ManageUserPermissionView(LoginRequiredMixin, PermissionRequiredMixin, Upda
     template_name = "admin_dashboard/manage_user/manage_permissions.html"
     form_class = UserPermissionForm
 
-    # def get_success_url(self):
-    #     return reverse_lazy("admin_dashboard:user_detail", kwargs={"pk": self.object.pk})
-    
     def get_success_url(self):
         """
         Redirects to the referring page if available; otherwise, reloads the form page.
@@ -96,19 +85,15 @@ class ManageUserPermissionView(LoginRequiredMixin, PermissionRequiredMixin, Upda
     
 
 # Delete staff 
-class DeleteStaffView(LoginRequiredMixin,DeleteView,PermissionRequiredMixin):
+class DeleteStaffView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     permission_required = "accounts.delete_user"
     model = get_user_model()
     success_url = reverse_lazy("admin_dashboard:staff_list")
     
-    # def get(self, request, *args, **kwargs):
-    #     # Override the GET method to directly delete the object without a confirmation page.
-    #     self.object = self.get_object()
-    #     self.object.delete()
-    #     return redirect(self.success_url)
     
 ### ============= Activate and deactivate user account =================
-class ToggleStaffActivationView(View):
+class ToggleStaffActivationMixin(View):
+    permission_required = "accounts.can_activate_deactivate_account"
     is_active = None  # Set this in the subclasses
     success_url = reverse_lazy("admin_dashboard:staff_list")  # Default success URL
 
@@ -128,21 +113,21 @@ class ToggleStaffActivationView(View):
     
 
 # Deactivate Staff View
-class DeactivateStaffView(LoginRequiredMixin,ToggleStaffActivationView,PermissionRequiredMixin):
-    permission_required = "accounts:can_activate_deactivate_account"
+class DeactivateStaffView(LoginRequiredMixin, PermissionRequiredMixin, ToggleStaffActivationMixin):
+    permission_required = "accounts.can_activate_deactivate_account"
     is_active = False
     success_url = reverse_lazy("admin_dashboard:inactive_users")
 
 # Activate Staff View
-class ActivateStaffView(LoginRequiredMixin,ToggleStaffActivationView,PermissionRequiredMixin):
-    permission_required = "accounts:can_activate_deactivate_account"
+class ActivateStaffView(LoginRequiredMixin, PermissionRequiredMixin, ToggleStaffActivationMixin):
+    permission_required = "accounts.can_activate_deactivate_account"
     is_active = True
     success_url = reverse_lazy("admin_dashboard:active_users")  # Custom success URL
 
 
 # show active user list 
-class ActiveUserListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
-    permission_required = "accounts:can_view_active_inactive_users"
+class ActiveUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "accounts.can_view_active_inactive_users"
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
 
@@ -152,8 +137,8 @@ class ActiveUserListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
 
 
 # show deactivated user list 
-class DeactivatedUserListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
-    permission_required = "accounts:can_view_active_inactive_users"
+class DeactivatedUserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "accounts.can_view_active_inactive_users"
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
     
@@ -162,8 +147,8 @@ class DeactivatedUserListView(LoginRequiredMixin,ListView,PermissionRequiredMixi
 ### ============= ./ Activate and deactivate user account =================
 
 
-# show all suepruser list
-class SuperuserListView(LoginRequiredMixin,ListView):
+# show all superuser list
+class SuperuserListView(LoginRequiredMixin, ListView):
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
     
@@ -171,8 +156,8 @@ class SuperuserListView(LoginRequiredMixin,ListView):
         return self.model.objects.filter(is_superuser=True)
 
 # Show all staff 
-class StaffListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
-    permission_required = "accounts:view_user"
+class StaffListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "accounts.view_user"
     model = get_user_model()
     template_name = "admin_dashboard/manage_user/staff_list.html"
 
@@ -184,13 +169,15 @@ class StaffListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
 
 
 """begin:: Groups and Permissions"""
-class GroupListView(LoginRequiredMixin,ListView,PermissionRequiredMixin):
+# show group list 
+class GroupListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     permission_required = "auth.view_group"
     model = Group
     template_name = "admin_dashboard/manage_groups_and_permissions/group-list.html"
 
 
-class CreateGroupView(LoginRequiredMixin,CreateView,PermissionRequiredMixin):
+# create/add new group 
+class CreateGroupView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = "auth.add_group"
     model = Group
     form_class=GroupForm
@@ -212,14 +199,12 @@ class CreateGroupView(LoginRequiredMixin,CreateView,PermissionRequiredMixin):
         return super().form_valid(form)
 
     
-
-
-class UpdateGroupPermission(LoginRequiredMixin,UpdateView,PermissionRequiredMixin):
+# change/update groups and permissions info
+class UpdateGroupPermission(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = "auth.change_group"
     model = Group
     form_class = GroupForm
     template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
-    # success_url = reverse_lazy("admin_dashboard:group-list")
 
     # custom context
     def get_context_data(self, **kwargs):
@@ -242,9 +227,12 @@ class UpdateGroupPermission(LoginRequiredMixin,UpdateView,PermissionRequiredMixi
         messages.success(self.request, "Group permissions updated successfully.")
         return super().form_valid(form)
 
-class DeleteGroupView(LoginRequiredMixin,DeleteView,PermissionRequiredMixin):
+
+# delete group 
+class DeleteGroupView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     permission_required = "auth.delete_group"
     model = Group
     success_url = reverse_lazy("admin_dashboard:group-list")
+    
 """end:: Groups and Permissions"""
 

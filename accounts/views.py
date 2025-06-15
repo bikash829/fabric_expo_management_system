@@ -1,20 +1,28 @@
+# Django core imports
 from django.shortcuts import get_object_or_404, render, redirect
-
-# Create your views here.
-from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
-from fabric_expo_management_system.decorators import redirect_authenticated_user
-from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import DetailView,TemplateView,UpdateView
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-# get user model
-from django.contrib.auth import get_user_model
-User = get_user_model()
 
-# import forms 
+# Django authentication imports
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
+# Django utilities and decorators
+from django.utils.decorators import method_decorator
+
+# Django generic views
+from django.views.generic import TemplateView, UpdateView
+
+# Project-specific imports
+from fabric_expo_management_system.decorators import redirect_authenticated_user
+
+# Local app imports
 from .forms import CustomUserChangeForm, ProfilePhotoForm, UserEmailUpdateForm
+
+# Get the custom user model
+User = get_user_model()
 
 @method_decorator(redirect_authenticated_user, name='dispatch')
 class LoginView(auth_views.LoginView):
@@ -42,7 +50,7 @@ def change_profile_photo(request, pk):
 
 
 
-class EmailChangeView(UpdateView,LoginRequiredMixin):
+class EmailChangeView(LoginRequiredMixin, UpdateView):
     model = User
     template_name = "accounts/manage_account/change_email.html"
     success_url=reverse_lazy("accounts:profile")
@@ -65,7 +73,7 @@ class UsernameChangeView(UpdateView):
 
 
 
-class UpdateProfileView(UpdateView,LoginRequiredMixin):
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = CustomUserChangeForm
     template_name = "accounts/manage_account/change_profile.html"

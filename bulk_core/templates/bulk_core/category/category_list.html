@@ -43,8 +43,12 @@
                               >
                               </button>
                               <ul class="dropdown-menu">
+                                {% if perms.bulk_core.change_recipientcategory %}
                                   <li><a class="dropdown-item text-primary" href="{% url 'bulk_core:update_category' pk=item.pk %}">Edit <i class="fa-solid fa-user-pen"></i></a></li>
+                                {% endif %}
+                                {% if perms.bulk_core.delete_recipientcategory %}
                                   <li><a class="dropdown-item text-danger delete-category" data-categoryname="{{ item.name }}" href="{% url 'bulk_core:delete_category' pk=item.pk %}">Delete <i class="fa-solid fa-trash"></i></a></li>
+                                {% endif %}
                               </ul>
                             </div>
                       </td>

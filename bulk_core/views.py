@@ -1,18 +1,14 @@
-from django.shortcuts import render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView
-
+from django.views.generic import ListView
 # from bulk_email.forms import EmailRecipientImportForm
-from .models import RecipientCategory, RecipientDataSheet
+from .models import RecipientCategory
 from .forms import CategoryCreateForm
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
-# Create your views here.
-
 
 # create category view
-class CategoryCreateView(CreateView,LoginRequiredMixin,PermissionRequiredMixin):
+class CategoryCreateView(LoginRequiredMixin,PermissionRequiredMixin, CreateView):
     permission_required = 'bulk_core.add_recipientcategory'
     model = RecipientCategory
     form_class = CategoryCreateForm
@@ -25,7 +21,6 @@ class CategoryCreateView(CreateView,LoginRequiredMixin,PermissionRequiredMixin):
         messages.success(self.request,f'Category "{new_name}" has been created')
         return super().form_valid(form)
 
-
 # category details
 # class CategoryDetailView(DetailView,LoginRequiredMixin,PermissionRequiredMixin):
 #     permission_required = 'bulk_core.view_recipientcategory'
@@ -35,14 +30,14 @@ class CategoryCreateView(CreateView,LoginRequiredMixin,PermissionRequiredMixin):
 
 
 # category list
-class CategoryListView(ListView,LoginRequiredMixin,PermissionRequiredMixin):
+class CategoryListView(LoginRequiredMixin,PermissionRequiredMixin, ListView):
     permission_required = 'bulk_core.view_recipientcategory'
     model = RecipientCategory
     template_name = "bulk_core/category/category_list.html"
 
 
 # category update
-class CategoryUpdateView(UpdateView,LoginRequiredMixin,PermissionRequiredMixin):
+class CategoryUpdateView(LoginRequiredMixin,PermissionRequiredMixin, UpdateView):
     permission_required = 'bulk_core.change_recipientcategory'
     model = RecipientCategory
     form_class = CategoryCreateForm
@@ -58,13 +53,9 @@ class CategoryUpdateView(UpdateView,LoginRequiredMixin,PermissionRequiredMixin):
 
     
 # delete category
-class CategoryDeleteView(DeleteView,LoginRequiredMixin,PermissionRequiredMixin):
+class CategoryDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     permission_required = 'bulk_core.delete_recipientcategory'
     model = RecipientCategory
     success_url = reverse_lazy('bulk_core:category_list')
 
 
-# import email 
-# class ImportEmailView(CreateView):
-#     model = RecipientDataSheet
-#     from_class = EmailRecipientImportForm 

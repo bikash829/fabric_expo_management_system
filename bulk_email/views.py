@@ -1,16 +1,13 @@
-from pprint import pprint
 import uuid
-import time
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
-from django.contrib import messages
 from django.db import transaction
 from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
-from bulk_email.forms import EmailAttachmentForm, EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
+from bulk_email.forms import  EmailChangeForm, EmailCreationForm, TempEmailRecipientImportForm
 from .models import EmailAttachment, EmailRecipient, EmailSession, EmailTemplate, SentMail,TempEmailRecipient
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView, TemplateView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import ListView, TemplateView
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 import csv
@@ -18,17 +15,14 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.core.mail import EmailMessage
 from django.db.models import F
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-
-import os
 from django.core.exceptions import ValidationError
 
 """begin::manage email recipients """
 ### Generate demo csv file 
-class GenerateCSV(View):
+class GenerateCSV(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -38,13 +32,15 @@ class GenerateCSV(View):
         writer = csv.writer(response)
         writer.writerow(["name", "email",])
         writer.writerow(['John Doe','example@example.com', ])
+        writer.writerow(['John Doe1','example@example1.com', ])
+        writer.writerow(['John Doe2','example@example2.com', ])
 
         return response
         
 
 
 ### import recipient from csv file 
-class EmailRecipientCreateView(CreateView):
+class EmailRecipientCreateView(LoginRequiredMixin, CreateView):
     model = TempRecipientDataSheet
     template_name = "bulk_email/import_recipients.html"
     form_class= TempEmailRecipientImportForm

@@ -25,8 +25,8 @@ urlpatterns = [
     path('staff_list/',views.StaffListView.as_view(),name="staff_list"),
 
     # manage groups and permissions 
-    path('group-list/',views.GroupListView.as_view(),name="group-list"),
     path('create-group/',views.CreateGroupView.as_view(),name="create-group"),
+    path('group-list/',views.GroupListView.as_view(),name="group-list"),
     path('update-group/<int:pk>/',views.UpdateGroupPermission.as_view(),name="manage-group-permissions"),
     path('delete-group/<int:pk>/',views.DeleteGroupView.as_view(),name="delete-group"),
     

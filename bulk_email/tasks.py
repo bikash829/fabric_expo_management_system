@@ -1,11 +1,8 @@
 from celery import shared_task
-import csv
-from bulk_core.models import RecipientDataSheet
 import mimetypes
 from premailer import transform
 from bulk_core.utils import replace_hsl_with_rgb
 from django.core.mail import EmailMultiAlternatives, get_connection
-from fabric_expo_management_system import settings
 from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, EmailTemplate
 from django.utils import timezone
 from django.shortcuts import get_object_or_404

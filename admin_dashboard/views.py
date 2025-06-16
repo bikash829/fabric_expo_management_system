@@ -169,13 +169,6 @@ class StaffListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 
 """begin:: Groups and Permissions"""
-# show group list 
-class GroupListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    permission_required = "auth.view_group"
-    model = Group
-    template_name = "admin_dashboard/manage_groups_and_permissions/group-list.html"
-
-
 # create/add new group 
 class CreateGroupView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     permission_required = "auth.add_group"
@@ -197,6 +190,13 @@ class CreateGroupView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     def form_valid(self,form):
         messages.success(self.request, f"Group {form.cleaned_data['name']} created successfully!")
         return super().form_valid(form)
+    
+# show group list 
+class GroupListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "auth.view_group"
+    model = Group
+    template_name = "admin_dashboard/manage_groups_and_permissions/group-list.html"
+
 
     
 # change/update groups and permissions info

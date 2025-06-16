@@ -1,0 +1,32 @@
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+
+def get_selected_permissions():
+    selected = [
+        # manage group 
+        ('auth','group','add_group'),
+        ('auth','group','change_group'),
+        ('auth','group','view_group'),
+        ('auth','group','delete_group'),
+        # user
+        ('accounts','user','add_user'),
+        ('accounts','user','change_user'),
+        ('accounts','user','view_user'),
+        ('accounts','user','delete_user'),
+        ('accounts','user','can_activate_deactivate_account'),
+        ('accounts','user','can_view_active_inactive_users'),
+        # manage permissions 
+        ('auth','permission','view_permission'),
+        ('auth','permission','change_permission'),
+        # recipient category
+        ('bulk_core','recipientcategory','add_recipientcategory'),
+        ('bulk_core','recipientcategory','change_recipientcategory'),
+        ('bulk_core','recipientcategory','view_recipientcategory'),
+        ('bulk_core','recipientcategory','delete_recipientcategory'),
+    ]
+    q = None
+    for app_label, model, codename in selected:
+        ct = ContentType.objects.get(app_label=app_label, model=model)
+        cond = Permission.objects.filter(content_type=ct, codename=codename)
+        q = cond if q is None else q | cond
+    return q if q is not None else Permission.objects.none()

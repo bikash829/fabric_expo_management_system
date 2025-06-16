@@ -2,9 +2,9 @@ from django.contrib.auth.models import Group, Permission
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm
-from phonenumber_field.formfields import SplitPhoneNumberField, PrefixChoiceField,PhoneNumberField
+from phonenumber_field.formfields import SplitPhoneNumberField, PrefixChoiceField
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
-from accounts.models import User
+from admin_dashboard.utils import get_selected_permissions
 
 
 
@@ -74,7 +74,8 @@ class UserPermissionForm(forms.ModelForm):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-control"}),
     )
     user_permissions= forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(),
+        # queryset=Permission.objects.all(),
+        queryset=get_selected_permissions(),
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={"class":"form-control"}),
     )
@@ -107,11 +108,9 @@ class UserPermissionForm(forms.ModelForm):
 #             self.fields['permissions'].initial = self.instance.permissions.all()
 
 
-
-
 class GroupForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
-        queryset=Permission.objects.all(),
+        queryset=get_selected_permissions(),
         widget=forms.CheckboxSelectMultiple(), # Widget should be set here
         required=False
     )

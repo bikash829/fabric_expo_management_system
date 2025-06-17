@@ -61,7 +61,8 @@ def extract_data(request,form):
 
 """Begin:: Buyer Details"""
 ### Generate demo csv for buyers
-class GenerateCSVBuyer(LoginRequiredMixin, View):
+class GenerateCSVBuyer(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.add_buyer"
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -113,7 +114,8 @@ class GenerateCSVBuyer(LoginRequiredMixin, View):
 
 
 # upload buyer data
-class BuyerUploadView(LoginRequiredMixin, View):
+class BuyerUploadView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.add_buyer"
     def get(self, request):
         form = BuyerUploadForm()
         context = {
@@ -161,7 +163,9 @@ class BuyerUploadView(LoginRequiredMixin, View):
 
 
 # preview uploaded data
-class BuyerPreviewView(LoginRequiredMixin, View):
+class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.add_buyer"
+
     def get(self, request):
         preview_data = request.session.get('preview_buyer_data', [])
         temp_file_path = request.session.get('temp_file_path', None)
@@ -331,10 +335,12 @@ class BuyerPreviewView(LoginRequiredMixin, View):
 
 
 # Buyer list 
-class BuyerListView(LoginRequiredMixin, TemplateView):
+class BuyerListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = "business_data.view_buyer"
     template_name = "business_data/manage_buyers/buyer_list.html"
 
-class BuyerDataSourceView(LoginRequiredMixin, View):
+class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.view_buyer"
     def get(self, request, *args, **kwargs):
         draw = int(request.GET.get('draw', 1))
         start = int(request.GET.get('start', 0))
@@ -431,6 +437,7 @@ class BuyerDataSourceView(LoginRequiredMixin, View):
 
 # delete customers 
 class DeleteBuyerView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "business_data.delete_buyer"
     model = Buyer
     fields = ['is_deleted']
     permission_required = 'business_data.delete_buyer'

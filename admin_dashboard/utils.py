@@ -76,6 +76,31 @@ def get_selected_permissions():
         #wechat log 
         ('bulk_wechat', 'sentwcmessage', 'view_sentwcmessage'),
 
+        ### business data 
+        # manage buyers
+        ('business_data','buyer', 'add_buyer'),
+        # ('business_data','buyer', 'change_buyer'),
+        ('business_data','buyer', 'view_buyer'),
+        ('business_data','buyer', 'delete_buyer'),
+
+        # manage customer 
+        ('business_data', 'customer', 'add_customer'),
+        ('business_data', 'customer', 'view_customer'),
+        # ('business_data', 'customer', 'change_customer'),
+        ('business_data', 'customer', 'delete_customer'),
+
+        # manage supplier 
+        ('business_data', 'supplier', 'add_supplier'),
+        ('business_data', 'supplier', 'view_supplier'),
+        # ('business_data', 'supplier', 'change_supplier'),
+        ('business_data', 'supplier', 'delete_supplier'),
+
+        # manage product 
+        ('business_data', 'product', 'add_product'),
+        ('business_data', 'product', 'view_product'),
+        ('business_data', 'product', 'change_product'),
+        ('business_data', 'product', 'delete_product'),
+
     ]
     q = None
     for app_label, model, codename in selected:

@@ -54,7 +54,7 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-success" onclick="window.location.href='{% url 'bulk_wechat:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
+              <button {% if not perms.bulk_wechat.sendmessage_wechattemplate %}disabled{% endif %} class="btn btn-success" onclick="window.location.href='{% url 'bulk_wechat:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
               <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_wechat:draft_list' %}'">Cancel</button>
             </div>
             <!--end::Footer-->

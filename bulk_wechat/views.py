@@ -8,24 +8,22 @@ from django.urls import reverse_lazy, reverse
 from django.db import transaction
 from django.contrib import messages
 import csv
-from django.db.models import F
 
 from bulk_wechat.forms import MessageCreationForm, TempRecipientImportForm
 from bulk_wechat.models import TempWCRecipient, WeChatAttachment, WeChatRecipient, WeChatTemplate
 from bulk_whatsapp.forms import MessageDraftUpdateForm
-from fabric_expo_management_system import settings
+from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 # import views 
 from django.views import View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView,DetailView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic import ListView
 
 
 # validators 
-from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
 # models 
-from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipientDataSheet
+from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
 # from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappRecipient, WhatsappTemplate
 
 # forms
@@ -36,7 +34,8 @@ from bulk_core.models import RecipientDataSheet, RecipientCategory, TempRecipien
 # Create your views here.
 """begin::manage recipients """
 ### Generate demo csv for whatsapp
-class GenerateCSV(View):
+class GenerateCSV(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_wechat.add_wechatrecipient"
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -53,7 +52,8 @@ class GenerateCSV(View):
 
 
 ### import whatsapp recipient from csv file view 
-class RecipientCreateView(CreateView):
+class RecipientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "bulk_wechat.add_wechatrecipient"
     model = TempRecipientDataSheet
     template_name = "bulk_wechat/import_recipients.html"
     form_class= TempRecipientImportForm
@@ -62,7 +62,9 @@ class RecipientCreateView(CreateView):
         return reverse('bulk_wechat:preview_recipients', kwargs={'datasheet_id': self.object.pk})
 
 
-class PreviewRecipientsView(View):
+class PreviewRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_wechat.add_wechatrecipient"
+
     template_name = "bulk_wechat/preview_recipients.html"
 
     def get(self, request, datasheet_id):
@@ -114,7 +116,9 @@ class PreviewRecipientsView(View):
 
 
 ### Move data from temporary data table to permanent table 
-class ConfirmWeChatRecipientsView(View):
+class ConfirmWeChatRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_wechat.add_wechatrecipient"
+
     @transaction.atomic
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
@@ -213,7 +217,8 @@ class DataSheetDeleteView(View):
         
 
 ### Recipient list view 
-class RecipientListView(ListView):
+class RecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "bulk_wechat.view_wechatrecipient"
     model = WeChatRecipient
     template_name = "bulk_core/manage_recipient/recipient_list.html"
     context_object_name = 'recipient_list' 
@@ -233,7 +238,8 @@ class RecipientListView(ListView):
 
 
 ### Export recipient list view 
-class ExportRecipientToCSVView(View):
+class ExportRecipientToCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_wechat.view_wechatrecipient'
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -255,7 +261,8 @@ class ExportRecipientToCSVView(View):
 
 """begin::Mange messages"""
 ### WA create message 
-class CreateMessageView(CreateView):
+class CreateMessageView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "bulk_wechat.add_wechattemplate"
     template_name = "bulk_wechat/manage_messages/create_message.html"
     form_class = MessageCreationForm
     success_url = reverse_lazy('bulk_wechat:draft_list')
@@ -280,24 +287,28 @@ class CreateMessageView(CreateView):
 
 
 ### WA draft view 
-class DraftView(ListView):
+class DraftView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'bulk_wechat.view_wechattemplate'
     template_name = "bulk_wechat/manage_messages/draft_list.html" 
     model = WeChatTemplate
 
+    def handle_no_permission(self):
+        # Redirect to a custom page if permission is denied
+        return redirect('bulk_wechat:create_message')
     
     def get_queryset(self):
         return self.model.objects.filter(delete_status=False)  # Only active drafts
 
 
 ## WC template update view 
-class DraftUpdateView(UpdateView):
+class DraftUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "bulk_wechat.change_wechattemplate"
     template_name = "bulk_wechat/manage_messages/open_draft.html"
     model = WeChatTemplate
     form_class = MessageDraftUpdateForm
     # success_url = reverse_lazy('bulk_email:draft_list')
 
 
-    
     def form_valid(self, form):
         response = super().form_valid(form)  # Correct method call
 
@@ -316,7 +327,8 @@ class DraftUpdateView(UpdateView):
 
 
 ### add attachment 
-class AddAttachmentView(View):
+class AddAttachmentView(LoginRequiredMixin, View):
+
     def post(self, request, *args, **kwargs):
         draft_id = kwargs.get('draft_id')
         wa_template = get_object_or_404(WeChatTemplate, id=draft_id)
@@ -347,7 +359,7 @@ class AddAttachmentView(View):
                 return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 ### remove attachment 
-class RemoveAttachmentView(View):
+class RemoveAttachmentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         attachment_id = self.request.POST.get('id')
         attachment = get_object_or_404(WeChatAttachment, id=attachment_id)
@@ -363,7 +375,8 @@ class RemoveAttachmentView(View):
 
 
 ### select recipients to send message 
-class SelectRecipientsView(View):
+class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_wechat.sendmessage_wechattemplate"
     template_name = "bulk_wechat/manage_messages/recipient_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -377,7 +390,8 @@ class SelectRecipientsView(View):
 
 
 ### WC draft delete view 
-class DraftDeleteView(UpdateView):
+class DraftDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "bulk_wechat.delete_wechattemplate"
     model = WeChatTemplate
     fields = ['delete_status'] 
     success_url = reverse_lazy('bulk_wechat:draft_list')

@@ -46,11 +46,15 @@
                         >
                         </button>
                         <ul class="dropdown-menu">
+                            {% if perms.bulk_wechat.change_wechattemplate %}
                             <li><a class="dropdown-item text-primary" href="{% url 'bulk_wechat:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            {% endif %}
+                            {% if perms.bulk_wechat.delete_wechattemplate %}
                             <form method="POST" action="{% url 'bulk_wechat:delete_draft' pk=item.pk %}">
                               {% csrf_token %}
                                 <li><button class="dropdown-item text-danger delete-draft" type="submit"  data-draft="{{item.name}}">Delete <i class="fa-solid fa-trash"></i></button></li>
                             </form>
+                            {% endif %}
                         </ul>
                       </div> 
                   </td>

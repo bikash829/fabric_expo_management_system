@@ -53,8 +53,14 @@ class WeChatTemplate(models.Model):
     delete_status =  models.BooleanField(default=False)
     is_saved = models.BooleanField(default=True)
 
+    class Meta:
+        permissions =[
+            ('sendmessage_wechattemplate','Can send we chat messages')
+        ]
+
 #     def __str__(self):
 #         return self.name
+
 
 
 class WeChatAttachment(models.Model):

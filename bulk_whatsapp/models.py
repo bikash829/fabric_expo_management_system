@@ -50,6 +50,11 @@ class WhatsappTemplate(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        permissions = [
+            ("sendmessage_whatsapptemplate", "Can send whatsapp messages"),
+        ]
 
 
 class WhatsappAttachment(models.Model):

@@ -15,9 +15,9 @@ from fabric_expo_management_system import settings
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView
-from twilio.twiml.messaging_response import MessagingResponse
 from django.utils.decorators import method_decorator
 from django_twilio.decorators import twilio_view
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from twilio.rest import Client
 
 # validators 
@@ -52,7 +52,8 @@ def normalize_phone_number(number):
 
 """begin::manage recipients """
 ### Generate demo csv for whatsapp
-class GenerateCSV(View):
+class GenerateCSV(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.add_whatsapprecipient"
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -69,7 +70,9 @@ class GenerateCSV(View):
 
 
 ### import whatsapp recipient from csv file view 
-class RecipientCreateView(CreateView):
+class RecipientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "bulk_whatsapp.add_whatsapprecipient"
+
     model = TempRecipientDataSheet
     template_name = "bulk_whatsapp/import_recipients.html"
     form_class= TempRecipientImportForm
@@ -79,7 +82,8 @@ class RecipientCreateView(CreateView):
 
 
 ### preview recipients list view 
-class PreviewRecipientsView(View):
+class PreviewRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.add_whatsapprecipient"
     template_name = "bulk_whatsapp/preview_recipients.html"
 
     def get(self, request, datasheet_id):
@@ -129,7 +133,9 @@ class PreviewRecipientsView(View):
 
 
 ### Move data from temporary data table to permanent table 
-class ConfirmWhatsappRecipientsView(View):
+class ConfirmWhatsappRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.add_whatsapprecipient"
+    
     @transaction.atomic
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
@@ -243,7 +249,8 @@ class DataSheetDeleteView(View):
 #         return EmailRecipient.objects.filter(category_id=category_id)
 
 ### Recipient list view 
-class RecipientListView(ListView):
+class RecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "bulk_whatsapp.view_whatsapprecipient"
     model = WhatsappRecipient
     template_name = "bulk_core/manage_recipient/recipient_list.html"
     context_object_name = 'recipient_list' 
@@ -263,7 +270,9 @@ class RecipientListView(ListView):
 
 
 ### Export recipient list view 
-class ExportRecipientToCSVView(View):
+class ExportRecipientToCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.view_whatsapprecipient"
+
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -285,7 +294,9 @@ class ExportRecipientToCSVView(View):
 
 """begin::Mange messages"""
 ### WA create message 
-class CreateMessageView(CreateView):
+class CreateMessageView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = "bulk_whatsapp.add_whatsapptemplate"
+
     template_name = "bulk_whatsapp/manage_messages/create_message.html"
     form_class = MessageCreationForm
     success_url = reverse_lazy('bulk_whatsapp:draft_list')
@@ -309,9 +320,15 @@ class CreateMessageView(CreateView):
 
 
 ### WA draft view 
-class DraftView(ListView):
+class DraftView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "bulk_whatsapp.view_whatsapptemplate"
+
     template_name = "bulk_whatsapp/manage_messages/draft_list.html" 
     model = WhatsappTemplate
+
+    def handle_no_permission(self):
+        # Redirect to a custom page if permission is denied
+        return redirect('bulk_whatsapp:create_message')
 
     
     def get_queryset(self):
@@ -319,7 +336,7 @@ class DraftView(ListView):
 
 
 ### add attachment 
-class AddAttachmentView(View):
+class AddAttachmentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         draft_id = kwargs.get('draft_id')
         wa_template = get_object_or_404(WhatsappTemplate, id=draft_id)
@@ -350,7 +367,7 @@ class AddAttachmentView(View):
                 return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 ### remove attachment 
-class RemoveAttachmentView(View):
+class RemoveAttachmentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         attachment_id = self.request.POST.get('id')
         attachment = get_object_or_404(WhatsappAttachment, id=attachment_id)
@@ -364,7 +381,8 @@ class RemoveAttachmentView(View):
 
 
 ### WA draft delete view 
-class DraftDeleteView(UpdateView):
+class DraftDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "bulk_whatsapp.delete_whatsapptemplate"
 
     model = WhatsappTemplate
     fields = ['delete_status']
@@ -381,7 +399,8 @@ class DraftDeleteView(UpdateView):
 
 
 ## WA template update view 
-class DraftUpdateView(UpdateView):
+class DraftUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "bulk_whatsapp.change_whatsapptemplate"
     template_name = "bulk_whatsapp/manage_messages/open_draft.html"
     model = WhatsappTemplate
     form_class = MessageDraftUpdateForm
@@ -405,7 +424,8 @@ class DraftUpdateView(UpdateView):
         return super().form_invalid(form)
 
 ### select recipients to send message 
-class SelectRecipientsView(View):
+class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.sendmessage_whatsapptemplate"
     template_name = "bulk_whatsapp/manage_messages/recipient_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -417,7 +437,9 @@ class SelectRecipientsView(View):
         })
     
 
-class SendMessageView(View):
+class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.sendmessage_whatsapptemplate"
+
     def post(self,request,*args,**kwargs):
         whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
@@ -493,7 +515,8 @@ class SendMessageView(View):
         
 
 """end::manage messages """
-class SenTMessageSessionListView(ListView):
+class SenTMessageSessionListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = "bulk_whatsapp.view_sentmessage"
     model = SentMessage
     template_name = "bulk_whatsapp/manage_messages/sent_message_session_list.html"
 

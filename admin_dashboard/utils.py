@@ -37,6 +37,19 @@ def get_selected_permissions():
         # email log and queue
         ('bulk_email', 'emailsession', 'view_emailsession'),
         ('bulk_email', 'sentmail', 'view_sentmail'),
+        # whatsapp recipients 
+        ('bulk_whatsapp','whatsapprecipient', 'add_whatsapprecipient'),
+        ('bulk_whatsapp','whatsapprecipient', 'view_whatsapprecipient'),
+        # ('bulk_whatsapp','whatsapprecipient', 'change_whatsapprecipient'),
+        # ('bulk_whatsapp','whatsapprecipient', 'delete_whatsapprecipient'),
+        # whatsapp template/draft 
+        ('bulk_whatsapp', 'whatsapptemplate', 'add_whatsapptemplate'),
+        ('bulk_whatsapp', 'whatsapptemplate', 'view_whatsapptemplate'),
+        ('bulk_whatsapp', 'whatsapptemplate', 'change_whatsapptemplate'),
+        ('bulk_whatsapp', 'whatsapptemplate', 'delete_whatsapptemplate'),
+        ('bulk_whatsapp', 'whatsapptemplate', 'sendmessage_whatsapptemplate'),
+        #whatsapp log 
+        ('bulk_whatsapp', 'sentmessage', 'view_sentmessage'),
 
 
     ]

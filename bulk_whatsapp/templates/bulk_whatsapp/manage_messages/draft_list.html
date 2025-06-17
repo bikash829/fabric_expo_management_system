@@ -46,11 +46,16 @@
                         >
                         </button>
                         <ul class="dropdown-menu">
+                            {% if perms.bulk_whatsapp.change_whatsapptemplate %}
                             <li><a class="dropdown-item text-primary" href="{% url 'bulk_whatsapp:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            {% endif %}
+                            {% if perms.bulk_whatsapp.delete_whatsapptemplate %}
                             <form method="POST" action="{% url 'bulk_whatsapp:delete_draft' pk=item.pk %}">
                               {% csrf_token %}
                                 <li><button class="dropdown-item text-danger delete-draft" type="submit"  data-draft="{{item.name}}">Delete <i class="fa-solid fa-trash"></i></button></li>
                             </form>
+                            {% endif %}
+
                         </ul>
                       </div> 
                   </td>

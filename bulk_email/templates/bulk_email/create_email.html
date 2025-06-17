@@ -62,7 +62,9 @@
     <!--end::Container-->
   </div>
   <!--end::App Content-->
-
+  <!--begin:: Toaster alert -->
+  {% include 'core/components/alert/toaster.html' %}
+  <!--end:: Toaster alert-->
 
 {% endblock content %}
 
@@ -95,6 +97,10 @@
 </script>
 <script>
     $(document).ready(function () {
+      // toast alert
+      $('.toast').toast({
+        delay: 1000*20,
+      }).toast('show')
     });
 </script>
 

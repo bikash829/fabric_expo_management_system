@@ -20,6 +20,12 @@ from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
 
+
+import mimetypes
+from premailer import transform
+from bulk_core.utils import replace_hsl_with_rgb
+from .tasks import send_mail_queue
+from django.core.exceptions import PermissionDenied
 """begin::manage email recipients """
 ### Generate demo csv file 
 class GenerateCSV(LoginRequiredMixin, View):
@@ -40,7 +46,8 @@ class GenerateCSV(LoginRequiredMixin, View):
 
 
 ### import recipient from csv file 
-class EmailRecipientCreateView(LoginRequiredMixin, CreateView):
+class EmailRecipientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'bulk_email.add_emailrecipient'
     model = TempRecipientDataSheet
     template_name = "bulk_email/import_recipients.html"
     form_class= TempEmailRecipientImportForm
@@ -50,7 +57,8 @@ class EmailRecipientCreateView(LoginRequiredMixin, CreateView):
 
 
 ### Preview recipient list imported from csv file 
-class PreviewEmailRecipientsView(View):
+class PreviewEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email:add_emailrecipient'
     template_name = "bulk_email/preview_recipients.html"
 
     def get(self, request, datasheet_id):
@@ -96,7 +104,9 @@ class PreviewEmailRecipientsView(View):
         })
 
 
-class ConfirmEmailRecipientsView(View):
+class ConfirmEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email:add_emailrecipient'
+
     @transaction.atomic
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
@@ -162,7 +172,8 @@ class ConfirmEmailRecipientsView(View):
 
 
 # Delete Datasheet/Temporary Datasheet
-class DataSheetDeleteView(View):
+class DataSheetDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email.add_emailrecipient'
     def post(self, request, datasheet_id, *args, **kwargs):
         
         try:
@@ -185,13 +196,16 @@ class DataSheetDeleteView(View):
 
 
 # email categories 
-class EmailCategories(ListView):
+class EmailCategories(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required  = 'bulk_email.view_emailrecipient'
     model = RecipientCategory
     template_name = 'bulk_email/category.html'
 
 
 # Recipient list based on categories 
-class EmailCategoriesRecipientList(ListView):
+class EmailCategoriesRecipientList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required  = 'bulk_email.view_emailrecipient'
+
     model = EmailRecipient
     template_name = "bulk_email/recipient_list.html"
     context_object_name = "recipients"  # Name for template access
@@ -202,7 +216,8 @@ class EmailCategoriesRecipientList(ListView):
     
 
 # Recipient list view 
-class RecipientListView(ListView):
+class RecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'bulk_email.view_emailrecipient'
     model = EmailRecipient
     template_name = "bulk_core/manage_recipient/recipient_list.html"
     context_object_name = 'recipient_list'
@@ -224,7 +239,9 @@ class RecipientListView(ListView):
 
 
 ### Export recipient list view 
-class ExportRecipientToCSVView(View):
+class ExportRecipientToCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email.view_emailrecipient'
+
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -244,7 +261,9 @@ class ExportRecipientToCSVView(View):
 """end::manage email recipients """
 
 """begin::writing email """
-class CreateEmail(CreateView):
+class CreateEmail(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = 'bulk_email.add_emailtemplate'
+
     template_name = "bulk_email/create_email.html" 
     form_class = EmailCreationForm 
     success_url = reverse_lazy('bulk_email:draft_list')
@@ -261,18 +280,27 @@ class CreateEmail(CreateView):
         # Handle file attachments
         for file in self.request.FILES.getlist('attachment'):
             EmailAttachment.objects.create(attachment=file,template=email_template)
+
+        messages.success(self.request, "Email draft created successfully.")
     
         return super().form_valid(form)
 
-class EmailDraftListView(ListView):
+class EmailDraftListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ['bulk_email.view_emailtemplate']
     model = EmailTemplate
     template_name = "bulk_email/email_draft.html"
+
+    def handle_no_permission(self):
+        # Redirect to a custom page if permission is denied
+        return redirect('bulk_email:create_email')
+
 
     def get_queryset(self):
         return self.model.objects.filter(delete_status=False)  # Only active drafts
 
 # Update email draft form 
-class EmailChangeView(UpdateView):
+class EmailChangeView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'bulk_email.change_emailtemplate'
     model = EmailTemplate
     template_name = "bulk_email/open_draft.html"
     form_class = EmailChangeForm
@@ -302,7 +330,7 @@ class EmailChangeView(UpdateView):
 
 
 ### add attachment 
-class AddAttachmentView(View):
+class AddAttachmentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
 
         draft_id = kwargs.get('draft_id')
@@ -336,7 +364,7 @@ class AddAttachmentView(View):
                 return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 ### remove attachment 
-class RemoveAttachmentView(View):
+class RemoveAttachmentView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         attachment_id = self.request.POST.get('id')
         attachment = get_object_or_404(EmailAttachment, id=attachment_id)
@@ -349,7 +377,9 @@ class RemoveAttachmentView(View):
         
 
 ### soft delete email draft  
-class DeleteEmailDraftView(UpdateView):
+class DeleteEmailDraftView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'bulk_email.delete_emailtemplate'
+
     model = EmailTemplate
     fields = ['delete_status']
     success_url = reverse_lazy('bulk_email:draft_list')
@@ -366,7 +396,8 @@ class DeleteEmailDraftView(UpdateView):
     
 
 """begin::sending email"""
-class SelectRecipientsView(View):
+class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email.sendmail_emailtemplate'
     template_name = "bulk_email/recipient_list.html"
 
     def get(self, request, *args, **kwargs):
@@ -378,87 +409,10 @@ class SelectRecipientsView(View):
         })
 
 
-# class SendEmailView(View):
-#     def post(self,request,*args,**kwargs):
-#         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
-#         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
-#         recipients = EmailRecipient.objects.filter(id__in=recipient_ids)
-#         session_id = str(uuid.uuid4())
-#         sender = request.user
+# sendmail view 
+class SendEmailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'bulk_email.sendmail_emailtemplate'
 
-#         # Maximum allowed file size (5MB)
-#         MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
-
-
-#         # # List of attachments (file paths)
-#         # attachments = ["path/to/file1.pdf", "path/to/file2.jpg", "path/to/file3.docx"]
-
-#         # # Function to validate file size
-#         # def validate_attachment(file_path):
-#         #     if os.path.exists(file_path):
-#         #         file_size = os.path.getsize(file_path)  # Get file size in bytes
-#         #         if file_size > MAX_FILE_SIZE:
-#         #             raise ValidationError(f"File {file_path} exceeds the 5MB size limit.")
-#         #     else:
-#         #         raise ValidationError(f"File {file_path} does not exist.")
-
-#         # Open a single SMTP connection for efficiency
-#         connection = get_connection()
-#         connection.open()
-
-#         # Track success and failure
-#         success_count = 0
-#         failure_count = 0
-
-#         emails = []
-
-#         # Loop through each recipient
-#         for recipient in recipients:
-#             # Plain text fallback
-#             text_body = f"Dear {recipient.name},\n{email_content.body}\n\nBest Regards,\nFabric Expo Management\n"
-
-#             # HTML Email (Better Formatting)
-#             html_body = f"""
-#                             <html>
-#                             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-#                                 <p>Dear {recipient.name},</p>
-#                                 <p>{email_content.body}</p>
-#                                 <p style="margin-top: 20px;">Best Regards,<br>
-#                                 <strong>Fabric Expo Management</strong></p>
-#                             </body>
-#                             </html>
-#                         """
-            
-#             email1 = EmailMessage(
-#                 subject=email_content.subject,
-#                 body=text_body,
-#                 html_body=html_body,
-#                 from_email="from@example.com",
-#                 to=[recipient.email],
-#             )
-#             emails.append(email1)
-
-#         # Send the email
-#         try:
-#             connection.send_messages(emails)
-#         except Exception as e:
-#             # Log failed email
-#             failure_count += 1
-           
-
-#         # Close the connection after all emails are sent
-#         connection.close()
-        
-#         # Add success message
-#         # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
-#         return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
-        
-
-import mimetypes
-from premailer import transform
-from bulk_core.utils import replace_hsl_with_rgb
-from .tasks import send_mail_queue
-class SendEmailView(View):
     def post(self,request,*args,**kwargs):
 
         draft_id = kwargs.get('draft_id')
@@ -485,7 +439,8 @@ class SendEmailView(View):
         # return redirect('bulk_email:email_queue')
 
 
-class EmailSessionListView(LoginRequiredMixin,TemplateView):
+class EmailSessionListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = 'bulk_email.view_emailsession'
     template_name = 'bulk_email/email_queue.html'
 
 class EmailSessionAjaxData(View):
@@ -548,7 +503,8 @@ class EmailSessionAjaxData(View):
 
 
 """begin::sent email"""
-class SenTEmailSessionListView(ListView):
+class SenTEmailSessionListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = 'bulk_email.view_sentmail'
     model = SentMail
     template_name = "bulk_email/sent_email_session_list.html"
 

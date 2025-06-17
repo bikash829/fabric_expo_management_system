@@ -75,6 +75,11 @@ class EmailTemplate(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        permissions = [
+            ("sendmail_emailtemplate", "Can send email"),
+        ]
 
 
 class EmailAttachment(models.Model):

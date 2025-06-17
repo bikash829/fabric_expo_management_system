@@ -23,6 +23,22 @@ def get_selected_permissions():
         ('bulk_core','recipientcategory','change_recipientcategory'),
         ('bulk_core','recipientcategory','view_recipientcategory'),
         ('bulk_core','recipientcategory','delete_recipientcategory'),
+        # email recipients 
+        ('bulk_email','emailrecipient','add_emailrecipient'),
+        # ('bulk_email','emailrecipient','change_emailrecipient'),
+        ('bulk_email','emailrecipient','view_emailrecipient'),
+        # ('bulk_email','emailrecipient','delete_emailrecipient'),
+        # email template/draft 
+        ('bulk_email', 'emailtemplate', 'add_emailtemplate'),
+        ('bulk_email', 'emailtemplate', 'change_emailtemplate'),
+        ('bulk_email', 'emailtemplate', 'view_emailtemplate'),
+        ('bulk_email', 'emailtemplate', 'delete_emailtemplate'),
+        ('bulk_email', 'emailtemplate', 'sendmail_emailtemplate'),
+        # email log and queue
+        ('bulk_email', 'emailsession', 'view_emailsession'),
+        ('bulk_email', 'sentmail', 'view_sentmail'),
+
+
     ]
     q = None
     for app_label, model, codename in selected:

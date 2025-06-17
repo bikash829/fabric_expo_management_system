@@ -48,11 +48,16 @@
                         >
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item text-primary" href="{% url 'bulk_email:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            {% if perms.bulk_email.change_emailtemplate %}
+                              <li><a class="dropdown-item text-primary" href="{% url 'bulk_email:open_draft' pk=item.pk %}">Open <i class="fa-solid fa-user-pen"></i></a></li>
+                            {% endif %}
+
+                            {% if perms.bulk_email.delete_emailtemplate %}
                             <form method="POST" action="{% url 'bulk_email:delete_draft' pk=item.pk %}">
                               {% csrf_token %}
                                 <li><button class="dropdown-item text-danger delete-draft" type="submit"  data-draft="{{item.name}}">Delete <i class="fa-solid fa-trash"></i></button></li>
                             </form>
+                            {% endif %}
                         </ul>
                       </div> 
                   </td>

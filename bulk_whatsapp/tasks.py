@@ -1,15 +1,26 @@
 from celery import shared_task
-from bulk_whatsapp.models import SentMessage, WhatsappSession, WhatsappTemplate, WhatsappRecipient, WhatsappAttachment
+from bulk_whatsapp.models import (
+    SentMessage, 
+    WhatsappSession, 
+    WhatsappTemplate, 
+    WhatsappRecipient, 
+    WhatsappAttachment
+)
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from time import sleep
-from fabric_expo_management_system import settings
+# from time import sleep
+from fabric_expo_management_system.settings import (
+    PROJECT_NAME, 
+    TWILIO_ACCOUNT_SID, 
+    TWILIO_AUTH_TOKEN, 
+    TWILIO_WHATSAPP_NUMBER
+)
 from twilio.rest import Client
 
 @shared_task
 def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):
-    whatsapp_content = get_object_or_404(WhatsappTemplate,id=draft_id)
+    whatsapp_content = get_object_or_404(WhatsappTemplate,pk=draft_id)
     recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
     User = get_user_model()
     sender = User.objects.get(pk=user_id)
@@ -23,8 +34,8 @@ def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):
     ]
     
 
-    account_sid = settings.TWILIO_ACCOUNT_SID
-    auth_token = settings.TWILIO_AUTH_TOKEN
+    account_sid = TWILIO_ACCOUNT_SID
+    auth_token = TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
     # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
     # results = []
@@ -35,17 +46,15 @@ def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):
     # Loop through each recipient
     for recipient in recipients:
         # Plain text fallback
-        text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\nFabric Expo Management\n"
+        text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\n{PROJECT_NAME}\n"
         # Send the message
         try:
             message = client.messages.create(
-                from_=settings.TWILIO_WHATSAPP_NUMBER,
+                from_= TWILIO_WHATSAPP_NUMBER,
                 body=text_body,
                 to=f"whatsapp:{recipient.recipient_number}",
                 media_url=media_urls # doesn't support direct file path
             )
-            # results.append({"recipient": recipient.phone_number, "status": "Sent", "sid": message.sid})
-
             success_count += 1
 
             # Log successful message

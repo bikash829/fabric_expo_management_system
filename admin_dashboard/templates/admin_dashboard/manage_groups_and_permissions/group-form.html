@@ -46,6 +46,11 @@
                 {% if perms.auth.change_permission %}
                   <h3>Mange Permissions:</h3>
                   <input type="text" id="permissionSearch" class="form-control mb-2" placeholder="Search permissions...">
+                  <!-- Select All Checkbox -->
+                  {% comment %} <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="selectAllPermissions">
+                    <label class="form-check-label" for="selectAllPermissions">Select All</label>
+                  </div>
                   <div class="scroll-check">
                     {% for permission in form.permissions.field.queryset|filter_permissions %}
                       <div class="form-group ">
@@ -57,7 +62,27 @@
                           </div>
                       </div>
                     {% endfor %}
+                  </div> {% endcomment %}
+                  <!-- Select All Checkbox -->
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="selectAllPermissions">
+                    <label class="form-check-label" for="selectAllPermissions">Select All</label>
                   </div>
+
+                  <div class="scroll-check">
+                    {% for permission in form.permissions.field.queryset|filter_permissions %}
+                      <div class="form-group">
+                        <div class="form-check">
+                          <input class="form-check-input permission-checkbox" name="permissions" type="checkbox" value="{{ permission.id }}" {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
+                          <label class="form-check-label" for="id_{{ permission.id }}">
+                            {{ permission.content_type.model }} | {{ permission.name }}
+                          </label>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+
                 {% endif %}
             </div>
             <!--end::Body-->
@@ -65,8 +90,8 @@
             <div class="card-footer">
               <!-- Action Buttons -->
               <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <a href="{% url 'admin_dashboard:group-list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Update Permissions</button>
+                <a href="{% url 'admin_dashboard:group-list' %}" class="btn btn-secondary">Back To Group List</a>
             </div>
             <!--end::Footer-->
           </form>
@@ -95,6 +120,34 @@
 
 {% block push_scripts %}
 <!--begin::JavaScript-->
+<script>
+$(document).ready(function() {
+  const $selectAllCheckbox = $('#selectAllPermissions');
+  const $permissionCheckboxes = $('.permission-checkbox');
+  
+  // Select All functionality
+  $selectAllCheckbox.on('change', function() {
+    $permissionCheckboxes.prop('checked', $(this).prop('checked'));
+  });
+  
+  // When individual checkboxes are changed, update Select All status
+  $permissionCheckboxes.on('change', function() {
+    const allChecked = $permissionCheckboxes.length === $permissionCheckboxes.filter(':checked').length;
+    const someChecked = $permissionCheckboxes.filter(':checked').length > 0;
+    
+    $selectAllCheckbox.prop('checked', allChecked);
+    $selectAllCheckbox.prop('indeterminate', !allChecked && someChecked);
+  });
+  
+  // Initialize Select All state
+  const allCheckedInitially = $permissionCheckboxes.length === $permissionCheckboxes.filter(':checked').length;
+  const someCheckedInitially = $permissionCheckboxes.filter(':checked').length > 0;
+  
+  $selectAllCheckbox.prop('checked', allCheckedInitially);
+  $selectAllCheckbox.prop('indeterminate', !allCheckedInitially && someCheckedInitially);
+});
+</script>
+
 <script>
   // Example starter JavaScript for disabling form submissions if there are invalid fields
   (() => {

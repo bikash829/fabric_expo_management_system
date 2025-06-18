@@ -27,7 +27,9 @@
         <button id="row_count" class="btn btn-info mt-2"  disabled>Row count</button>
         <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
         <button id="print_barcodes" class="btn btn-secondary mt-2" disabled>Print Barcodes</button>
+        {% if perms.business_data.delete_product %}
         <button id="delete-data" class="btn btn-danger mt-2">Delete</button>
+        {% endif %}
       </div>
 
       <div>

@@ -24,6 +24,10 @@ urlpatterns = [
     path('select_recipients/<int:draft_id>/',views.SelectRecipientsView.as_view(),name="select_recipients"),
     path('send_message/<int:draft_id>/',views.SendMessageView.as_view(),name="send_message"),
     path('sent_message_session/',views.SenTMessageSessionListView.as_view(),name='sent_message_session'),
+    path('sent_message_queue/',views.SendMessageQueueListView.as_view(),name='sent_message_queue'),
+    path('sent_message_queue_ajax/',views.SendMessageQueueAjaxListView.as_view(),name='sent_message_queue_ajax'),
+
+
 
     # path('message_draft')
 

@@ -56,6 +56,7 @@ def get_selected_permissions():
         ('bulk_whatsapp', 'whatsapptemplate', 'change_whatsapptemplate'),
         ('bulk_whatsapp', 'whatsapptemplate', 'delete_whatsapptemplate'),
         ('bulk_whatsapp', 'whatsapptemplate', 'sendmessage_whatsapptemplate'),
+        ('bulk_whatsapp', 'whatsappsession', 'view_whatsappsession'),
 
         #whatsapp log 
         ('bulk_whatsapp', 'sentmessage', 'view_sentmessage'),

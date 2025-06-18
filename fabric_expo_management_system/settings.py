@@ -16,6 +16,8 @@ import dj_database_url
 from decouple import config, Csv
 from fabric_expo_management_system.ckeditor_conf import *
 
+
+PROJECT_NAME = config("PROJECT_NAME")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,6 +87,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'fabric_expo_management_system.context_processors.sidebar_items', # aside items 
+                'fabric_expo_management_system.context_processors.system_info', # system info 
             ],
         },
     },
@@ -181,14 +184,14 @@ LOGIN_REDIRECT_URL = 'admin_dashboard:welcome'
 LOGOUT_REDIRECT_URL = 'admin_dashboard:welcome'
 
 """"console backend"""
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = config("EMAIL")
-# EMAIL_HOST_PASSWORD = config("EMAIL_PASS")
-# EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config("EMAIL")
+EMAIL_HOST_PASSWORD = config("EMAIL_PASS")
+EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 
 
 # django.contrib.auth.tokens.PasswordResetTokenGenerator

@@ -7,7 +7,7 @@ from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, Ema
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from time import sleep
+from fabric_expo_management_system.settings import PROJECT_NAME, EMAIL_HOST_USER
 
 
 # def parse_csv(file):
@@ -49,17 +49,17 @@ def send_mail_queue(**kwargs):
                         {email_content.body}\n\n
 
                         Best Regards,\n
-                        Fabric Expo Management\n
+                        {PROJECT_NAME}\n
                     """
 
         # HTML Email (Better Formatting)
         html_body = f"""
                         <html>
                         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                            <p>Dear {recipient.name},</p>
+                            Dear {recipient.name},
                             <p>{email_content.body}</p>
                             <p style="margin-top: 20px;">Best Regards,<br>
-                            <strong>Fabric Expo Management</strong></p>
+                            <strong>{PROJECT_NAME}</strong></p>
                         </body>
                         </html>
                     """
@@ -71,8 +71,8 @@ def send_mail_queue(**kwargs):
         email_message = EmailMultiAlternatives(
             subject=email_content.subject,
             # body=text_body,  # Plain text version
-            # from_email=settings.EMAIL_HOST_USER,
-            from_email="admin@email.com",
+            from_email=EMAIL_HOST_USER,
+            # from_email="admin@email.com",
             to=[recipient.email],
             connection=connection,  # Use open connection
         )

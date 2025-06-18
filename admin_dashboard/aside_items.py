@@ -390,6 +390,18 @@ def get_sidebar_items(request):
                     }
                 )
             
+            
+            # check permission view_queued whatsapp message  
+            if request.user.has_perm('bulk_whatsapp.view_whatsappsession'):
+                message_elements['send_bulk_message']['children'][index]['children'].append(
+                    {
+                        'name': 'Message Queue',
+                        'code_name': 'whatsapp_queue',
+                        'url': reverse('bulk_whatsapp:sent_message_queue'),
+                        'icon': "fa-solid fa-envelope-open-text",
+                    }
+                )
+            
             # check permission view_sentwhatsapp template
             if request.user.has_perm('bulk_whatsapp.view_sentmessage'):
                 message_elements['send_bulk_message']['children'][index]['children'].append(
@@ -430,6 +442,7 @@ def get_sidebar_items(request):
                         'icon': "fa-regular fa-folder-open",
                     }
                 )
+            
             
             # check permission view_sent message log
             if request.user.has_perm('bulk_wechat.view_sentwcmessage'):

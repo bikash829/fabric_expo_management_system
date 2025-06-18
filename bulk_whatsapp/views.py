@@ -1,3 +1,4 @@
+import pprint
 from django.utils import timezone
 import uuid
 
@@ -13,11 +14,12 @@ import csv
 # import views 
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 from django.utils.decorators import method_decorator
 from django_twilio.decorators import twilio_view
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from twilio.rest import Client
+from django.db.models import Q
+from django.utils import timezone
 
 # validators 
 from django.core.validators import validate_email
@@ -28,7 +30,7 @@ from bulk_whatsapp.tasks import send_whatsapp_message
 
 # models 
 from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
-from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappTemplate
+from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappSession, WhatsappTemplate
 from django.db.models import F
 
 # forms
@@ -429,11 +431,11 @@ class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "bulk_whatsapp/manage_messages/recipient_list.html"
 
     def get(self, request, *args, **kwargs):
-        email_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
+        whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         recipients = WhatsappRecipient.objects.all()
         return render(request, self.template_name, {
             'recipients': recipients,
-            'message_content': email_content
+            'message_content': whatsapp_content
         })
     
 
@@ -441,15 +443,25 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "bulk_whatsapp.sendmessage_whatsapptemplate"
 
     def post(self,request,*args,**kwargs):
+        pprint.pprint(kwargs)
         # whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         # recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
         session_id = str(uuid.uuid4())
         user_id = request.user.pk
+        draft_id=kwargs.get('draft_id')
 
-        send_whatsapp_message(
+        WhatsappSession.objects.create(
+            session_id=session_id,
+            sender_id=user_id,
+            draft_id=draft_id,
+            status='processing'
+        )
+
+
+        send_whatsapp_message.delay(
             user_id= user_id,
-            draft_id=kwargs.get('draft_id'),
+            draft_id=draft_id,
             recipient_ids = recipient_ids,
             session_id = session_id,
         )
@@ -457,6 +469,72 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # Add success message
         # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
         return JsonResponse({'message': "Messages sending are processing. Check queued message status."})
+
+
+class SendMessageQueueListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = "bulk_whatsapp.view_whatsappsession"
+    template_name = "bulk_whatsapp/manage_messages/message_queue.html"
+
+
+class SendMessageQueueAjaxListView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "bulk_whatsapp.view_whatsappsession"
+    def get(self, request, *args, **kwargs):
+        draw = int(request.GET.get('draw', 1))
+        start = int(request.GET.get('start', 0))
+        length = int(request.GET.get('length', 10))
+        search_value = request.GET.get('search[value]', '')
+        order_column_index = int(request.GET.get('order[0][column]', 0))
+        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
+
+
+        columns = [
+            'id', 'session_id', 'created_at', 'draft__name', 'success_count', 'failure_count', 'status'
+        ]
+
+        order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
+        if order_dir == 'asc':
+            order_field = '-' + order_field
+
+
+
+        qs = WhatsappSession.objects.all()
+
+        if search_value:
+            search_q = Q()
+            # List of fields to search (including id and all relevant fields)
+            search_fields = columns
+            for col in search_fields:
+                search_q |= Q(**{f"{col}__icontains": search_value})
+            qs = qs.filter(search_q)
+
+        total_count = WhatsappSession.objects.count()
+        filtered_count = qs.count()
+
+        qs = qs.order_by(order_field)[start:start+length]
+
+        data = []
+        for obj in qs:
+            # Convert UTC time to local time for display
+            local_created_at = timezone.localtime(obj.created_at)
+            data.append({
+                'id': obj.id,
+                'session_id': obj.session_id,
+                'created_at': local_created_at.strftime('%Y-%m-%d %H:%M'),
+                'subject': obj.draft.name,
+                'success': obj.success_count,
+                'failed': obj.failure_count,
+                'status': obj.get_status_display(),
+            })
+
+  
+
+        return JsonResponse({
+            'draw': draw,
+            'recordsTotal': total_count,
+            'recordsFiltered': filtered_count,
+            'data': data,
+        })
+
 
 
 """end::manage messages """

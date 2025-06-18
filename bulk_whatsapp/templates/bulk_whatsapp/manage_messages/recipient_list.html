@@ -174,7 +174,7 @@
                   text: response.message,
                   showConfirmButton: true,
                 }).then((result) => {
-                  window.location.href = "{% url 'bulk_whatsapp:draft_list' %}";
+                  window.location.href = "{% url 'bulk_whatsapp:sent_message_queue' %}";
                 });
               },
               error: function(xhr, status, error) {

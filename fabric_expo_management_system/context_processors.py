@@ -2,6 +2,9 @@ from admin_dashboard.aside_items import get_sidebar_items
 from django.urls import reverse
 # from admin_dashboard import nav_data
 from admin_dashboard import nav_data
+from fabric_expo_management_system.settings import (
+    PROJECT_NAME
+)
 
 def sidebar_items(request):
     
@@ -23,3 +26,11 @@ def sidebar_items(request):
         }
     else:
         return {}
+    
+
+def system_info(request):
+    data = {
+        'PROJECT_NAME' : PROJECT_NAME,
+    }
+
+    return data

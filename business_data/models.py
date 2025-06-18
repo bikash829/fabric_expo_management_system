@@ -168,7 +168,9 @@ class Product(SoftDeleteModel):
         self.barcode.save(file_name, File(buffer), save=False)
 
     def generate_qr_code_image(self):
-        full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
+        # full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
+        full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail-sticker', kwargs={'pk': self.pk})}"
+
         qr = qrcode.make(full_url)
         buffer = BytesIO()
         qr.save(buffer, format='PNG')

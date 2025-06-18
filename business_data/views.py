@@ -1767,6 +1767,26 @@ class PublicProductDetailView(DetailView):
     template_name = 'business_data/manage_products/public_product_detail.html'
     context_object_name = 'product'
      
+class ProductDetailViewSticker(DetailView):
+    model = Product
+    
+    def get(self, request, pk):
+        product = Product.objects.get(pk=pk)
+        template = 'business_data/manage_products/print_labels/details_label.html'
+        
+        context = {
+            'product': product,
+            # 'base_url': base_url
+        }
+
+        html_string = render_to_string(template, context)
+        
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{product.fabric_article_fexpo}_label.pdf"'
+        return response
+     
 
 # view product details 
 class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):

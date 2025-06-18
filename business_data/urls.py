@@ -41,6 +41,7 @@ urlpatterns = [
     path('product-list/',views.ProductListView.as_view(),name='product-list'),
     path('products/data-source/', views.ProductDataSourceView.as_view(), name='product_data_source'),
     path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
+    path('products/<int:pk>/sticker/', views.ProductDetailViewSticker.as_view(), name='product-detail-sticker'),
     path('products-public/<int:pk>/', views.PublicProductDetailView.as_view(), name='product-detail-public'),
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""

@@ -10,7 +10,6 @@ from django.db import transaction
 from django.contrib import messages
 import csv
 
-from fabric_expo_management_system import settings
 # import views 
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
@@ -25,6 +24,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from phonenumber_field.validators import validate_international_phonenumber
+from bulk_whatsapp.tasks import send_whatsapp_message
 
 # models 
 from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
@@ -441,78 +441,23 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "bulk_whatsapp.sendmessage_whatsapptemplate"
 
     def post(self,request,*args,**kwargs):
-        whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
+        # whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
+        # recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
         recipient_ids = request.POST.getlist('selectedRecipientIds[]')
-        recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
         session_id = str(uuid.uuid4())
-        sender = request.user 
-        print(whatsapp_content)
-        print(recipient_ids)
-        print(recipients)
-        # retriving attachments
-        attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
-        media_urls = [request.build_absolute_uri(attachment.attachment.url) for attachment in attachments]
-        media_urls = [
-            "https://demo.twilio.com/owl.png",
-            "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
-        ]
-        
+        user_id = request.user.pk
 
-        account_sid = settings.TWILIO_ACCOUNT_SID
-        auth_token = settings.TWILIO_AUTH_TOKEN
-        client = Client(account_sid, auth_token)
-        # client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        # results = []
-
-        success_count = 0  
-        failure_count = 0
-
-        # Loop through each recipient
-        for recipient in recipients:
-            # Plain text fallback
-            text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\nFabric Expo Management\n"
-            # Send the message
-            try:
-                message = client.messages.create(
-                    from_=settings.TWILIO_WHATSAPP_NUMBER,
-                    body=text_body,
-                    to=f"whatsapp:{recipient.recipient_number}",
-                    media_url=media_urls # doesn't support direct file path
-                )
-                # results.append({"recipient": recipient.phone_number, "status": "Sent", "sid": message.sid})
-
-                success_count += 1
-
-                # Log successful message
-                SentMessage.objects.create(
-                    recipient_to=recipient,
-                    message_template=whatsapp_content,
-                    sent_by=sender,
-                    sent_at=timezone.now(),  # Set current time
-                    session_id=session_id,  # Generate unique ID
-                    status=True,
-                )
-            except Exception as e:
-                # Log unsuccessful message
-                SentMessage.objects.create(
-                    recipient_to=recipient,
-                    message_template=whatsapp_content,
-                    sent_by=sender,
-                    sent_at=timezone.now(),  # Set current time
-                    session_id=session_id,  # Generate unique ID
-                    error_message=str(e),
-                    status=True,
-                )
-            
-           
-
-        # Close the connection after all emails are sent
-        # connection.close()
+        send_whatsapp_message(
+            user_id= user_id,
+            draft_id=kwargs.get('draft_id'),
+            recipient_ids = recipient_ids,
+            session_id = session_id,
+        )
         
         # Add success message
-        # messages.success(request, f"{success_count} emails sent successfully, {failure_count} failed.")
-        return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
-        
+        # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
+        return JsonResponse({'message': "Messages sending are processing. Check queued message status."})
+
 
 """end::manage messages """
 class SenTMessageSessionListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):

@@ -6,6 +6,8 @@ from bulk_core.models import RecipientCategory, RecipientDataSheet
 from django.contrib.auth import get_user_model
 from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class WhatsappRecipient(models.Model):
     name = models.CharField(max_length=50,null=True)
@@ -78,3 +80,14 @@ class SentMessage(models.Model):
 
     def __str__(self):
         return self.message_template
+    
+
+class WhatsappSession(models.Model):
+    session_id = models.CharField(max_length=255, unique=True)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    draft = models.ForeignKey(WhatsappTemplate, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=[('processing', 'Processing'), ('done', 'Done'), ('failed', 'Failed')], default='processing')
+    success_count = models.PositiveIntegerField(default=0)
+    failure_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)

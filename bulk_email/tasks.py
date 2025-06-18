@@ -28,7 +28,6 @@ from time import sleep
 
 @shared_task
 def send_mail_queue(**kwargs):
-    sleep(20)
     User = get_user_model()
     email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
     recipients = EmailRecipient.objects.filter(id__in=kwargs['recipient_ids'])

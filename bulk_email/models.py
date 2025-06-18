@@ -6,6 +6,9 @@ import threading
 from bulk_core.models import RecipientCategory, RecipientDataSheet
 from django.contrib.auth import get_user_model
 # Create your models here.
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 
 class EmailRecipient(models.Model):
     name = models.CharField(max_length=50,null=True)
@@ -110,8 +113,6 @@ class SentMail(models.Model):
     def __str__(self):
         return self.email
     
-from django.contrib.auth import get_user_model
-User = get_user_model()
 
 class EmailSession(models.Model):
     session_id = models.CharField(max_length=255, unique=True)

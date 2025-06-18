@@ -1333,7 +1333,8 @@ class DeleteSupplierView(LoginRequiredMixin, PermissionRequiredMixin,UpdateView)
 
 """Begin::Product Details"""
 # generate csv file of product details 
-class GenerateCSVProduct(LoginRequiredMixin, View):
+class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.add_product"
     def get(self, request, *args, **kwargs):
         response = HttpResponse(
             content_type="text/csv",
@@ -1357,7 +1358,7 @@ class GenerateCSVProduct(LoginRequiredMixin, View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(100):  # Change to any number you want
+        for _ in range(5):  # Change to any number you want
             writer.writerow([
                 fake.date_this_decade().strftime("%Y-%m-%d"),
                 fake.company(),
@@ -1417,7 +1418,8 @@ class GenerateCSVProduct(LoginRequiredMixin, View):
         return response
  
 # upload product details 
-class ProductUploadView(LoginRequiredMixin,View):
+class ProductUploadView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.add_product"
     def get(self, request):
         form = FileUploadForm()
         context = {
@@ -1449,7 +1451,8 @@ class ProductUploadView(LoginRequiredMixin,View):
 
 
 # preview product list 
-class ProductPreviewView(LoginRequiredMixin, View):
+class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'business_data.add_product'
     def get(self, request):
         preview_data = request.session.get('preview_product_data', [])
         temp_file_path = request.session.get('temp_file_path', None)
@@ -1620,13 +1623,16 @@ class ProductPreviewView(LoginRequiredMixin, View):
         request.session.pop('temp_file_path', None)
 
         return redirect('business_data:product-upload') 
-# Product list 
 
-class ProductListView(LoginRequiredMixin, TemplateView):
+# Product list 
+class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = "business_data.view_product"
     # model = Product
     template_name = "business_data/manage_products/product_list.html"
 
-class ProductDataSourceView(LoginRequiredMixin, View):
+# product list 
+class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'business_data.view_product'
     def get(self, request, *args, **kwargs):
         draw = int(request.GET.get('draw', 1))
         start = int(request.GET.get('start', 0))
@@ -1739,11 +1745,13 @@ class ProductDataSourceView(LoginRequiredMixin, View):
             'recordsFiltered': filtered_count,
             'data': data,
         })
+
 # delete products 
 class DeleteProductView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = 'business_data.delete_product'
+
     model = Product
     fields= ['is_deleted']
-    permission_required = 'business_data.delete_product'
 
     def post(self, request, *args, **kwargs):
         ids = request.POST.getlist('selectedIds[]')
@@ -1761,16 +1769,21 @@ class PublicProductDetailView(DetailView):
      
 
 # view product details 
-class ProductDetailView(LoginRequiredMixin, DetailView):
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = "business_data.view_product"
+
     model = Product
     template_name = 'business_data/manage_products/product_detail.html'  # Customize the path if needed
     context_object_name = 'product'
-    login_url = reverse_lazy('business_data:product-detail-public')
     redirect_field_name = 'next'
+    
+    def get_login_url(self):
+        return reverse_lazy('business_data:product-detail-public', kwargs={'pk': self.kwargs['pk']})
 
 
 # import tempfile
-class ProductLabelPrintView(LoginRequiredMixin, View):
+class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.view_product"
     def get(self, request, pk, label_type):
         product = Product.objects.get(pk=pk)
         
@@ -1800,7 +1813,9 @@ class ProductLabelPrintView(LoginRequiredMixin, View):
 
 
 # generate qrcode list 
-class ProductQRCodePDFView(LoginRequiredMixin, View):
+class ProductQRCodePDFView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.view_product"
+
     def get(self, request, *args, **kwargs):
         product_ids = request.GET.getlist('ids[]')
 
@@ -1820,7 +1835,9 @@ class ProductQRCodePDFView(LoginRequiredMixin, View):
 
 
 # generate barcode list 
-class ProductBarCodePDFView(LoginRequiredMixin, View):
+class ProductBarCodePDFView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.view_product"
+
     def get(self, request, *args, **kwargs):
         product_ids = request.GET.getlist('ids[]')
 

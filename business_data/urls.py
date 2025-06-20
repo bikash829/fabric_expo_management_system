@@ -41,14 +41,17 @@ urlpatterns = [
     path('product-list/',views.ProductListView.as_view(),name='product-list'),
     path('products/data-source/', views.ProductDataSourceView.as_view(), name='product_data_source'),
     path('products/<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
-    path('products/<int:pk>/sticker/', views.ProductDetailViewSticker.as_view(), name='product-detail-sticker'),
     path('products-public/<int:pk>/', views.PublicProductDetailView.as_view(), name='product-detail-public'),
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     # End::Product details"""
 
-    path('products/<int:pk>/print/<str:label_type>/', views.ProductLabelPrintView.as_view(), name='print-product-label'),
     path('product-list/print-qr-codes/',views.ProductQRCodePDFView.as_view(), name='print_selected_qrcodes'),
     path('product-list/print-barcodes/',views.ProductBarCodePDFView.as_view(), name='print_selected_barcodes'),
+    path('product-list/print-product-details/',views.ProductDetailListPDFView.as_view(), name='print-product-list-details'),
+    
+    path('products/<int:pk>/sticker/', views.ProductDetailViewSticker.as_view(), name='product-detail-sticker'),
+    path('products/<int:pk>/print/<str:label_type>/', views.ProductLabelPrintView.as_view(), name='print-product-label'),
+
 
 ]
 

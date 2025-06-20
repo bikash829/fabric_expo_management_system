@@ -3,9 +3,20 @@
 <head>
   <style>
     @page {
-            size: 5in 3.2in;
-            margin: 0.1in;
+        
+          /* size: 5in 3.2in; */
+          size: A4;
+          margin: 4mm;
         }
+      body {
+        margin: 4mm;
+    }
+    .grid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* 5 columns */
+        /* gap: 5mm; */
+        gap: 8mm;
+    }
     .sticker {
       width: auto;
       border: 1px solid #000;
@@ -33,13 +44,15 @@
     padding: 4px;
     vertical-align: top;
   }
-    .label {
-      width: 45%;
-      font-weight: bold;
-    }
+  .label {
+    width: 40%;
+    font-weight: bold;
+  }
   </style>
 </head>
 <body>
+  <div class="grid">
+  {% for product in products %}
   <div class="sticker">
     <div class="sticker-header">{{product.fabric_mill_supplier}}</div>
     <div class="sticker-subheader">{{product.mill_reference}}</div>
@@ -66,7 +79,7 @@
         <td>: {{ product.wash }}</td>
       </tr>
       <tr>
-        <td class="label">Finish Width (Inch)</td>
+        <td class="label">Finish Width (In)</td>
         <td>: {{ product.cut_width }}"</td>
       </tr>
       <tr>
@@ -78,6 +91,8 @@
         <td>: SOFT</td> <!-- If you have a field for this, replace accordingly -->
       </tr>
     </table>
+  </div>
+  {% endfor %}
   </div>
 </body>
 </html>

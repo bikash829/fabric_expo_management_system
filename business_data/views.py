@@ -1766,6 +1766,21 @@ class PublicProductDetailView(DetailView):
     model = Product
     template_name = 'business_data/manage_products/public_product_detail.html'
     context_object_name = 'product'
+
+
+# view product details 
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = "business_data.view_product"
+
+    model = Product
+    template_name = 'business_data/manage_products/product_detail.html'  # Customize the path if needed
+    context_object_name = 'product'
+    redirect_field_name = 'next'
+    
+    def get_login_url(self):
+        return reverse_lazy('business_data:product-detail-sticker', kwargs={'pk': self.kwargs['pk']})
+
+
      
 class ProductDetailViewSticker(DetailView):
     model = Product
@@ -1788,17 +1803,28 @@ class ProductDetailViewSticker(DetailView):
         return response
      
 
-# view product details 
-class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class ProductDetailListPDFView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_product"
 
-    model = Product
-    template_name = 'business_data/manage_products/product_detail.html'  # Customize the path if needed
-    context_object_name = 'product'
-    redirect_field_name = 'next'
-    
-    def get_login_url(self):
-        return reverse_lazy('business_data:product-detail-public', kwargs={'pk': self.kwargs['pk']})
+
+    def get(self, request, *args, **kwargs):
+        product_ids = request.GET.getlist('ids[]')
+
+        if not product_ids:
+            return HttpResponse("No product IDs provided.", status=400)
+
+        products = Product.objects.filter(id__in=product_ids)
+
+        html_string = render_to_string('business_data/manage_products/print_labels/product_detail_sticker_list.html', {'products': products})
+
+        pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
+        
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="product_details_list.pdf"'
+        # response = render(request,'business_data/manage_products/print_labels/product_detail_sticker_list.html', {'products': products})
+        return response
+ 
+
 
 
 # import tempfile
@@ -1830,7 +1856,6 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
         response['Content-Disposition'] = f'inline; filename="{product.fabric_article_fexpo}_{label_type}_label.pdf"'
         return response
     
-
 
 # generate qrcode list 
 class ProductQRCodePDFView(LoginRequiredMixin, PermissionRequiredMixin, View):

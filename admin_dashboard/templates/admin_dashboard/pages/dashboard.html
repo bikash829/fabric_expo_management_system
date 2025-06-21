@@ -247,80 +247,62 @@
 
 <script>
   $(document).ready(function () {
-    // Pie chart user summary 
-    $(function(){
-      // Fetch user summary data from backend using AJAX
-      let data = {
-        labels: [],
-        datasets: [{
-          label: 'User Summary',
-          data: [],
-          backgroundColor: [],
-          hoverOffset: 4
-        }]
-      };
-
-      $.ajax({
-        url: "{% url 'admin_dashboard:user-summary-data' %}", // Replace with your actual URL name
-        method: "GET",
-        dataType: "json",
-        success: function(response) {
-          console.log(response)
-          data.labels = response.labels;
-          data.datasets[0].data = response.data;
-          data.datasets[0].backgroundColor = response.background_color;
-          // Optionally update backgroundColor if dynamic
-        },
-        error: function(xhr, status, error) {
-          console.error("Failed to fetch user summary data:", error);
-        },
-        async: false // Ensures data is loaded before chart is rendered
-      });
-  
-      const config = {
-        type: 'pie',
-        data: data,
-      };
-  
-      const userSummaryPieChart = new Chart(
-        $('#userSummaryPieChart')[0], // jQuery object converted to DOM element
-        config
-      );
-    })
+    // --- User Summary Pie Chart ---
+    $.ajax({
+      url: "{% url 'admin_dashboard:user-summary-data' %}",
+      method: "GET",
+      dataType: "json",
+      success: function(response) {
+        const userSummaryData = {
+          labels: response.labels,
+          datasets: [{
+            label: 'User Summary',
+            data: response.data,
+            backgroundColor: response.background_color,
+            hoverOffset: 4
+          }]
+        };
+        const userSummaryConfig = {
+          type: 'pie',
+          data: userSummaryData,
+        };
+        new Chart($('#userSummaryPieChart')[0], userSummaryConfig);
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to fetch user summary data: " + error);
+        // console.error("Failed to fetch user summary data:", error);
+      }
+    });
 
     // Doughnut chart for Buyer and supplier summary 
-    $(function(){
-      // <block:setup:1>
-      const data = {
-        labels: [
-          'Red',
-          'Blue',
-          'Yellow'
-        ],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [300, 50, 100],
-          backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)'
-          ],
-          hoverOffset: 4
-        }]
-      };
-      // </block:setup>
+    $.ajax({
+      url: "{% url 'admin_dashboard:buyer-supplier-data' %}",
+      method: "GET",
+      dataType: "json",
+      success: function(response) {
+        console.log(response)
+        const buyerAndSupplierSummary = {
+          labels: response.labels,
+          datasets: [{
+            label: 'Buyer & Supplier Summary ',
+            data: response.data,
+            backgroundColor: response.background_color,
+            hoverOffset: 4
+          }]
+        };
+        const buyerAndSupplierSummaryConfig = {
+          type: 'doughnut',
+          data: buyerAndSupplierSummary,
+        };
+        new Chart($('#doughnutChart')[0], buyerAndSupplierSummaryConfig);
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to fetch buyers and suppliers summary data: " + error);
+        // console.error("Failed to fetch user summary data:", error);
+      }
+    });
 
-      // <block:config:0>
-      const config = {
-        type: 'doughnut',
-        data: data,
-      };
-
-      const doughnutChart = new Chart(
-        $('#doughnutChart')[0], // jQuery object converted to DOM element
-        config
-      );
-    })
+    
 
     // bar chart for fabric info 
     $(function(){

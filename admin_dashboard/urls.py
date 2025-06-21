@@ -32,6 +32,7 @@ urlpatterns = [
 
     # chart
     path('user-summary-data/',views.UserSummaryDataView.as_view(),name='user-summary-data'),
+    path('buyer-supplier-data/',views.BuyerAndSupplierSummaryDataView.as_view(),name='buyer-supplier-data'),
     
     
 ]

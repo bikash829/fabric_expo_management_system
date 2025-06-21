@@ -4,6 +4,8 @@ from django.views.generic import TemplateView,FormView, ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
+
+from business_data.models import Buyer, Supplier
 from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -273,6 +275,52 @@ class UserSummaryDataView(LoginRequiredMixin, View):
             labels.append(group_name)
             data.append(user_count)
             unique_rgb_color(background_color)
+
+        return JsonResponse({
+            'labels': labels,
+            'data': data,
+            'background_color': list(background_color),
+        })
+    
+# Buyer and Suppliers summary 
+class BuyerAndSupplierSummaryDataView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs ):
+        labels = []
+        data = []
+        background_color = set()
+
+        # Helper to generate a unique random RGB color
+        def unique_rgb_color(existing_colors):
+            while True:
+                color = f"rgb({random.randint(0,255)},{random.randint(0,255)},{random.randint(0,255)})"
+                if color not in existing_colors:
+                    existing_colors.add(color)
+                    return color
+
+        # total buyers     
+        total_buyers = Buyer.objects.count()
+        labels.append('Total Buyers')
+        data.append(total_buyers)
+        unique_rgb_color(background_color)
+
+        # total suppliers     
+        total_suppliers = Supplier.objects.count()
+        labels.append('Total Supplier')
+        data.append(total_suppliers)
+        unique_rgb_color(background_color)
+
+        # total local buyers
+        total_local_buyers = Buyer.objects.filter(country_of_origin__iexact="bangladesh").count()
+        labels.append('Local Buyers')
+        data.append(total_local_buyers)
+        unique_rgb_color(background_color)
+
+        # total local suppliers 
+        total_local_suppliers = Supplier.objects.filter(country_of_origin__iexact="bangladesh").count()
+        labels.append('Local Suppliers')
+        data.append(total_local_suppliers)
+        unique_rgb_color(background_color)
+
 
         return JsonResponse({
             'labels': labels,

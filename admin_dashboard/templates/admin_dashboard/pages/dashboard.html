@@ -152,289 +152,45 @@
       <!--end::Row-->
       <!--begin::Row-->
       <div class="row">
-        <!-- Start col -->
-        <div class="col-lg-7 connectedSortable">
+        <!-- Start col User Summary-->
+        <div class="col-xl-4 col-lg-6 col-12 connectedSortable">
           <div class="card mb-4">
-            <div class="card-header"><h3 class="card-title">Sales Value</h3></div>
-            <div class="card-body"><div id="revenue-chart"></div></div>
+            <div class="card-header"><h3 class="card-title">User Summary</h3></div>
+            <div class="card-body">
+              {% comment %} <div id="revenue-chart">re</div> {% endcomment %}
+              <canvas id="userSummaryPieChart"></canvas>
+            </div>
           </div>
           <!-- /.card -->
-          <!-- DIRECT CHAT -->
-          <div class="card direct-chat direct-chat-primary mb-4">
-            <div class="card-header">
-              <h3 class="card-title">Direct Chat</h3>
-              <div class="card-tools">
-                <span title="3 New Messages" class="badge text-bg-primary"> 3 </span>
-                <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
-                  <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                  <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-tool"
-                  title="Contacts"
-                  data-lte-toggle="chat-pane"
-                >
-                  <i class="bi bi-chat-text-fill"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-lte-toggle="card-remove">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <!-- Conversations are loaded here -->
-              <div class="direct-chat-messages">
-                <!-- Message. Default to the start -->
-                <div class="direct-chat-msg">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-start"> Alexander Pierce </span>
-                    <span class="direct-chat-timestamp float-end"> 23 Jan 2:00 pm </span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img
-                    class="direct-chat-img"
-                    src="{% static 'assets/img/user1-128x128.jpg' %} "
-                    alt="message user image"
-                  />
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    Is this template really for free? That's unbelievable!
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-                <!-- Message to the end -->
-                <div class="direct-chat-msg end">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-end"> Sarah Bullock </span>
-                    <span class="direct-chat-timestamp float-start"> 23 Jan 2:05 pm </span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img
-                    class="direct-chat-img"
-                    src="{% static 'assets/img/user3-128x128.jpg' %}"
-                    alt="message user image"
-                  />
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">You better believe it!</div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-                <!-- Message. Default to the start -->
-                <div class="direct-chat-msg">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-start"> Alexander Pierce </span>
-                    <span class="direct-chat-timestamp float-end"> 23 Jan 5:37 pm </span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img
-                    class="direct-chat-img"
-                    src="{% static 'assets/img/user1-128x128.jpg' %}"
-                    alt="message user image"
-                  />
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">
-                    Working with AdminLTE on a great new app! Wanna join?
-                  </div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-                <!-- Message to the end -->
-                <div class="direct-chat-msg end">
-                  <div class="direct-chat-infos clearfix">
-                    <span class="direct-chat-name float-end"> Sarah Bullock </span>
-                    <span class="direct-chat-timestamp float-start"> 23 Jan 6:10 pm </span>
-                  </div>
-                  <!-- /.direct-chat-infos -->
-                  <img
-                    class="direct-chat-img"
-                    src="{% static 'assets/img/user3-128x128.jpg' %}"
-                    alt="message user image"
-                  />
-                  <!-- /.direct-chat-img -->
-                  <div class="direct-chat-text">I would love to.</div>
-                  <!-- /.direct-chat-text -->
-                </div>
-                <!-- /.direct-chat-msg -->
-              </div>
-              <!-- /.direct-chat-messages-->
-              <!-- Contacts are loaded here -->
-              <div class="direct-chat-contacts">
-                <ul class="contacts-list">
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user1-128x128.jpg' %}"
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Count Dracula
-                          <small class="contacts-list-date float-end"> 2/28/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> How have you been? I was... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user7-128x128.jpg' %} "
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Sarah Doe
-                          <small class="contacts-list-date float-end"> 2/23/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> I will be waiting for... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user3-128x128.jpg' %} "
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Nadia Jolie
-                          <small class="contacts-list-date float-end"> 2/20/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> I'll call you back at... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user5-128x128.jpg' %} "
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Nora S. Vans
-                          <small class="contacts-list-date float-end"> 2/10/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> Where is your new... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user6-128x128.jpg' %} "
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          John K.
-                          <small class="contacts-list-date float-end"> 1/27/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> Can I take a look at... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                  <li>
-                    <a href="#">
-                      <img
-                        class="contacts-list-img"
-                        src="{% static 'assets/img/user8-128x128.jpg' %} "
-                        alt="User Avatar"
-                      />
-                      <div class="contacts-list-info">
-                        <span class="contacts-list-name">
-                          Kenneth M.
-                          <small class="contacts-list-date float-end"> 1/4/2023 </small>
-                        </span>
-                        <span class="contacts-list-msg"> Never mind I found... </span>
-                      </div>
-                      <!-- /.contacts-list-info -->
-                    </a>
-                  </li>
-                  <!-- End Contact Item -->
-                </ul>
-                <!-- /.contacts-list -->
-              </div>
-              <!-- /.direct-chat-pane -->
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-              <form action="#" method="post">
-                <div class="input-group">
-                  <input
-                    type="text"
-                    name="message"
-                    placeholder="Type Message ..."
-                    class="form-control"
-                  />
-                  <span class="input-group-append">
-                    <button type="button" class="btn btn-primary">Send</button>
-                  </span>
-                </div>
-              </form>
-            </div>
-            <!-- /.card-footer-->
-          </div>
-          <!-- /.direct-chat -->
+          
         </div>
-        <!-- /.Start col -->
-        <!-- Start col -->
-        <div class="col-lg-5 connectedSortable">
-          <div class="card text-white bg-primary bg-gradient border-primary mb-4">
+        <!-- /.End col .User Summary-->
+        <!-- Start col Buyer & Supplier Summary -->
+        <div class="col-xl-4 col-lg-6 col-12 connectedSortable">
+          <div class="card mb-4">
             <div class="card-header border-0">
-              <h3 class="card-title">Sales Value</h3>
-              <div class="card-tools">
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  data-lte-toggle="card-collapse"
-                >
-                  <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
-                  <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
-                </button>
-              </div>
+              <h3 class="card-title">Buyer & Supplier Summary </h3>
             </div>
-            <div class="card-body"><div id="world-map" style="height: 220px"></div></div>
-            <div class="card-footer border-0">
-              <!--begin::Row-->
-              <div class="row">
-                <div class="col-4 text-center">
-                  <div id="sparkline-1" class="text-dark"></div>
-                  <div class="text-white">Visitors</div>
-                </div>
-                <div class="col-4 text-center">
-                  <div id="sparkline-2" class="text-dark"></div>
-                  <div class="text-white">Online</div>
-                </div>
-                <div class="col-4 text-center">
-                  <div id="sparkline-3" class="text-dark"></div>
-                  <div class="text-white">Sales</div>
-                </div>
-              </div>
-              <!--end::Row-->
+            <div class="card-body">
+              <canvas id="doughnutChart"></canvas>
             </div>
+            
           </div>
         </div>
-        <!-- /.Start col -->
+        <!-- /.End col Buyer & Supplier Summary -->
+        <!-- Start col Fabric Overview -->
+        <div class="col-xl-4 col-lg-6 col-12 connectedSortable">
+          <div class="card mb-4">
+            <div class="card-header border-0">
+              <h3 class="card-title">Fabric Overview </h3>
+            </div>
+            <div class="card-body">
+              <canvas id="barChartFabric"></canvas>
+            </div>
+         
+          </div>
+        </div>
+        <!-- /.end col Fabric Overview -->
       </div>
       <!-- /.row (main row) -->
     </div>
@@ -442,3 +198,243 @@
   </div>
   <!--end::App Content-->
 {% endblock content %}
+
+
+{% block push_scripts %}
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js" integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+  // Minimal Utils for Chart.js demo purposes
+  const Utils = {
+    numbers: function({count, min, max}) {
+      const arr = [];
+      for (let i = 0; i < count; i++) {
+        arr.push(Math.floor(Math.random() * (max - min + 1)) + min);
+      }
+      return arr;
+    },
+    months: function({count}) {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                          'August', 'September', 'October', 'November', 'December'];
+      // Repeat months if count > 12
+      let arr = [];
+      for (let i = 0; i < count; i++) {
+        arr.push(monthNames[i % 12]);
+      }
+      return arr;
+    },
+    rand: function(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    },
+    namedColor: function(index) {
+      const colors = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'yellow'];
+      return colors[index % colors.length];
+    },
+    transparentize: function(color, opacity) {
+      // Simple fallback for demo: just return the color
+      return color;
+    },
+    CHART_COLORS: {
+      red: 'rgb(255, 99, 132)',
+      blue: 'rgb(54, 162, 235)',
+      green: 'rgb(75, 192, 192)',
+      orange: 'rgb(255, 159, 64)',
+      purple: 'rgb(153, 102, 255)'
+    }
+  };
+</script>
+
+<script>
+  $(document).ready(function () {
+    // Pie chart user summary 
+    $(function(){
+      // Fetch user summary data from backend using AJAX
+      let data = {
+        labels: [],
+        datasets: [{
+          label: 'User Summary',
+          data: [],
+          backgroundColor: [],
+          hoverOffset: 4
+        }]
+      };
+
+      $.ajax({
+        url: "{% url 'admin_dashboard:user-summary-data' %}", // Replace with your actual URL name
+        method: "GET",
+        dataType: "json",
+        success: function(response) {
+          console.log(response)
+          data.labels = response.labels;
+          data.datasets[0].data = response.data;
+          data.datasets[0].backgroundColor = response.background_color;
+          // Optionally update backgroundColor if dynamic
+        },
+        error: function(xhr, status, error) {
+          console.error("Failed to fetch user summary data:", error);
+        },
+        async: false // Ensures data is loaded before chart is rendered
+      });
+  
+      const config = {
+        type: 'pie',
+        data: data,
+      };
+  
+      const userSummaryPieChart = new Chart(
+        $('#userSummaryPieChart')[0], // jQuery object converted to DOM element
+        config
+      );
+    })
+
+    // Doughnut chart for Buyer and supplier summary 
+    $(function(){
+      // <block:setup:1>
+      const data = {
+        labels: [
+          'Red',
+          'Blue',
+          'Yellow'
+        ],
+        datasets: [{
+          label: 'My First Dataset',
+          data: [300, 50, 100],
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)'
+          ],
+          hoverOffset: 4
+        }]
+      };
+      // </block:setup>
+
+      // <block:config:0>
+      const config = {
+        type: 'doughnut',
+        data: data,
+      };
+
+      const doughnutChart = new Chart(
+        $('#doughnutChart')[0], // jQuery object converted to DOM element
+        config
+      );
+    })
+
+    // bar chart for fabric info 
+    $(function(){
+      // <block:actions:2>
+      const actions = [
+        {
+          name: 'Randomize',
+          handler(chart) {
+            chart.data.datasets.forEach(dataset => {
+              dataset.data = Utils.numbers({count: chart.data.labels.length, min: -100, max: 100});
+            });
+            chart.update();
+          }
+        },
+        {
+          name: 'Add Dataset',
+          handler(chart) {
+            const data = chart.data;
+            const dsColor = Utils.namedColor(chart.data.datasets.length);
+            const newDataset = {
+              label: 'Dataset ' + (data.datasets.length + 1),
+              backgroundColor: Utils.transparentize(dsColor, 0.5),
+              borderColor: dsColor,
+              borderWidth: 1,
+              data: Utils.numbers({count: data.labels.length, min: -100, max: 100}),
+            };
+            chart.data.datasets.push(newDataset);
+            chart.update();
+          }
+        },
+        {
+          name: 'Add Data',
+          handler(chart) {
+            const data = chart.data;
+            if (data.datasets.length > 0) {
+              data.labels = Utils.months({count: data.labels.length + 1});
+
+              for (let index = 0; index < data.datasets.length; ++index) {
+                data.datasets[index].data.push(Utils.rand(-100, 100));
+              }
+
+              chart.update();
+            }
+          }
+        },
+        {
+          name: 'Remove Dataset',
+          handler(chart) {
+            chart.data.datasets.pop();
+            chart.update();
+          }
+        },
+        {
+          name: 'Remove Data',
+          handler(chart) {
+            chart.data.labels.splice(-1, 1); // remove the label first
+
+            chart.data.datasets.forEach(dataset => {
+              dataset.data.pop();
+            });
+
+            chart.update();
+          }
+        }
+      ];
+      // </block:actions>
+
+      // <block:setup:1>
+      const DATA_COUNT = 7;
+      const NUMBER_CFG = {count: DATA_COUNT, min: -100, max: 100};
+
+      const labels = Utils.months({count: 7});
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Dataset 1',
+            data: Utils.numbers(NUMBER_CFG),
+            borderColor: Utils.CHART_COLORS.red,
+            backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
+          },
+          {
+            label: 'Dataset 2',
+            data: Utils.numbers(NUMBER_CFG),
+            borderColor: Utils.CHART_COLORS.blue,
+            backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
+          }
+        ]
+      };
+      // </block:setup>
+
+      // <block:config:0>
+      const config = {
+        type: 'bar',
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Chart.js Bar Chart'
+            }
+          }
+        },
+      };
+      // </block:config>
+      const barChartFabric = new Chart(
+        $('#barChartFabric')[0], // jQuery object converted to DOM element
+        config
+      );
+    })
+  });
+</script>
+{% endblock push_scripts %}

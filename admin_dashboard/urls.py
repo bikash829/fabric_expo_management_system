@@ -29,6 +29,9 @@ urlpatterns = [
     path('group-list/',views.GroupListView.as_view(),name="group-list"),
     path('update-group/<int:pk>/',views.UpdateGroupPermission.as_view(),name="manage-group-permissions"),
     path('delete-group/<int:pk>/',views.DeleteGroupView.as_view(),name="delete-group"),
+
+    # chart
+    path('user-summary-data/',views.UserSummaryDataView.as_view(),name='user-summary-data'),
     
     
 ]

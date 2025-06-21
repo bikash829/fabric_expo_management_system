@@ -9,6 +9,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from accounts.models import User
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
+import random
+from django.db.models import Count
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -236,3 +239,48 @@ class DeleteGroupView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     
 """end:: Groups and Permissions"""
 
+
+"""start::chart data"""
+# user summary 
+class UserSummaryDataView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs ):
+        labels = []
+        data = []
+        background_color = set()
+
+        # Helper to generate a unique random RGB color
+        def unique_rgb_color(existing_colors):
+            while True:
+                color = f"rgb({random.randint(0,255)},{random.randint(0,255)},{random.randint(0,255)})"
+                if color not in existing_colors:
+                    existing_colors.add(color)
+                    return color
+
+        # total user 
+        User = get_user_model()    
+        total_user = User.objects.count()
+        labels.append('Total User')
+        data.append(total_user)
+        unique_rgb_color(background_color)
+
+        # Get group counts in one query
+        group_counts = (
+            Group.objects.annotate(user_count=Count('user'))
+            .values_list('name', 'user_count')
+        )
+
+        for group_name, user_count in group_counts:
+            labels.append(group_name)
+            data.append(user_count)
+            unique_rgb_color(background_color)
+
+        return JsonResponse({
+            'labels': labels,
+            'data': data,
+            'background_color': list(background_color),
+        })
+
+
+
+
+"""end::chart data"""

@@ -1,3 +1,4 @@
+import pprint
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
@@ -5,7 +6,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
 
-from business_data.models import Buyer, Supplier
+from business_data.models import Buyer, Product, Supplier
 from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -330,5 +331,87 @@ class BuyerAndSupplierSummaryDataView(LoginRequiredMixin, View):
 
 
 
+class FabricOverviewDataView(View):
+    def get(self, request, *args, **kwargs):
+        # Example: You can add filters based on request.GET later
+        fabric_counts = Product.objects.values('composition').annotate(count=Count('id')).order_by('-count')
+        supplier_types = Product.objects.values('fabric_mill_supplier').annotate(count=Count('id')).order_by('-count')
+        country_origin = Product.objects.values('coo').annotate(count=Count('id')).order_by('-count')
 
+        return JsonResponse({
+            'fabric_counts': list(fabric_counts),
+            'supplier_types': list(supplier_types),
+            'country_origin': list(country_origin),
+        })
+    
+from django.db.models.functions import TruncWeek, TruncMonth
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+from datetime import timedelta
+# qr code activity 
+class QrCodeActivityDataView(View):
+    def get(self, request, *args, **kwargs):
+        period = request.GET.get('period', 'week')  # Default to weekly
+        end_date = timezone.now().date()
+
+        if period == 'month':
+            # Monthly data for last 12 months
+            start_date = end_date - timedelta(days=365)
+            data = (
+                Product.objects
+                .filter(date__gte=start_date)
+                .annotate(period=TruncMonth('date'))
+                .values('period')
+                .annotate(count=Count('id'))
+                .order_by('period')
+            )
+            
+            # Generate all months in range (including empty ones)
+            labels = []
+            data_points = []
+            current_month = end_date.replace(day=1)
+            
+            for i in range(12):
+                month = current_month - timedelta(days=30*i)
+                month = month.replace(day=1)
+                labels.insert(0, month.strftime('%b %Y'))
+                count = next(
+                    (item['count'] for item in data 
+                    if item['period'].replace(day=1) == month),  # Removed .date()
+                    0
+                )
+                data_points.insert(0, count)
+                
+        else:
+            # Weekly data for last 12 weeks
+            start_date = end_date - timedelta(weeks=24)
+            data = (
+                Product.objects
+                .filter(created_at__gte=start_date)
+                .annotate(period=TruncWeek('created_at'))
+                .values('period')
+                .annotate(count=Count('id'))
+                .order_by('period')
+            )
+            
+            # Generate all weeks in range (including empty ones)
+            labels = []
+            data_points = []
+            
+            for i in range(24):
+                week_start = end_date - timedelta(weeks=(23-i))
+                week_start = week_start - timedelta(days=week_start.weekday())  # Start of week (Monday)
+                labels.append(f"Week {week_start.isocalendar()[1]} ({week_start.strftime('%Y-%m-%d')})")
+                count = next(
+                    (item['count'] for item in data 
+                    if item['period'] == week_start),  # Removed .date()
+                    0
+                )
+                data_points.append(count)
+        
+        return JsonResponse({
+            'labels': labels,
+            'data': data_points,
+            'period': period
+        })
 """end::chart data"""

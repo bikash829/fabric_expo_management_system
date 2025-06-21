@@ -140,7 +140,9 @@ class Product(SoftDeleteModel):
     barcode = models.ImageField(upload_to='barcodes/', blank=True, null=True)
     qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     concern_person = models.CharField(max_length=255)
+    created_at = models.DateField(auto_now_add=True)
     tag = models.CharField(max_length=50,null=True,blank=True)
+
 
     @property
     def total_value(self):

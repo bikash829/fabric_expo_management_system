@@ -191,6 +191,19 @@
           </div>
         </div>
         <!-- /.end col Fabric Overview -->
+        <!-- Start col QR Code Activity -->
+        <div class="col-12 connectedSortable">
+          <div class="card mb-4">
+            <div class="card-header border-0">
+              <h3 class="card-title">QR Code Activity </h3>
+            </div>
+            <div class="card-body">
+              <canvas id="qrCodeActivityChart"></canvas>
+            </div>
+         
+          </div>
+        </div>
+        <!-- /.end col QR Code Activity -->
       </div>
       <!-- /.row (main row) -->
     </div>
@@ -302,121 +315,83 @@
       }
     });
 
+    // Line chart for Qr code activity
+    $.ajax({
+      url: "{% url 'admin_dashboard:qr-code-activity-data' %}",
+      method: "GET",
+      dataType: "json",
+      success: function(response) {
+        console.log(response)
+        const qrCodeActivityChart = {
+          labels: response.labels,
+          datasets: [{
+            label: 'QR code activity',
+            data: response.data,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgb(54, 162, 235)',
+            fill: true,
+            // hoverOffset: 4
+          }]
+        };
+        const qrCodeActivityChartConfig = {
+          type: 'line',
+          data: qrCodeActivityChart,
+        };
+        new Chart($('#qrCodeActivityChart')[0], qrCodeActivityChartConfig);
+      },
+      error: function(xhr, status, error) {
+        alert("Failed to fetch qr code activity data: " + error);
+        // console.error("Failed to fetch user summary data:", error);
+      }
+    });
+
     
 
-    // bar chart for fabric info 
-    $(function(){
-      // <block:actions:2>
-      const actions = [
-        {
-          name: 'Randomize',
-          handler(chart) {
-            chart.data.datasets.forEach(dataset => {
-              dataset.data = Utils.numbers({count: chart.data.labels.length, min: -100, max: 100});
-            });
-            chart.update();
-          }
-        },
-        {
-          name: 'Add Dataset',
-          handler(chart) {
-            const data = chart.data;
-            const dsColor = Utils.namedColor(chart.data.datasets.length);
-            const newDataset = {
-              label: 'Dataset ' + (data.datasets.length + 1),
-              backgroundColor: Utils.transparentize(dsColor, 0.5),
-              borderColor: dsColor,
-              borderWidth: 1,
-              data: Utils.numbers({count: data.labels.length, min: -100, max: 100}),
-            };
-            chart.data.datasets.push(newDataset);
-            chart.update();
-          }
-        },
-        {
-          name: 'Add Data',
-          handler(chart) {
-            const data = chart.data;
-            if (data.datasets.length > 0) {
-              data.labels = Utils.months({count: data.labels.length + 1});
+  // --- Fabric Overview Bar Chart ---
+  const $fabricCanvas = $('#barChartFabric');
+  if ($fabricCanvas.length) {
+    $.ajax({
+      url: "{% url 'admin_dashboard:fabric-overview-data' %}",
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        let labels = data.fabric_counts.map(item => item.composition);
+        let values = data.fabric_counts.map(item => item.count);
 
-              for (let index = 0; index < data.datasets.length; ++index) {
-                data.datasets[index].data.push(Utils.rand(-100, 100));
-              }
-
-              chart.update();
-            }
-          }
-        },
-        {
-          name: 'Remove Dataset',
-          handler(chart) {
-            chart.data.datasets.pop();
-            chart.update();
-          }
-        },
-        {
-          name: 'Remove Data',
-          handler(chart) {
-            chart.data.labels.splice(-1, 1); // remove the label first
-
-            chart.data.datasets.forEach(dataset => {
-              dataset.data.pop();
-            });
-
-            chart.update();
-          }
-        }
-      ];
-      // </block:actions>
-
-      // <block:setup:1>
-      const DATA_COUNT = 7;
-      const NUMBER_CFG = {count: DATA_COUNT, min: -100, max: 100};
-
-      const labels = Utils.months({count: 7});
-      const data = {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Dataset 1',
-            data: Utils.numbers(NUMBER_CFG),
-            borderColor: Utils.CHART_COLORS.red,
-            backgroundColor: Utils.transparentize(Utils.CHART_COLORS.red, 0.5),
+        new Chart($fabricCanvas[0].getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Fabric Overview',
+              data: values,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            }]
           },
-          {
-            label: 'Dataset 2',
-            data: Utils.numbers(NUMBER_CFG),
-            borderColor: Utils.CHART_COLORS.blue,
-            backgroundColor: Utils.transparentize(Utils.CHART_COLORS.blue, 0.5),
-          }
-        ]
-      };
-      // </block:setup>
-
-      // <block:config:0>
-      const config = {
-        type: 'bar',
-        data: data,
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top',
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+                align: 'end'
+              }
             },
-            title: {
-              display: true,
-              text: 'Chart.js Bar Chart'
+            scales: {
+              y: {
+                beginAtZero: true
+              }
             }
           }
-        },
-      };
-      // </block:config>
-      const barChartFabric = new Chart(
-        $('#barChartFabric')[0], // jQuery object converted to DOM element
-        config
-      );
-    })
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error('AJAX error:', error);
+      }
+    });
+  }
+
   });
 </script>
 {% endblock push_scripts %}

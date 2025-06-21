@@ -6,6 +6,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
 
+from bulk_email.models import EmailSession, SentMail
+from bulk_whatsapp.models import SentMessage
 from business_data.models import Buyer, Product, Supplier
 from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
@@ -15,6 +17,10 @@ from django.contrib.auth.models import Group
 from django.http import JsonResponse
 import random
 from django.db.models import Count
+from django.db.models.functions import TruncWeek, TruncMonth
+from django.utils import timezone
+from datetime import timedelta
+from django.utils.timezone import now
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -344,10 +350,7 @@ class FabricOverviewDataView(View):
             'country_origin': list(country_origin),
         })
     
-from django.db.models.functions import TruncWeek, TruncMonth
-from django.utils import timezone
-from dateutil.relativedelta import relativedelta
-from datetime import timedelta
+
 # qr code activity 
 class QrCodeActivityDataView(View):
     def get(self, request, *args, **kwargs):
@@ -414,4 +417,44 @@ class QrCodeActivityDataView(View):
             'data': data_points,
             'period': period
         })
+    
+
+# communication tracker 
+class CommunicationTrackerDataView(View):
+    def get(self, request, *args, **kwargs):
+
+        end_date = now().date()
+        start_date = end_date - timedelta(days=29)
+
+        # Prepare date labels for the last 30 days
+        labels = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(30)]
+
+        # Get email counts per day
+        email_counts = (
+            SentMail.objects.filter(sent_at__date__range=(start_date, end_date))
+            .extra({'date': "date(sent_at)"})
+            .values('date')
+            .annotate(count=Count('id'))
+        )
+        email_data_map = {item['date']: item['count'] for item in email_counts}
+
+        # Get whatsapp counts per day
+        whatsapp_counts = (
+            SentMessage.objects.filter(sent_at__date__range=(start_date, end_date))
+            .extra({'date': "date(sent_at)"})
+            .values('date')
+            .annotate(count=Count('id'))
+        )
+        whatsapp_data_map = {item['date']: item['count'] for item in whatsapp_counts}
+
+        # Prepare data lists aligned with labels
+        email_data = [email_data_map.get(label, 0) for label in labels]
+        whatsapp_data = [whatsapp_data_map.get(label, 0) for label in labels]
+
+        return JsonResponse({
+            'labels': labels,
+            'email_data': email_data,
+            'whatsapp_data': whatsapp_data,
+        })
+
 """end::chart data"""

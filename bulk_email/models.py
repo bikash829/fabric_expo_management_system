@@ -106,6 +106,7 @@ class SentMail(models.Model):
     session_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True,null=True)
     status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
     

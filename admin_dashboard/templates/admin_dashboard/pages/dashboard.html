@@ -26,7 +26,7 @@
   <div class="app-content">
     <!--begin::Container-->
     <div class="container-fluid">
-      <!--begin::Row-->
+      {% comment %} <!--begin::Row-->
       <div class="row">
         <!--begin::Col-->
         <div class="col-lg-3 col-6">
@@ -149,7 +149,7 @@
         </div>
         <!--end::Col-->
       </div>
-      <!--end::Row-->
+      <!--end::Row--> {% endcomment %}
       <!--begin::Row-->
       <div class="row">
         <!-- Start col User Summary-->
@@ -157,7 +157,6 @@
           <div class="card mb-4">
             <div class="card-header"><h3 class="card-title">User Summary</h3></div>
             <div class="card-body">
-              {% comment %} <div id="revenue-chart">re</div> {% endcomment %}
               <canvas id="userSummaryPieChart"></canvas>
             </div>
           </div>
@@ -204,6 +203,19 @@
           </div>
         </div>
         <!-- /.end col QR Code Activity -->
+        <!-- Start col Communication Tracker -->
+        <div class="col-12 connectedSortable">
+          <div class="card mb-4">
+            <div class="card-header border-0">
+              <h3 class="card-title">Communication Tracker </h3>
+            </div>
+            <div class="card-body">
+              <canvas id="communicationTracker"></canvas>
+            </div>
+         
+          </div>
+        </div>
+        <!-- /.end col Communication Tracker -->
       </div>
       <!-- /.row (main row) -->
     </div>
@@ -321,7 +333,6 @@
       method: "GET",
       dataType: "json",
       success: function(response) {
-        console.log(response)
         const qrCodeActivityChart = {
           labels: response.labels,
           datasets: [{
@@ -345,52 +356,89 @@
       }
     });
 
-    
-
-  // --- Fabric Overview Bar Chart ---
-  const $fabricCanvas = $('#barChartFabric');
-  if ($fabricCanvas.length) {
+    // Multi line chart activity for communication tracker 
     $.ajax({
-      url: "{% url 'admin_dashboard:fabric-overview-data' %}",
-      type: 'GET',
-      dataType: 'json',
-      success: function (data) {
-        let labels = data.fabric_counts.map(item => item.composition);
-        let values = data.fabric_counts.map(item => item.count);
-
-        new Chart($fabricCanvas[0].getContext('2d'), {
-          type: 'bar',
-          data: {
-            labels: labels,
-            datasets: [{
-              label: 'Fabric Overview',
-              data: values,
-              backgroundColor: 'rgba(54, 162, 235, 0.5)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'top',
-                align: 'end'
-              }
+      url: "{% url 'admin_dashboard:communication-tracker-data' %}",
+      method: "GET",
+      dataType: "json",
+      success: function(response) {
+        console.log(response)
+        const communicationTracker = {
+          labels: response.labels,
+          datasets: [
+            {
+              label: 'Whatsapp Messages',
+              data: response.whatsapp_data,
+              // data: Utils.numbers(NUMBER_CFG),
+              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+            {
+              label: 'Emails',
+              data: response.email_data,
+              // data: Utils.numbers(NUMBER_CFG),
+              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
             }
-          }
-        });
+          ]
+
+          
+        };
+        const communicationTrackerConfig = {
+          type: 'bar',
+          data: communicationTracker,
+        };
+        new Chart($('#communicationTracker')[0], communicationTrackerConfig);
       },
-      error: function (xhr, status, error) {
-        console.error('AJAX error:', error);
+      error: function(xhr, status, error) {
+        alert("Failed to fetch communication tracker activity data: " + error);
       }
     });
-  }
+
+    // --- Fabric Overview Bar Chart ---
+    const $fabricCanvas = $('#barChartFabric');
+    if ($fabricCanvas.length) {
+      $.ajax({
+        url: "{% url 'admin_dashboard:fabric-overview-data' %}",
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          let labels = data.fabric_counts.map(item => item.composition);
+          let values = data.fabric_counts.map(item => item.count);
+
+          new Chart($fabricCanvas[0].getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Fabric Overview',
+                data: values,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'top',
+                  align: 'end'
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        },
+        error: function (xhr, status, error) {
+          console.error('AJAX error:', error);
+        }
+      });
+    }
 
   });
 </script>

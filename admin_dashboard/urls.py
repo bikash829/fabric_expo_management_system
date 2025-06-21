@@ -35,6 +35,7 @@ urlpatterns = [
     path('buyer-supplier-data/',views.BuyerAndSupplierSummaryDataView.as_view(),name='buyer-supplier-data'),
     path('ajax/fabric-overview-data/', views.FabricOverviewDataView.as_view(), name='fabric-overview-data'),
     path('qr-code-activity-data/',views.QrCodeActivityDataView.as_view(),name='qr-code-activity-data'),
+    path('communication-tracker-data/',views.CommunicationTrackerDataView.as_view(),name='communication-tracker-data'),
     
     
 ]

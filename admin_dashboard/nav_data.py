@@ -20,10 +20,10 @@ def nav_data(request):
                 'name': 'Home',
                 'url': reverse('admin_dashboard:welcome')
             },
-            {
-                'name': 'Contact',
-                'url': None
-            }
+            # {
+            #     'name': 'Contact',
+            #     'url': None
+            # }
         ],
         'end_menu_items':{
             'messages':[

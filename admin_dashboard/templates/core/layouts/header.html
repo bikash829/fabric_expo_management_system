@@ -19,12 +19,12 @@
       <ul class="navbar-nav ms-auto">
         <!--begin::Navbar Search-->
         <li class="nav-item">
-          <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+          <a class="nav-link" data-widget="navbar-search" href="{% url 'business_data:product-list' %}?focus_search=1" role="button">
             <i class="bi bi-search"></i>
           </a>
         </li>
         <!--end::Navbar Search-->
-        <!--begin::Messages Dropdown Menu-->
+        {% comment %} <!--begin::Messages Dropdown Menu-->
         <li class="nav-item dropdown">
           <a class="nav-link" data-bs-toggle="dropdown" href="#">
             <i class="bi bi-chat-text"></i>
@@ -113,7 +113,7 @@
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
           </div>
-        </li>
+        </li> {% endcomment %}
         <!--end::Notifications Dropdown Menu-->
         <!--begin::Fullscreen Toggle-->
         <li class="nav-item">

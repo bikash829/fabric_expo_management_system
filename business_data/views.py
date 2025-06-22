@@ -1358,7 +1358,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(5):  # Change to any number you want
+        for _ in range(50):  # Change to any number you want
             writer.writerow([
                 fake.date_this_decade().strftime("%Y-%m-%d"),
                 fake.company(),

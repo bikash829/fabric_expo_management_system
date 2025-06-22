@@ -29,6 +29,13 @@ urlpatterns = [
     path('group-list/',views.GroupListView.as_view(),name="group-list"),
     path('update-group/<int:pk>/',views.UpdateGroupPermission.as_view(),name="manage-group-permissions"),
     path('delete-group/<int:pk>/',views.DeleteGroupView.as_view(),name="delete-group"),
+
+    # chart
+    path('user-summary-data/',views.UserSummaryDataView.as_view(),name='user-summary-data'),
+    path('buyer-supplier-data/',views.BuyerAndSupplierSummaryDataView.as_view(),name='buyer-supplier-data'),
+    path('ajax/fabric-overview-data/', views.FabricOverviewDataView.as_view(), name='fabric-overview-data'),
+    path('qr-code-activity-data/',views.QrCodeActivityDataView.as_view(),name='qr-code-activity-data'),
+    path('communication-tracker-data/',views.CommunicationTrackerDataView.as_view(),name='communication-tracker-data'),
     
     
 ]

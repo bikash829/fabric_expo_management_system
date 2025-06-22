@@ -70,12 +70,13 @@ class StaffChangeForm(UserChangeForm):
 class UserPermissionForm(forms.ModelForm):
     groups  = forms.ModelMultipleChoiceField(
         queryset=Group.objects.all(),
+        # queryset=Group.objects.all(),
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-control"}),
     )
     user_permissions= forms.ModelMultipleChoiceField(
-        # queryset=Permission.objects.all(),
-        queryset=get_selected_permissions(),
+        # queryset=get_selected_permissions(),
+        queryset=Permission.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={"class":"form-control"}),
     )
@@ -89,6 +90,10 @@ class UserPermissionForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["groups", "user_permissions", "is_active", "is_superuser"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user_permissions'].queryset = get_selected_permissions()
 
 
 # class GroupForm(forms.ModelForm):
@@ -110,14 +115,19 @@ class UserPermissionForm(forms.ModelForm):
 
 class GroupForm(forms.ModelForm):
     permissions = forms.ModelMultipleChoiceField(
-        queryset=get_selected_permissions(),
+        # queryset=get_selected_permissions(),
+        queryset=Permission.objects.none(),
         widget=forms.CheckboxSelectMultiple(), # Widget should be set here
         required=False
+    )
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter group name'})
     )
 
     class Meta:
         model = Group
         fields = ['name', 'permissions']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter group name'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['permissions'].queryset = get_selected_permissions()

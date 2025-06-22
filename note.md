@@ -1,9 +1,10 @@
-# install database url
+# install database url  
+
 > pip install dj-database-url
 -- dj_database_url.parse("")
 
-2. post gre driver install 
-pip install psycopg2-binary 
+2. post gre driver install  
+pip install psycopg2-binary  
 
 -- migrate database
 

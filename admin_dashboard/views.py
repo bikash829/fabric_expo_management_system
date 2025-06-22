@@ -215,8 +215,8 @@ class GroupListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class UpdateGroupPermission(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = "auth.change_group"
     model = Group
-    form_class = GroupForm
     template_name = "admin_dashboard/manage_groups_and_permissions/group-form.html"
+    form_class = GroupForm
 
     # custom context
     def get_context_data(self, **kwargs):

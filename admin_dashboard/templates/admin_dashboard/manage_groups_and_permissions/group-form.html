@@ -20,11 +20,13 @@
             <div class="card-title">{{form_title}}</div>
           </div>
           <!--end::Header-->
+         
           <!--begin::Form-->
           <form method="POST" class="needs-validation" novalidate>
             {% csrf_token %}            
             <!--begin::Body-->
             <div class="card-body">
+              
               {% comment %} {{form}} {% endcomment %}
                 <!-- Group Name Input -->
                 {% if perms.auth.change_group %}
@@ -69,11 +71,15 @@
                     <label class="form-check-label" for="selectAllPermissions">Select All</label>
                   </div>
 
+                  
+
                   <div class="scroll-check">
                     {% for permission in form.permissions.field.queryset|filter_permissions %}
+
                       <div class="form-group">
                         <div class="form-check">
-                          <input class="form-check-input permission-checkbox" name="permissions" type="checkbox" value="{{ permission.id }}" {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
+                          <input class="form-check-input permission-checkbox" name="permissions" type="checkbox" value="{{ permission.id }}" 
+                          {% if permission in form.permissions.initial %}checked{% endif %} id="id_{{ permission.id }}">
                           <label class="form-check-label" for="id_{{ permission.id }}">
                             {{ permission.content_type.model }} | {{ permission.name }}
                           </label>

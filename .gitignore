@@ -88,7 +88,7 @@ local_settings.py
 .env
 db.sqlite3
 note.md
-readme.md
+/readme.md/
 Dockerfile
 venv/
 packages_adminlte/

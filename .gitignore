@@ -87,6 +87,9 @@ local_settings.py
 
 .env
 db.sqlite3
+note.md
+readme.md
+Dockerfile
 venv/
 packages_adminlte/
 resources/
@@ -103,6 +106,3 @@ static/
 media/barcodes/
 media/qrcodes/
 media/temp/
-note.md
-readme.md
-Dockerfile

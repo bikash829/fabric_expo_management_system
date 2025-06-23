@@ -104,3 +104,5 @@ media/barcodes/
 media/qrcodes/
 media/temp/
 note.md
+readme.md
+Dockerfile

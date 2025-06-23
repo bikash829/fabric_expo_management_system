@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
-import dj_database_url
 from decouple import config, Csv
 from fabric_expo_management_system.ckeditor_conf import *
 
@@ -109,10 +108,10 @@ WSGI_APPLICATION = 'fabric_expo_management_system.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": 'django.db.backends.mysql',
-        "NAME": "expo_sync",
-        "USER": "root",
-        "PASSWORD": "",
-        "HOST": "127.0.0.1",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASS"),
+        "HOST": config("DATABASE_URL"),
         "PORT": "3306",
     }
 }

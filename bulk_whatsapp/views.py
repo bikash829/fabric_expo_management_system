@@ -65,7 +65,7 @@ class GenerateCSV(LoginRequiredMixin, PermissionRequiredMixin, View):
         writer = csv.writer(response)
         writer.writerow(["name", "whatsapp_no",])
         writer.writerow(['John Doe','+8801777777254', ])
-        writer.writerow(['John Doe2','01777777254', ])
+        writer.writerow(['John Doe2','+8801777777354', ])
 
         return response
         

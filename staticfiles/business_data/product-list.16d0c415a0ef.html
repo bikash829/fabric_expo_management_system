@@ -1,0 +1,187 @@
+
+<script>
+
+    // Datatable 
+    const table = $('#data_list').DataTable({
+      deferRender: true,
+      responsive: true,
+      // select: true,
+      serverSide: true,
+      ajax: '{% url "business_data:product_data_source" %}',
+      processing: true,
+      createdRow: function(row, data, dataIndex) {
+        $(row).attr('data-id', data[0]);
+      },
+      columnDefs: [
+        {
+          targets: -1, // The last column (Action)
+          orderable: false,
+          searchable: false,
+          render: function(data, type, row, meta) {
+            var detailUrl = row[row.length - 1];
+            return `<a href="${detailUrl}" class="btn btn-link text-dark" target="_blank">View More Details</a>`;
+          }
+        }
+      ]
+      // columns: [
+      //  { data: 'date' },
+      //  { data: 'fabric_article_supplier' },
+      //   ...other fields...
+      // ]
+    });
+
+    // toggle select data_list
+    $('#data_list tbody').on('click', 'tr', function() {
+      $(this).toggleClass('selected');
+      updateRowCount();
+    });
+
+    // Show row count 
+    function updateRowCount() {
+      const count = table.rows('.selected').data().length;
+      $('#row_count').text(count + ' row(s) selected');
+    }
+    
+    // Handle "Select All" checkbox click event
+    $('#select-all').on('click', function() {
+      var rows = table.rows({ 'search': 'applied' }).nodes();
+      if (this.checked) {
+          $(rows).addClass('selected');
+      } else {
+          $(rows).removeClass('selected');
+      }
+      updateRowCount();
+    });
+
+    // Handle individual row click event to update "Select All" checkbox state
+    $('#data_list tbody').on('click', 'tr', function() {
+      var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
+      $('#select-all').prop('checked', allChecked);
+    });
+    
+    // Initial update of the row count button text
+    updateRowCount();
+      
+
+    // Handle "delete" button click event to delete selected column data to backend
+    $('#delete-data').on('click', function(e) {
+      const selectedIds = [];
+      $('#data_list tbody tr.selected').each(function(e) {
+        selectedIds.push($(this).data('id'));
+    });
+
+
+      if (selectedIds.length === 0){
+        Swal.fire({
+          icon: 'info', 
+          text: "Please select desired recipients first!"
+        });
+      }else{
+        Swal.fire({
+            title: "Are you sure you want to delete the selected items?",
+            text: "This action cannot be undone. Once deleted.",
+          showCancelButton: true,
+          confirmButtonText: "Delete",
+        }).then((result) => {
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+            // Show loader
+            Swal.fire({
+              title: 'Deleting...',
+              text: 'Please wait while we delete the selected items.',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+            $.ajax({
+              //url: "#",  // Replace with your backend endpoint
+              url: "{% url 'business_data:delete-products' %}",  
+              type: 'POST',
+              data: {
+                selectedIds: selectedIds,
+                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
+              },
+              success: function(response) {
+                Swal.fire({
+                  position: "center",
+                  icon: "success",
+                  text: response.message,
+                  showConfirmButton: true,
+                }).then((result) => {
+                    location.reload();
+                });
+              },
+              error: function(xhr, status, error) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+                });
+              }
+            });
+
+          } 
+        });
+        
+      }
+    });
+
+
+    // Print QR Codes for selected products
+    $('#print_qr_codes').on('click', function() {
+        const selectedIds = [];
+        $('#data_list tbody tr.selected').each(function() {
+            selectedIds.push($(this).data('id'));
+        });
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                text: "Please select at least one product to print QR codes."
+            });
+            return;
+        }
+        // Open the print page in a new tab
+        const url = "{% url 'business_data:print_selected_qrcodes' %}?ids[]=" + selectedIds.join('&ids[]=');
+        window.open(url, '_blank');
+    });
+
+    // Enable/disable print button based on selection
+    function updatePrintButton() {
+        const count = table.rows('.selected').data().length;
+        $('#print_qr_codes').prop('disabled', count === 0);
+    }
+    $('#data_list tbody').on('click', 'tr', updatePrintButton);
+    $('#select-all').on('click', updatePrintButton);
+    updatePrintButton();
+
+
+    // Print Barcodes for selected products
+    $('#print_barcodes').on('click', function() {
+        const selectedIds = [];
+        $('#data_list tbody tr.selected').each(function() {
+            selectedIds.push($(this).data('id'));
+        });
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                text: "Please select at least one product to print barcodes."
+            });
+            return;
+        }
+        // Open the print page in a new tab
+        const url = "{% url 'business_data:print_selected_barcodes' %}?ids[]=" + selectedIds.join('&ids[]=');
+        window.open(url, '_blank');
+    });
+
+    // Enable/disable print button based on selection
+    function updatePrintBarcodeButton() {
+        const count = table.rows('.selected').data().length;
+        $('#print_barcodes').prop('disabled', count === 0);
+    }
+    $('#data_list tbody').on('click', 'tr', updatePrintBarcodeButton);
+    $('#select-all').on('click', updatePrintBarcodeButton);
+    updatePrintBarcodeButton();
+
+</script>

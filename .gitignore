@@ -86,6 +86,7 @@ __pycache__/
 local_settings.py
 
 .env
+.example_env
 db.sqlite3
 note.md
 readme.md
@@ -106,3 +107,4 @@ static/
 media/barcodes/
 media/qrcodes/
 media/temp/
+media/bulk_messages_data/bulk_recipients_data_sheet/

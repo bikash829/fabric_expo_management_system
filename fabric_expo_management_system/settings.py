@@ -19,7 +19,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-# SITE_BASE_URL = 'http://127.0.0.1:8000'
+SITE_BASE_URL = 'http://127.0.0.1:8000'
 
 
 # Application definition

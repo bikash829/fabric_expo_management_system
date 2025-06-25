@@ -88,26 +88,26 @@ class GenerateCSVBuyer(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
         for _ in range(10):
             writer.writerow([
-            fake.date_this_decade().strftime("%Y-%m-%d"),
-            fake.company(),
-            fake.random_element(org_types),
-            fake.company_suffix(),
-            fake.random_element(categories),
-            fake.random_element(departments),
-            fake.name(),
-            fake.random_element(designations),
-            fake.country(),
-            fake.email(),
-            fake.phone_number(),
-            fake.phone_number(),
-            fake.url(),
-            fake.random_element(payment_terms),
-            ", ".join([fake.word().capitalize() for _ in range(2)]),
-            fake.address().replace('\n', ', '),
-            fake.address().replace('\n', ', '),
-            fake.url(),
-            fake.random_element(remarks_list),
-            fake.name()
+                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.company(),
+                fake.random_element(org_types),
+                fake.company_suffix(),
+                fake.random_element(categories),
+                fake.random_element(departments),
+                fake.name(),
+                fake.random_element(designations),
+                fake.country(),
+                fake.email(),
+                f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
+                f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+                fake.url(),
+                fake.random_element(payment_terms),
+                ", ".join([fake.word().capitalize() for _ in range(2)]),
+                fake.address().replace('\n', ', '),
+                fake.address().replace('\n', ', '),
+                fake.url(),
+                fake.random_element(remarks_list),
+                fake.name()
             ])
 
         return response
@@ -283,6 +283,7 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                                 tag=tag
                             )
                         except Exception as e:
+                            print(f"Row import failed: {e}")
                             messages.error(request, "Invalid data upload. Please check your file and try again.")
                             if default_storage.exists(file_path):
                                 default_storage.delete(file_path)
@@ -491,8 +492,10 @@ class GenerateCSVCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
             fake.random_element(designations),
             fake.country(),
             fake.email(),
-            fake.phone_number(),
-            fake.phone_number(),
+            # fake.phone_number(),
+            # fake.phone_number(),
+            f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
+            f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
             fake.url(),
             fake.random_element(payment_terms),
             ", ".join([fake.word().capitalize() for _ in range(2)]),
@@ -897,9 +900,12 @@ class GenerateCSVSupplier(LoginRequiredMixin, PermissionRequiredMixin, View):
             email1 = fake.email()
             email2 = fake.email()
             email3 = fake.email()
-            phone1 = fake.phone_number()
-            phone2 = fake.phone_number()
-            whatsapp = fake.phone_number()
+            phone1 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
+            phone2 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+            whatsapp =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+            # phone1 = fake.phone_number()
+            # phone2 = fake.phone_number()
+            # whatsapp = fake.phone_number()
             wechat = fake.user_name()
 
             writer.writerow([
@@ -1736,7 +1742,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 obj.concern_person,
                 obj.get_absolute_url(), 
             ])
-
+        print("Data:", data)
   
 
         return JsonResponse({

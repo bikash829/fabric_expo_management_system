@@ -99,6 +99,9 @@
     // Datatable 
     const table = $('#recipients').DataTable({
       responsive: true,
+      order: [[1, 'desc']], // Order by 2nd column (ID) descending
+      processing: true,
+
       // select: true,
     });
 

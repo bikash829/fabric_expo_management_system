@@ -149,6 +149,7 @@ class BuyerUploadView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 df[col] = pd.to_datetime(df[col], errors='coerce').dt.strftime('%Y-%m-%d')
 
             data = df.to_dict(orient='records')
+            
             request.session['preview_buyer_data'] = data
             return redirect('business_data:buyer-preview')
         context = {
@@ -177,7 +178,7 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'url': default_storage.url(temp_file_path),
                 'uploaded_at': default_storage.get_created_time(temp_file_path) if default_storage.exists(temp_file_path) else None
             }
-
+        
         # List all fields you want to check for duplicates
         fields_to_check = [
             'date','company_name', 'organization_type', 'brand', 'category', 'department',
@@ -228,7 +229,6 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     row['duplicates'][field] = value in existing_values[field] if value else False
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
-
 
         context = {
             'buyers': preview_data,
@@ -376,7 +376,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
         order_column = columns[order_col_index] if 0 <= order_col_index < len(columns) else 'id'
-        if order_dir == 'desc':
+        if order_dir == 'asc':
             order_column = '-' + order_column
 
         qs = Buyer.objects.all().prefetch_related('emails', 'phones')
@@ -764,7 +764,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
 
         order_column = columns[int(order_col_index)]
-        if order_dir == 'desc':
+        if order_dir == 'asc':
             order_column = '-' + order_column
 
         # get supplier list 
@@ -900,9 +900,9 @@ class GenerateCSVSupplier(LoginRequiredMixin, PermissionRequiredMixin, View):
             email1 = fake.email()
             email2 = fake.email()
             email3 = fake.email()
-            phone1 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
-            phone2 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
-            whatsapp =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+            # phone1 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
+            # phone2 =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+            # whatsapp =  f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
             # phone1 = fake.phone_number()
             # phone2 = fake.phone_number()
             # whatsapp = fake.phone_number()
@@ -921,9 +921,9 @@ class GenerateCSVSupplier(LoginRequiredMixin, PermissionRequiredMixin, View):
                 email1,
                 email2,
                 email3,
-                phone1,
-                phone2,
-                whatsapp,
+                f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # WhatsApp number (Bangladesh)
+                f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
+                f"+8801{randint(3,9)}{randint(10000000,99999999)}",  # Phone number (Bangladesh)
                 wechat,
                 choice(payment_terms),
                 fake.bothify(text="Ref###"),
@@ -1205,6 +1205,7 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         search_value = request.GET.get('search[value]', '')
         order_col_index = request.GET.get('order[0][column]', 0)
         order_dir = request.GET.get('order[0][dir]', 'asc')
+       
 
         # sorting columns
         columns = [
@@ -1234,7 +1235,7 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # if order_col_index < 0 or order_col_index >= len(columns):
         #     order_col_index = 0
         order_column = columns[int(order_col_index)]
-        if order_dir == 'desc':
+        if order_dir == 'asc':
             order_column = '-' + order_column
 
 

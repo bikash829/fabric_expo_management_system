@@ -76,7 +76,7 @@
                   <div class="scroll-check">
                     {% for permission in form.user_permissions.field.queryset|filter_permissions %}
                       <div class="form-group">
-                        <div class="form-check">
+                        <div class="form-check permission-element">
                           <input class="form-check-input permission-checkbox" 
                           name="{{ form.user_permissions.html_name }}" 
                           type="checkbox" 

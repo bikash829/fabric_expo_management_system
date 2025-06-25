@@ -106,9 +106,22 @@
           <!-- /.social-auth-links -->
           <p class="mb-3 text-center"><a href="{% url 'accounts:password_reset' %}">I forgot my password</a></p>
 
-          <div class="text-end">
-            <span style="font-size:.7rem;">Powered by BinaryByte</span>
+          <div class="row">
+            <div class="col-6">
+              <div class="text-start text-grey">
+                <span style="font-size:.7rem;">{{APP_VERSION}}</span>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="text-end">
+                <span style="font-size:.7rem;">Powered by BinaryByte</span>
+              </div>
+            </div>
+          
+
           </div>
+          
          
         </div>
         <!-- /.login-card-body -->

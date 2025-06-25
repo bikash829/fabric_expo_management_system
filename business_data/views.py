@@ -88,7 +88,8 @@ class GenerateCSVBuyer(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
         for _ in range(10):
             writer.writerow([
-                fake.date_this_decade().strftime("%Y-%m-%d"),
+                # fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.date_this_decade().strftime("%d/%m/%Y"),
                 fake.company(),
                 fake.random_element(org_types),
                 fake.company_suffix(),
@@ -225,7 +226,8 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 # if field == 'buyer_email_id':
                 #     row['duplicates'][field] = value in existing_values[field] if value else False
                 if field == 'date':
-                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
                     row['duplicates'][field] = value in existing_values[field] if value else False
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
@@ -263,7 +265,8 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     for _, row in df.iterrows():
                         try:
                             buyer = Buyer.objects.create(
-                                date=row.get('date'),
+                                # date=row.get('date'),datetime.strptime(date_str, "%d/%m/%Y").date()
+                                date= datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
                                 company_name=row.get('company_name'),
                                 organization_type=row.get('organization_type'),
                                 brand=row.get('brand'),
@@ -482,7 +485,8 @@ class GenerateCSVCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         ]
         for _ in range(20):
             writer.writerow([
-            fake.date_this_decade().strftime("%Y-%m-%d"),
+            # fake.date_this_decade().strftime("%Y-%m-%d"),
+            fake.date_this_decade().strftime("%d/%m/%Y"),
             fake.company(),
             fake.random_element(org_types),
             fake.company_suffix(),
@@ -607,7 +611,7 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 value = row.get(field)
 
                 if field == 'date':
-                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
                     row['duplicates'][field] = value in existing_values[field] if value else False
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
@@ -645,7 +649,7 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     for _, row in df.iterrows():
                         try:
                             customer = Customer.objects.create(
-                                date=row.get('date'),
+                                date=datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
                                 company_name=row.get('company_name'),
                                 organization_type=row.get('organization_type'),
                                 brand=row.get('brand'),
@@ -909,7 +913,7 @@ class GenerateCSVSupplier(LoginRequiredMixin, PermissionRequiredMixin, View):
             wechat = fake.user_name()
 
             writer.writerow([
-                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.date_this_decade().strftime("%d/%m/%Y"),
                 fake.company(),
                 fake.company(),
                 name1,
@@ -1050,7 +1054,7 @@ class SupplierPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 value = row.get(field)
 
                 if field == 'date':
-                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
                     row['duplicates'][field] = value in existing_values[field] if value else False
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
@@ -1088,7 +1092,7 @@ class SupplierPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         # create row and validate 
                         try:
                             supplier = Supplier.objects.create(
-                                date=row.get('date'),
+                                date=datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
                                 mill_name=row.get('mill_name'),
                                 supplier_name=row.get('supplier_name'),
                                 concern_person=row.get('concern_person'),
@@ -1367,11 +1371,11 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         for _ in range(50):  # Change to any number you want
             writer.writerow([
-                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.date_this_decade().strftime("%d/%m/%Y"),
                 fake.company(),
                 fake.company(),
                 fake.company(),
-                fake.date_this_decade().strftime("%Y-%m-%d"),
+                fake.date_this_decade().strftime("%d/%m/%Y"),
                 fake.country(),
                 fake.country_code(),
                 choice(categories),
@@ -1537,7 +1541,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 value = row.get(field)
 
                 if field == 'date' or field == 'rd_generated_date':
-                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                    value = datetime.strptime(value, "%d/%m/%Y").date()
                 elif field == 'barcode':
                     value = str(value)
                 elif field == 'price_per_yard' or field == 'shrinkage_percent':
@@ -1576,11 +1580,11 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     for _, row in df.iterrows():
                         try:
                             Product.objects.create(
-                                date=row.get('date'),
+                                date=datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
                                 fabric_article_supplier=row.get('fabric_article_supplier', ''),
                                 fabric_article_fexpo=row.get('fabric_article_fexpo', ''),
                                 fabric_mill_supplier=row.get('fabric_mill_supplier', ''),
-                                rd_generated_date=row.get('rd_generated_date', ''),
+                                rd_generated_date=datetime.strptime(row.get('rd_generated_date', ''), "%d/%m/%Y").date(),
                                 fabric_mill_source=row.get('fabric_mill_source', ''),
                                 coo=row.get('coo', ''),
                                 product_category=row.get('product_category', ''),

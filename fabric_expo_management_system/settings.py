@@ -3,7 +3,6 @@ from pathlib import Path
 from decouple import config, Csv
 from fabric_expo_management_system.ckeditor_conf import *
 
-
 PROJECT_NAME = config("PROJECT_NAME")
 BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -1,5 +1,5 @@
 from admin_dashboard.aside_items import get_sidebar_items
-from django.urls import reverse
+from decouple import config
 # from admin_dashboard import nav_data
 from admin_dashboard import nav_data
 from fabric_expo_management_system.settings import (
@@ -29,8 +29,10 @@ def sidebar_items(request):
     
 
 def system_info(request):
+
     data = {
-        'PROJECT_NAME' : PROJECT_NAME,
+        'PROJECT_NAME': PROJECT_NAME,
+        'APP_VERSION': config("APP_VERSION", default="1.0.0"),
     }
 
     return data

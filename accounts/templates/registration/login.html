@@ -73,7 +73,7 @@
           <!--./end::Non field errors-->
          
           <p class="login-box-msg">Sign in to start your session</p>
-          <form action="{% url 'accounts:login' %}" method="post" was-validated>
+          <form action="{% url 'accounts:login' %}" method="post"  was-validated>
             {% csrf_token %}
             <div class="input-group mb-3">
               <div class="form-floating">
@@ -118,8 +118,6 @@
                 <span style="font-size:.7rem;">Powered by BinaryByte</span>
               </div>
             </div>
-          
-
           </div>
           
          

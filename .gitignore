@@ -108,3 +108,7 @@ media/barcodes/
 media/qrcodes/
 media/temp/
 media/bulk_messages_data/bulk_recipients_data_sheet/
+
+.htaccess
+stderr.log
+tmp/

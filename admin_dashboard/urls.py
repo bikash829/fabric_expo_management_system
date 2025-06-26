@@ -37,5 +37,7 @@ urlpatterns = [
     path('qr-code-activity-data/',views.QrCodeActivityDataView.as_view(),name='qr-code-activity-data'),
     path('communication-tracker-data/',views.CommunicationTrackerDataView.as_view(),name='communication-tracker-data'),
     
+    # SELECT COMPANY
+    path('select_company/', views.SelectCompanyView.as_view(), name='select_company'),
     
 ]

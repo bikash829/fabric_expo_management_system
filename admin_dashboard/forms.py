@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 from phonenumber_field.formfields import SplitPhoneNumberField, PrefixChoiceField
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
 from admin_dashboard.utils import get_selected_permissions
+from business_data.models import CompanyProfile
 
 
 
@@ -131,3 +132,17 @@ class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['permissions'].queryset = get_selected_permissions()
+        
+        
+        
+class CompanySelectForm(forms.ModelForm):
+    company_name = forms.ModelChoiceField(
+        queryset=CompanyProfile.objects.all(),
+        empty_label="-- Select a Company --",
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Select Company"
+    )
+
+    class Meta:
+        model = CompanyProfile
+        fields = ['company_name']

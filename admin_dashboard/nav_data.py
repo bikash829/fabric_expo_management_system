@@ -1,4 +1,5 @@
 from django.urls import reverse
+from business_data.models import CompanyProfile
 
 def nav_data(request):
     # if request.user.groups.filter(name='doctor') != 'doctor':
@@ -14,19 +15,22 @@ def nav_data(request):
             user_name = request.user.username
     except:
         user_name = request.username
-    nav_data={
-        'left_menu_items':[
+
+
+
+    nav_data = {
+        'left_menu_items': [
             {
                 'name': 'Home',
                 'url': reverse('admin_dashboard:welcome')
             },
-            # {
-            #     'name': 'Contact',
-            #     'url': None
-            # }
+            {
+                'name': 'Select Company',
+                'url': reverse('admin_dashboard:select_company')
+            }
         ],
-        'end_menu_items':{
-            'messages':[
+        'end_menu_items': {
+            'messages': [
                 {
                     'divider': True,
                     'url': None,
@@ -34,7 +38,7 @@ def nav_data(request):
                     'avatar_alt': 'something alternet',
                     'user_name': 'John Pierce',
                     'message': 'I got your message bro',
-                    'time' : '4 Hours Ago',
+                    'time': '4 Hours Ago',
                     'is_unread': True,
                     'is_important': True,
                 },
@@ -45,7 +49,7 @@ def nav_data(request):
                     'avatar_alt': 'something alternet',
                     'user_name': 'John Pierce',
                     'message': 'I got your message bro',
-                    'time' : '4 Hours Ago',
+                    'time': '4 Hours Ago',
                     'is_unread': False,
                     'is_important': True,
                 },
@@ -56,7 +60,7 @@ def nav_data(request):
                     'avatar_alt': 'something alternet',
                     'user_name': 'John Pierce',
                     'message': 'I got your message bro',
-                    'time' : '4 Hours Ago',
+                    'time': '4 Hours Ago',
                     'is_unread': True,
                     'is_important': False,
                 },
@@ -66,14 +70,14 @@ def nav_data(request):
                     'avatar_alt': 'something alternet',
                     'user_name': 'Rango',
                     'message': 'Yoo! what\'s up?',
-                    'time' : '10 Hours Ago',
+                    'time': '10 Hours Ago',
                     'is_unread': False,
                     'is_important': False,
                 },
             ],
-            'notifications':{
+            'notifications': {
                 'total_notifications': 16,
-                'notification_list':[
+                'notification_list': [
                     {
                         'url': None,
                         'icon': 'bi bi-envelope',
@@ -106,16 +110,14 @@ def nav_data(request):
                 ]
             }
         },
-        'self_info':{
+        'self_info': {
             'name': user_name,
-            # 'photo': 'dashboard/assets/img/user2-160x160.jpg',
             'photo': photo_url,
             'photo_alt': 'Admin',
             'designation': 'Web Developer',
             'member_from': request.user.date_joined,
             'profile_link': reverse('accounts:profile'),
         }
-     
     }
 
     # Calculate the count of unread messages

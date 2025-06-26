@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 
 from bulk_email.models import EmailSession, SentMail
 from bulk_whatsapp.models import SentMessage
-from business_data.models import Buyer, Product, Supplier
+from business_data.models import Buyer, CompanyProfile, Product, Supplier
 from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -21,6 +21,7 @@ from django.db.models.functions import TruncWeek, TruncMonth
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import now
+from .forms import CompanySelectForm
 
 
 class IndexView(LoginRequiredMixin,TemplateView):
@@ -458,3 +459,20 @@ class CommunicationTrackerDataView(View):
         })
 
 """end::chart data"""
+
+
+
+"""Begin::Manage company profile   """
+class SelectCompanyView(LoginRequiredMixin, FormView):
+    template_name = "admin_dashboard/manage_company_profile/select_company.html"
+    form_class = CompanySelectForm
+
+    def form_valid(self, form):
+        company = form.cleaned_data['company']
+        return redirect('admin_dashboard:edit_company_profile', pk=company.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Select Company"
+        return context
+"""End:: Manage company profile   """

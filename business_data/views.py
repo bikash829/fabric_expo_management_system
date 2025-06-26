@@ -1804,6 +1804,8 @@ class ProductDetailViewSticker(DetailView):
             'product': product,
             # 'base_url': base_url
         }
+        
+        # response = redirect(request,template, context)
 
         html_string = render_to_string(template, context)
         
@@ -1858,7 +1860,7 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'product': product,
             # 'base_url': base_url
         }
-
+        # response = redirect(request,template, context)
         html_string = render_to_string(template, context)
         
         pdf = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()

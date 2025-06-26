@@ -142,7 +142,8 @@ class Product(SoftDeleteModel):
     concern_person = models.CharField(max_length=255)
     created_at = models.DateField(auto_now_add=True)
     tag = models.CharField(max_length=50,null=True,blank=True)
-
+    # gtin = models.CharField(max_length=14, unique=True, blank=True, null=True)  # GS1 Global Trade Item Number
+    # batch_number = models.CharField(max_length=50)  # For traceability
 
     @property
     def total_value(self):
@@ -168,6 +169,9 @@ class Product(SoftDeleteModel):
         ean.write(buffer)
         file_name = f"barcode_{self.id}.png"
         self.barcode.save(file_name, File(buffer), save=False)
+        
+    
+    
 
     def generate_qr_code_image(self):
         # full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
@@ -194,6 +198,25 @@ class ProductImage(models.Model):
     alt_text = models.CharField(max_length=255, blank=True, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+class CompanyProfile(models.Model):
+    COMPANY_CHOICES = [
+        ('FABRIC_EXPO', 'Fabric Expo'),
+        ('REPUBLIC_EXPORT', 'REPUBLIC EXPORT'),
+        ('INTEXTILE', 'Intextile'),
+        # Add more choices as needed
+    ]
+    company_name = models.CharField(max_length=255, choices=COMPANY_CHOICES)
+    logo = models.ImageField(upload_to='company_logos/', blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    phone_number = PhoneNumberField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    established_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.company_name
 
 
 

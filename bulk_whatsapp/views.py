@@ -446,10 +446,10 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "bulk_whatsapp.sendmessage_whatsapptemplate"
 
     def post(self,request,*args,**kwargs):
-        pprint.pprint(kwargs)
         # whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         # recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
         recipient_category_ids = request.POST.getlist('selectedRecipientsCategoriesId[]')
+        company_id = request.POST.get('selectedCompanyId')
         session_id = str(uuid.uuid4())
         user_id = request.user.pk
         draft_id=kwargs.get('draft_id')
@@ -461,14 +461,12 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
             status='processing'
         )
         
-        print(recipient_category_ids)
-
-
         send_whatsapp_message.delay(
             user_id= user_id,
             draft_id=draft_id,
             recipient_category_ids = recipient_category_ids,
             session_id = session_id,
+            company_id = company_id,
         )
         
         # Add success message

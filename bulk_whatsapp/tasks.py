@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 # from time import sleep
+from business_data.models import CompanyProfile
 from fabric_expo_management_system.settings import (
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
@@ -19,12 +20,13 @@ from twilio.rest import Client
 from fabric_expo_management_system.info import PROJECT_NAME
 
 @shared_task
-def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id):
+def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id, company_id):
     whatsapp_content = get_object_or_404(WhatsappTemplate,pk=draft_id)
     recipients = WhatsappRecipient.objects.filter(category_id__in=recipient_category_ids)
-    print(recipients)
     User = get_user_model()
     sender = User.objects.get(pk=user_id)
+    company_info = CompanyProfile.objects.filter(company_name=company_id).first()
+    company_name = company_info.get_company_name_display()
 
     # retrieving attachments
     attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
@@ -49,7 +51,7 @@ def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id)
     # Loop through each recipient
     for recipient in recipients:
         # Plain text fallback
-        text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\n{PROJECT_NAME}\n"
+        text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\n{company_name}\n"
         # Send the message
         try:
             message = client.messages.create(

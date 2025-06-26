@@ -105,60 +105,81 @@
 
     // Handle "Send Data" button click event to send selected column data to backend
     $('#send-data').on('click', function() {
-      const selectedRecipientsCategoriesId = table.rows('.selected').data().pluck(0).toArray();  // Extract data from the first column (Name)
-      const messageContent = {{message_content.id}}
-      
-      if (selectedRecipientsCategoriesId.length === 0){
+      const selectedRecipientsCategoriesId = table.rows('.selected').data().pluck(0).toArray();
+      const messageContent = {{message_content.id}};
+
+      if (selectedRecipientsCategoriesId.length === 0) {
         Swal.fire({
           icon: 'info',
           text: "Please select desired recipients first!"
         });
-      }else{
-        console.log(selectedRecipientsCategoriesId)
-        console.log(messageContent)
-        Swal.fire({
-          title: "Do you want to send this message to the selected users?",
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: "Send",
-        }).then((result) => {
-          /* Read more about isConfirmed, isDenied below */
-          if (result.isConfirmed) {
-            $.ajax({
-              //url: "#",  // Replace with your backend endpoint
-              url: "{% url 'bulk_whatsapp:send_message' draft_id=message_content.id %}",  
-              type: 'POST',
-              data: {
-                selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
-                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
-              },
-              success: function(response) {
-                Swal.fire({
-                  position: "center",
-                  icon: "success",
-                  title: "Message has been sent",
-                  text: response.message,
-                  showConfirmButton: true,
-                }).then((result) => {
-                  window.location.href = "{% url 'bulk_whatsapp:sent_message_queue' %}";
-                });
-              },
-              error: function(xhr, status, error) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong!",
-                });
-              }
-            });
-
-          } else if (result.isDenied) {
-            Swal.fire("Canceled", "", "info"); 
-          }
-        });
-        
+        return;
       }
-      
-  });
+
+      // Prepare company options for the select input
+      const companyOptions = {
+        {% for business_info in business_infos %}
+          '{{ business_info.company_name }}': '{{ business_info.get_company_name_display }}',
+        {% endfor %}
+      };
+
+      Swal.fire({
+        title: "Select Company",
+        text: "Choose a company before sending.",
+        input: 'select',
+        inputOptions: companyOptions,
+        inputPlaceholder: 'Select a company',
+        showCancelButton: true,
+        confirmButtonText: "Next",
+        preConfirm: (selectedCompanyId) => {
+          if (!selectedCompanyId) {
+            Swal.showValidationMessage('You must select a company!');
+          }
+          return selectedCompanyId;
+        }
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          // Second confirmation
+          Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to send this message to the selected categorie's users?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Send",
+            cancelButtonText: "Cancel"
+          }).then((confirmResult) => {
+            if (confirmResult.isConfirmed) {
+              $.ajax({
+                url: "{% url 'bulk_whatsapp:send_message' draft_id=message_content.id %}",
+                type: 'POST',
+                data: {
+                  selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
+                  selectedCompanyId: result.value,
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                  Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Message has been sent",
+                    text: response.message,
+                    showConfirmButton: true,
+                  }).then(() => {
+                    window.location.href = "{% url 'bulk_whatsapp:sent_message_queue' %}";
+                  });
+                },
+                error: function(xhr, status, error) {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    });
 </script>
 {% endblock push_scripts %}

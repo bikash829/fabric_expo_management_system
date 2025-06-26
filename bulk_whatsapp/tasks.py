@@ -29,6 +29,7 @@ def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):
     attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
     # media_urls = [request.build_absolute_uri(attachment.attachment.url) for attachment in attachments]
     media_urls = [
+        "https://drive.usercontent.google.com/download?id=1LGCyQ0N6SQ2lnEhBwq7cRb9b2FQodpwA&export=download&authuser=0&confirm=t&uuid=74c94d9d-213e-479e-8910-87b7bb9904bb&at=AN8xHoor1FHt-w8dp38gq0bIcVP_:1750933676487",
         # "https://demo.twilio.com/owl.png",
         # "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
         # "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",

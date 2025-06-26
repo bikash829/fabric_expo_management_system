@@ -40,7 +40,7 @@ class TempRecipientImportForm(ModelForm):
 class MessageCreationForm(ModelForm):
     template_name = "form_template/full_width_form.html"
     # attachment = MultipleFileField(required=False,label='Choose Files to Attach (Multiple selections allowed)',widget=MultipleFileInput(attrs={'class': 'form-control'}))
-
+    attachment = forms.FileField(required=False, label='Choose File to Attach', widget=forms.FileInput(attrs={'class': 'form-control'}))
     class Meta:
         model = WhatsappTemplate
         fields = ['name', 'message_content']

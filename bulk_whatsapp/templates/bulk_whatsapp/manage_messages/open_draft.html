@@ -31,26 +31,34 @@
 
 
                 <!-- Manage Attachments -->
-                {% comment %} <div>
-                  <h5>Existing Attachments:</h5>
-                  <button class="btn btn-warning mb-3" id="add_attachment">Add Attachment <i class="fa-solid fa-plus"></i></button>
-                  <input type="file" id="attachment_input" name="attachment" style="display: none;" multiple>
+                 <div>
+                  <h5>Attachment:</h5>
+                  {% if object.attachments.all|length > 0 %}
+                    <div class="alert alert-warning py-2 mb-2">
+                      You must remove the current attachment to upload or change a new one.
+                    </div>
                     <ul class="list-group">
-                      {% for attachment in object.attachments.all %}
+                      {% with attachment=object.attachments.all.0 %}
                       <li class="list-group-item">
                         <div class="row">
                           <div class="col-6">
-                          <a href="{{attachment.attachment.url}}">{{attachment.attachment.name}}</a>
-                        </div>
+                            <a href="{{attachment.attachment.url}}">{{attachment.attachment.name}}</a>
+                          </div>
                           <div class="col-6 text-end">
-                          <a href="#" id="attachment_{{attachment.id}}" data-attachmentid="{{attachment.id}}" class="btn btn-sm btn-danger attachment_remove">Remove</a>
-                        </div>
+                            <a href="#" id="attachment_{{attachment.id}}" data-attachmentid="{{attachment.id}}" class="btn btn-sm btn-danger attachment_remove">Remove</a>
+                          </div>
                         </div>
                       </li>
-                      {% endfor %}
+                      {% endwith %}
                     </ul>
+                    <!-- Hide add button and file input if attachment exists -->
+                    <input type="file" id="attachment_input" name="attachment" style="display: none;">
+                  {% else %}
+                    <button class="btn btn-warning mb-3" id="add_attachment">Add Attachment <i class="fa-solid fa-plus"></i></button>
+                    <input type="file" id="attachment_input" name="attachment" style="display: none;">
+                  {% endif %}
                 </div>
-              </div> {% endcomment %}
+              </div> 
               <!--end::Row-->
             </div>
             <!--end::Body-->
@@ -107,124 +115,101 @@
   })();
 </script>
 <script>
-    $(document).ready(function () {
-      // Attach event listener to all inputs, selects, and textareas within the form
-      $("#formDraft").on("change", "input, textarea", function () {
-        var formData = $("#formDraft").serialize(); // Serialize form data
+    $(document).ready(function(){
+  // Only allow add_attachment if no attachment exists
+  {% if object.attachments.all|length == 0 %}
+    $("#add_attachment").click(function(e){
+      e.preventDefault();
+      $("#attachment_input").val(""); // Clear previous selection
+      $("#attachment_input").click();
+    });
+  {% endif %}
 
-        $.ajax({
-            url: "{% url 'bulk_whatsapp:open_draft' pk=form.instance.pk %}", // Change this to your actual endpoint
-            type: "POST",
-            data: formData,
-            dataType: "json",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}" // Ensure CSRF token is included
-            },
-            success: function (response) {
-                console.log("Data updated successfully:", response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error updating data:", error);
-            }
+  // Only allow one file to be uploaded
+  $("#attachment_input").change(function() {
+    let formData = new FormData();
+    let file = $("#attachment_input")[0].files[0];
+    if (file) {
+      formData.append('attachment', file);
+    }
+
+    $.ajax({
+      url: "{% url 'bulk_whatsapp:add_attachment' draft_id=form.instance.id %}",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      success: function (response) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: response.message,
+          showConfirmButton: true,
+        }).then((result) => {
+          window.location.reload();
         });
-      });
-    });
-
-     // Add attachment 
-     $(document).ready(function(){
-      $("#add_attachment").click(e =>{
-        e.preventDefault();
-        $("#attachment_input").click();
-      });
-    });
-
-    // Handle file input change event
-    $("#attachment_input").change(function() {
-      let formData = new FormData();
-      let files = $("#attachment_input")[0].files;
-      for (let i = 0; i < files.length; i++) {
-        formData.append('attachment', files[i]);
-      }
-
-      $.ajax({
-        url: "{% url 'bulk_whatsapp:add_attachment' draft_id=form.instance.id %}", // Change this to your actual endpoint 
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}" // Ensure CSRF token is included
-        },
-        success: function (response) {
-          //location.reload(); // Reload the page to show the new attachment
+      },
+      error: function (xhr, status, error) {
+        try {
+          let responseJson = JSON.parse(xhr.responseText);
           Swal.fire({
             position: "center",
-            icon: "success",
-            title: response.message,
+            icon: "warning",
+            title: "Can't upload attachment",
+            text: responseJson.error,
             showConfirmButton: true,
-          }).then((result) => {
-            window.location.reload();
-          });
-        },    
-        error: function (xhr, status, error) {
-          try {
-            let responseJson = JSON.parse(xhr.responseText);
-            Swal.fire({
-              position: "center",
-              icon: "warning",
-              title: "Can't upload attachment",
-              text: responseJson.error,
-              showConfirmButton: true,
-            })
-            
-          } catch (e) {
-            alert("An unknown error occurred.");
-          }
+          })
+        } catch (e) {
+          alert("An unknown error occurred.");
         }
-
-      });
+      }
     });
+  });
 
-    // Remove attachment
-    $(document).on("click", ".attachment_remove", function (e) {
-      e.preventDefault();
-  
-      let attachmentId = $(this).data("attachmentid");
-      let attachmentElement = $(this).closest('.list-group-item'); // Assuming attachments are wrapped in an element
-      const url = "{% url 'bulk_whatsapp:remove_attachment' %}" 
+  // Remove attachment
+  $(document).on("click", ".attachment_remove", function (e) {
+    e.preventDefault();
+    let attachmentId = $(this).data("attachmentid");
+    let attachmentElement = $(this).closest('.list-group-item');
+    const url = "{% url 'bulk_whatsapp:remove_attachment' %}";
 
-      $.ajax({
-          url: url,  // Adjust this based on your Django URL configuration
-          type: "POST",
-          data: {id:attachmentId},
-          headers: {
-              "X-CSRFToken": "{{ csrf_token }}"  // Ensure CSRF token is included
-          },
-          success: function (response) {
-              if (response.success) {
-                  attachmentElement.remove();  // Remove the element from DOM
-              } else {
-                  Swal.fire({
-                    position: "center",
-                    icon: "error",
-                    title: "An error occurred",
-                    text: response.error,
-                    showConfirmButton: true,
-                  })
-              }
-          },
-          error: function (xhr) {
-              let responseJson = JSON.parse(xhr.responseText);
-              Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "An error occurred",
-                text: responseJson.error,
-                showConfirmButton: true,
-              })
-          }
-      });
+    $.ajax({
+      url: url,
+      type: "POST",
+      data: {id:attachmentId},
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      success: function (response) {
+        if (response.success) {
+          attachmentElement.remove();
+          window.location.reload();
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "An error occurred",
+            text: response.error,
+            showConfirmButton: true,
+          })
+        }
+      },
+      error: function (xhr) {
+        let responseJson = JSON.parse(xhr.responseText);
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: "An error occurred",
+          text: responseJson.error,
+          showConfirmButton: true,
+        })
+      }
     });
+  });
+});
 </script>
 <!--end::JavaScript-->
 {% endblock push_scripts %}

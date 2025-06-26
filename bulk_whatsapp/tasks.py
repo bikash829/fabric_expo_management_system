@@ -11,12 +11,12 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 # from time import sleep
 from fabric_expo_management_system.settings import (
-    PROJECT_NAME, 
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
     TWILIO_WHATSAPP_NUMBER
 )
 from twilio.rest import Client
+from fabric_expo_management_system.info import PROJECT_NAME
 
 @shared_task
 def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):

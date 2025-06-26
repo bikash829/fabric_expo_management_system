@@ -25,7 +25,7 @@ from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from business_data.models import Buyer, PersonEmail, PersonPhone, Supplier, Customer, Product
+from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, Supplier, Customer, Product
 
 from .forms import BuyerUploadForm, FileUploadForm
 
@@ -1845,19 +1845,19 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_product"
     def get(self, request, pk, label_type):
         product = Product.objects.get(pk=pk)
-        
+       
         # Render different templates based on label type
-        if label_type == 'barcode':
-            template = 'business_data/manage_products/print_labels/barcode_label.html'
-        elif label_type == 'qrcode':
-            template = 'business_data/manage_products/print_labels/qrcode_label.html'
-        else:  # default to details
-            template = 'business_data/manage_products/print_labels/details_label.html'
-        
-
-        # base_url = request.build_absolute_uri('/')[:-1]  # Gets domain without trailing slash
+        # if label_type == 'FABRIC_EXPO':
+        #     template = 'business_data/manage_products/print_labels/barcode_label.html'
+        # elif label_type == 'REPUBLIC_EXPORT':
+        #     template = 'business_data/manage_products/print_labels/qrcode_label.html'
+        # elif label_type == 'INTEXTILE':  # default to details
+        #     template = 'business_data/manage_products/print_labels/details_label.html'
+        company_info = CompanyProfile.objects.filter(company_name=label_type).first()
+        template = 'business_data/manage_products/print_labels/details_label.html'
         context = {
             'product': product,
+            'company_info': company_info,
             # 'base_url': base_url
         }
         # response = redirect(request,template, context)

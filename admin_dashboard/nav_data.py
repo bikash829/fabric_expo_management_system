@@ -24,10 +24,10 @@ def nav_data(request):
                 'name': 'Home',
                 'url': reverse('admin_dashboard:welcome')
             },
-            {
-                'name': 'Select Company',
-                'url': reverse('admin_dashboard:select_company')
-            }
+            # {
+            #     'name': 'Select Company',
+            #     'url': reverse('admin_dashboard:select_company')
+            # }
         ],
         'end_menu_items': {
             'messages': [

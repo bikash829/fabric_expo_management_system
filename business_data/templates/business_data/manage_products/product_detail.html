@@ -225,15 +225,14 @@
                 <div class="mb-3">
                     <label class="form-label">Select Company</label>
                     <select class="form-select" id="labelTypeSelect">
-                        <option value="barcode">Barcode Label</option>
-                        <option value="qrcode">QR Code Label</option>
-                        <option value="details">Product Details Label</option>
+                        
+                        {% for business_info in business_infos %}
+                            <option value="{{business_info.company_name}}">{{business_info.get_company_name_display}}</option>
+                        {% endfor %}
+                            
                     </select>
                 </div>
-                {% comment %} <div class="mb-3">
-                    <label class="form-label">Quantity (copies)</label>
-                    <input type="number" class="form-control" id="labelQuantity" value="1" min="1" max="10">
-                </div> {% endcomment %}
+                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

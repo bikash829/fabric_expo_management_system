@@ -7,7 +7,8 @@ from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, Ema
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from fabric_expo_management_system.settings import PROJECT_NAME, EMAIL_HOST_USER
+from fabric_expo_management_system.settings import  EMAIL_HOST_USER
+from fabric_expo_management_system.info import PROJECT_NAME
 
 
 # def parse_csv(file):

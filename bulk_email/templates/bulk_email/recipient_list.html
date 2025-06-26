@@ -146,65 +146,65 @@
         };
 
         Swal.fire({
-  title: "Select Company",
-  text: "Choose a company before sending.",
-  input: 'select',
-  inputOptions: companyOptions,
-  inputPlaceholder: 'Select a company',
-  showCancelButton: true,
-  confirmButtonText: "Next",
-  preConfirm: (selectedCompanyId) => {
-    if (!selectedCompanyId) {
-      Swal.showValidationMessage('You must select a company!');
-    }
-    return selectedCompanyId;
-  }
-}).then((result) => {
-  if (result.isConfirmed && result.value) {
-    // Second confirmation
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to send this email to the selected users?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Send",
-      cancelButtonText: "Cancel"
-    }).then((confirmResult) => {
-      if (confirmResult.isConfirmed) {
-        $.ajax({
-          url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",
-          type: 'POST',
-          data: {
-            selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
-            selectedCompanyId: result.value,
-            csrfmiddlewaretoken: '{{ csrf_token }}'
-          },
-          success: function(response) {
-            window.location.href = "{% url 'bulk_email:email_queue' %}";
-            Swal.fire({
-              position: "top-end",
-              icon: "success",
-              title: "Email has been sent",
-              text: response.message,
-              showConfirmButton: false,
-              timer: 5000,
-            });
-          },
-          error: function(xhr, status, error) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong!",
-            });
+          title: "Select Company",
+          text: "Choose a company before sending.",
+          input: 'select',
+          inputOptions: companyOptions,
+          inputPlaceholder: 'Select a company',
+          showCancelButton: true,
+          confirmButtonText: "Next",
+          preConfirm: (selectedCompanyId) => {
+            if (!selectedCompanyId) {
+              Swal.showValidationMessage('You must select a company!');
+            }
+            return selectedCompanyId;
           }
-        });
-      }
-    });
-  }
-});
-        
-      }
-      
-  });
+        }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                      // Second confirmation
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: "Do you want to send this email to the selected users?",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: "Send",
+                        cancelButtonText: "Cancel"
+                      }).then((confirmResult) => {
+                        if (confirmResult.isConfirmed) {
+                          $.ajax({
+                            url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",
+                            type: 'POST',
+                            data: {
+                              selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
+                              selectedCompanyId: result.value,
+                              csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                              window.location.href = "{% url 'bulk_email:email_queue' %}";
+                              Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "Email has been sent",
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 5000,
+                              });
+                            },
+                            error: function(xhr, status, error) {
+                              Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Something went wrong!",
+                              });
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+                
+              }
+              
+          });
 </script>
 {% endblock push_scripts %}

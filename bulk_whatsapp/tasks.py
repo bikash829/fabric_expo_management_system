@@ -19,9 +19,10 @@ from twilio.rest import Client
 from fabric_expo_management_system.info import PROJECT_NAME
 
 @shared_task
-def send_whatsapp_message(user_id, draft_id, recipient_ids, session_id):
+def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id):
     whatsapp_content = get_object_or_404(WhatsappTemplate,pk=draft_id)
-    recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
+    recipients = WhatsappRecipient.objects.filter(category_id__in=recipient_category_ids)
+    print(recipients)
     User = get_user_model()
     sender = User.objects.get(pk=user_id)
 

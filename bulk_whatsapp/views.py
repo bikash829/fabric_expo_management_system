@@ -29,7 +29,7 @@ from phonenumber_field.validators import validate_international_phonenumber
 from bulk_whatsapp.tasks import send_whatsapp_message
 
 # models 
-from bulk_core.models import RecipientDataSheet, TempRecipientDataSheet
+from bulk_core.models import RecipientCategory, RecipientDataSheet, TempRecipientDataSheet
 from bulk_whatsapp.models import SentMessage, TempRecipient, WhatsappAttachment, WhatsappRecipient, WhatsappSession, WhatsappTemplate
 from django.db.models import F
 
@@ -433,9 +433,12 @@ class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         recipients = WhatsappRecipient.objects.all()
+        recipients_category = RecipientCategory.objects.all()
+
         return render(request, self.template_name, {
             'recipients': recipients,
-            'message_content': whatsapp_content
+            'message_content': whatsapp_content,
+            'recipients_category': recipients_category,
         })
     
 
@@ -446,7 +449,7 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
         pprint.pprint(kwargs)
         # whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         # recipients = WhatsappRecipient.objects.filter(id__in=recipient_ids)
-        recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+        recipient_category_ids = request.POST.getlist('selectedRecipientsCategoriesId[]')
         session_id = str(uuid.uuid4())
         user_id = request.user.pk
         draft_id=kwargs.get('draft_id')
@@ -457,12 +460,14 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
             draft_id=draft_id,
             status='processing'
         )
+        
+        print(recipient_category_ids)
 
 
         send_whatsapp_message.delay(
             user_id= user_id,
             draft_id=draft_id,
-            recipient_ids = recipient_ids,
+            recipient_category_ids = recipient_category_ids,
             session_id = session_id,
         )
         

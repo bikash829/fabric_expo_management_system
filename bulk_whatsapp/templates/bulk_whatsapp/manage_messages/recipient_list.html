@@ -1,6 +1,6 @@
 {% extends "core/_base.html" %}
 {% load static %}
-{% block title %}Whatsapp Recipient List{% endblock title %}
+{% block title %}Whatsapp Recipient's Category List{% endblock title %}
 
 {% block push_css %}
 <!--Datatable -->
@@ -12,7 +12,7 @@
 {% block content %}
 <!--begin::header-->
 {% comment %} {% url 'bulk_email:email_category' as email_category_url %} {% endcomment %}
-{% include 'core/layouts/content_header.html' with page_name="Recipient's List"  only%}
+{% include 'core/layouts/content_header.html' with page_name="Recipient's Category List"  only%}
 <!--end::header-->
 <!--begin::App Content-->
 <div class="app-content">
@@ -35,54 +35,21 @@
         <table id="recipients" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                  <th>Count</th>
                   <th>#ID</th>
-                  <th>Recipient Name</th>
-                  <th>Recipient Number</th>
+                  <th>Category Name</th>
               </tr>
           </thead>
           <tbody>
-              {% for item in recipients %}
+              {% for item in recipients_category %}
               <tr>
-                  <td>{{forloop.counter}}</td>
-                  <td>{{item.id}}</td>
+                  <td>{{item.pk}}</td>
                   <td>{{item.name}}</td>
-                  <td>{{item.recipient_number}}</td>
               </tr>
               {% endfor %}
           </tbody>
-          <tfoot>
-              <tr>
-                <th>Count</th>
-                <th>#ID</th>
-                <th>Recipient Name</th>
-                <th>Recipient Number</th>
-              </tr>
-          </tfoot>
+          
         </table>
       </div>
-
-{% comment %} 
-      <div class="row justify-content-center">
-        <div class="col-12">
-            <div class="list-group">
-              {% if not recipients %}
-              <div colspan="4" class="bg-light text-center text-muted">
-                <h5 class="py-3">No Data Available</h5>
-              </div>
-              {% else %}
-                <div class="list-group-item fs-5 list-group-item-action active " aria-current="true">
-                  Select emails
-                </div> 
-                {% for item in recipients %}
-                <a href="#" class="list-group-item list-group-item-action">{{item.email}}</a>
-                {% endfor %}
-              {% endif %}
-                
-              </div>
-        </div>
-      </div> {% endcomment %}
-        
     </div>
     <!--end::Container-->
 </div>
@@ -138,16 +105,16 @@
 
     // Handle "Send Data" button click event to send selected column data to backend
     $('#send-data').on('click', function() {
-      const selectedRecipientIds = table.rows('.selected').data().pluck(1).toArray();  // Extract data from the first column (Name)
+      const selectedRecipientsCategoriesId = table.rows('.selected').data().pluck(0).toArray();  // Extract data from the first column (Name)
       const messageContent = {{message_content.id}}
       
-      if (selectedRecipientIds.length === 0){
+      if (selectedRecipientsCategoriesId.length === 0){
         Swal.fire({
           icon: 'info',
           text: "Please select desired recipients first!"
         });
       }else{
-        console.log(selectedRecipientIds)
+        console.log(selectedRecipientsCategoriesId)
         console.log(messageContent)
         Swal.fire({
           title: "Do you want to send this message to the selected users?",
@@ -162,7 +129,7 @@
               url: "{% url 'bulk_whatsapp:send_message' draft_id=message_content.id %}",  
               type: 'POST',
               data: {
-                selectedRecipientIds: selectedRecipientIds,
+                selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
                 csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
               },
               success: function(response) {

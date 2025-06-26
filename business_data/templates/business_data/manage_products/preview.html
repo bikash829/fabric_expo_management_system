@@ -67,10 +67,12 @@
                           <th>{{'price (yards)'|pretty_label}}</th>
                           <th>{{'shrinkage%'|pretty_label}}</th>
                           <th>{{'available/ stock_qty'|pretty_label}}</th>
-                          <th>{{'images'|pretty_label}}</th>
+                          <!-- <th>{{'images'|pretty_label}}</th>
                           <th>{{'barcode'|pretty_label}}</th>
-                          <th>{{'qr_code'|pretty_label}}</th>
+                          <th>{{'qr_code'|pretty_label}}</th> -->
                           <th>{{'concern_person'|pretty_label}}</th>
+                          <th>{{'remarks'|pretty_label}}</th>
+
                       </tr>
                   </thead>
                   <tbody>
@@ -238,32 +240,19 @@
                               {{ item.stock_qty }}
                             {% endif %}
                             </td>
-                            <td>
-                            {% if item.duplicates.images %}
-                              <mark>{{ item.images }}</mark>
-                            {% else %}
-                              {{ item.images }}
-                            {% endif %}
-                            </td>
-                            <td>
-                            {% if item.duplicates.barcode %}
-                              <mark>{{ item.barcode }}</mark>
-                            {% else %}
-                              {{ item.barcode }}
-                            {% endif %}
-                            </td>
-                            <td>
-                            {% if item.duplicates.qr_code %}
-                              <mark>{{ item.qr_code }}</mark>
-                            {% else %}
-                              {{ item.qr_code }}
-                            {% endif %}
-                            </td>
+                            
                             <td>
                             {% if item.duplicates.concern_person %}
                               <mark>{{ item.concern_person }}</mark>
                             {% else %}
                               {{ item.concern_person }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.remarks %}
+                              <mark>{{ item.remarks }}</mark>
+                            {% else %}
+                              {{ item.remarks }}
                             {% endif %}
                             </td>
                       </tr>
@@ -295,10 +284,11 @@
                           <th>{{'price (yards)'|pretty_label}}</th>
                           <th>{{'shrinkage%'|pretty_label}}</th>
                           <th>{{'available/ stock_qty'|pretty_label}}</th>
-                          <th>{{'images'|pretty_label}}</th>
+                          <!-- <th>{{'images'|pretty_label}}</th>
                           <th>{{'barcode'|pretty_label}}</th>
-                          <th>{{'qr_code'|pretty_label}}</th>
+                          <th>{{'qr_code'|pretty_label}}</th> -->
                           <th>{{'concern_person'|pretty_label}}</th>
+                          <th>{{'remarks'|pretty_label}}</th>
                       </tr>
                   </tfoot>
                 </table>

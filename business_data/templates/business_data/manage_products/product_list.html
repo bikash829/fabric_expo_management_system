@@ -25,9 +25,9 @@
           <label class="btn btn-outline-primary mt-2" for="select-all">Select All</label>
         </div>
         <button id="row_count" class="btn btn-info mt-2"  disabled>Row count</button>
-        <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
+        <!-- <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
         <button id="print_barcodes" class="btn btn-secondary mt-2" disabled>Print Barcodes</button>
-        <button id="print_product_details" class="btn btn-secondary mt-2" disabled>Print Product Details</button>
+        <button id="print_product_details" class="btn btn-secondary mt-2" disabled>Print Product Details</button> -->
         {% if perms.business_data.delete_product %}
         <button id="delete-data" class="btn btn-danger mt-2">Delete</button>
         {% endif %}
@@ -66,6 +66,7 @@
                   <th>{{'barcode'|pretty_label}}</th>
                   <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                   <th>{{'concern_person'|pretty_label}}</th>
+                  <th>{{'remarks'|pretty_label}}</th>
                   <th>Action</th>
                   
               </tr>
@@ -98,10 +99,12 @@
                   <td>{{item.price_per_yard}}</td>
                   <td>{{item.shrinkage_percent}}</td>
                   <td>{{item.stock_qty}}</td>
-                  <td>{{'item.images'}}</td>
+                  <!-- <td>{{'item.images'}}</td>
                   <td>{{item.barcode}}</td>
-                  <td>{{item.qr_code}}</td>
+                  <td>{{item.qr_code}}</td> -->
                   <td>{{item.concern_person}}</td>
+                <th>{{item.remarks}}</th>
+
               </tr>
               {% endfor %}
           </tbody> {% endcomment %}
@@ -136,6 +139,7 @@
                 <th>{{'barcode'|pretty_label}}</th>
                 <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
                 <th>{{'concern_person'|pretty_label}}</th>
+                <th>{{'remarks'|pretty_label}}</th>
                 <th>Action</th>
                 
               </tr>

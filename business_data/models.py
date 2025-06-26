@@ -141,6 +141,7 @@ class Product(SoftDeleteModel):
     qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     concern_person = models.CharField(max_length=255)
     created_at = models.DateField(auto_now_add=True)
+    remarks = models.CharField(max_length=255, blank=True, null=True)
     tag = models.CharField(max_length=50,null=True,blank=True)
     # gtin = models.CharField(max_length=14, unique=True, blank=True, null=True)  # GS1 Global Trade Item Number
     # batch_number = models.CharField(max_length=50)  # For traceability

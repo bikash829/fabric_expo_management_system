@@ -27,7 +27,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, Supplier, Customer, Product
 
-from .forms import BuyerUploadForm, FileUploadForm
+from .forms import BuyerUploadForm, FileUploadForm, ProductUpdateForm
 
 from faker import Faker
 from random import randint, choice, uniform
@@ -1358,7 +1358,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
             "construction", "weight", "color", "cut_width",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
-            "images", "barcode", "qr_code", "concern_person"
+            "concern_person","remarks"
         ])
 
         """begin::faker"""
@@ -1367,7 +1367,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         seasons = ["Spring/Summer", "Fall/Winter", "Resort"]
         washes = ["Enzyme Wash", "Stone Wash", "No Wash", "Acid Wash"]
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
-        images = ["image1.png", "image2.jpg", "image2.png"]
+        # images = ["image1.png", "image2.jpg", "image2.png"]
 
         for _ in range(50):  # Change to any number you want
             writer.writerow([
@@ -1394,10 +1394,11 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
                 round(uniform(3.0, 15.0), 2),
                 round(uniform(1.0, 5.0), 2),
                 randint(100, 5000),
-                choice(images),
-                fake.ean13(),
-                fake.url(),
-                fake.name()
+                # choice(images),
+                # fake.ean13(),
+                # fake.url(),
+                fake.name(),
+                fake.text(max_nb_chars=50)  # Remarks
             ])
 
         """end::faker"""
@@ -1482,7 +1483,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
             "construction", "weight", "color", "cut_width",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
-            "images", "barcode", "qr_code", "concern_person"
+            "concern_person", "remarks"
         ]
 
         # Build sets of existing values for each field
@@ -1606,7 +1607,8 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                                 # barcode=row.get('barcode', ''),
                                 # qr_code=row.get('qr_code', ''),
                                 concern_person=row.get('concern_person', ''),
-                                tag=tag
+                                tag=tag,
+                                remarks=row.get('remarks', '')
                             )
                         except Exception as row_e:
                             logger.error("Row import failed: %s", row_e)
@@ -1657,7 +1659,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
             'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
-            'shrinkage_percent', 'stock_qty', 'images', 'barcode', 'qr_code', 'concern_person'
+            'shrinkage_percent', 'stock_qty', 'concern_person','remarks'
         ]
 
         order_field = columns[int(order_column_index)] if int(order_column_index) < len(columns) else 'id'
@@ -1696,10 +1698,9 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'price_per_yard',
             'shrinkage_percent',
             'stock_qty',
-            'barcode',
-            'qr_code',
             'concern_person',
             'tag',
+            'remarks'
             ]
             for col in search_fields:
                 search_q |= Q(**{f"{col}__icontains": search_value})
@@ -1745,7 +1746,8 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 # obj.barcode,
                 # obj.qr_code,
                 obj.concern_person,
-                obj.get_absolute_url(), 
+                obj.remarks,
+                obj.get_absolute_url(),
             ])
         print("Data:", data)
   
@@ -1914,5 +1916,22 @@ class ProductBarCodePDFView(LoginRequiredMixin, PermissionRequiredMixin, View):
         response['Content-Disposition'] = 'inline; filename="product_barcodes.pdf"'
         return response
 
+# edit product details
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "business_data.change_product"
+    model = Product
+    # fields = [
+    #     'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+    #     'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
+    #     'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
+    #     'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
+    #     'shrinkage_percent', 'stock_qty', 'concern_person','remarks'
+    # ]
+    form_class = ProductUpdateForm
+    
+    template_name = "business_data/manage_products/product_update_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy('business_data:product-detail', kwargs={'pk': self.object.pk})
 """End::Product Details"""
 

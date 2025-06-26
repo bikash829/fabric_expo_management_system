@@ -403,9 +403,11 @@ class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
         recipients = EmailRecipient.objects.all()
+        recipients_category = RecipientCategory.objects.all()
         return render(request, self.template_name, {
             'recipients': recipients,
-            'email_content': email_content
+            'email_content': email_content,
+            'recipients_category': recipients_category,
         })
 
 
@@ -416,7 +418,8 @@ class SendEmailView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def post(self,request,*args,**kwargs):
 
         draft_id = kwargs.get('draft_id')
-        recipient_ids = request.POST.getlist('selectedRecipientIds[]')
+        recipient_category_ids = request.POST.getlist('selectedRecipientsCategoriesId[]')
+        
         session_id = str(uuid.uuid4())
         sender_id = request.user.id
 
@@ -428,7 +431,7 @@ class SendEmailView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
         send_mail_queue.delay(
-            recipient_ids=recipient_ids,
+            recipient_category_ids=recipient_category_ids,
             draft_id=draft_id, 
             sender_id = sender_id,
             session_id = session_id,

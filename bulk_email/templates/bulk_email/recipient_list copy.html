@@ -1,8 +1,8 @@
 {% extends "core/_base.html" %}
 {% load static %}
-{% block title %}Email Recipient Category{% endblock title %}
+{% block title %}Email Recipient List{% endblock title %}
 
-{% block push_css %} 
+{% block push_css %}
 <!--Datatable -->
 <link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
 <link herf="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
@@ -35,19 +35,30 @@
         <table id="recipients" class="table table-striped" style="width:100%">
           <thead>
               <tr>
-                  <th>#ID</th>                  
-                  <th>Recipient's Category</th>
+                  <th>Count</th>
+                  <th>#ID</th>
+                  <th>Recipient Name</th>
+                  <th>Email</th>
               </tr>
           </thead>
           <tbody>
-              {% for item in recipients_category %}
+              {% for item in recipients %}
               <tr>
-                  <td>{{item.pk}}</td>                  
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
                   <td>{{item.name}}</td>
+                  <td>{{item.email}}</td>
               </tr>
               {% endfor %}
           </tbody>
-          
+          <tfoot>
+              <tr>
+                <th>Count</th>
+                <th>#ID</th>
+                <th>Recipient Name</th>
+                <th>Email</th>
+              </tr>
+          </tfoot>
         </table>
       </div>
 
@@ -91,7 +102,13 @@
     const table = $('#recipients').DataTable({
       responsive: true,
       processing: true,
-      
+      lengthMenu: [
+        [50, 100, 500, 1000],
+        [50, 100, 500, 1000]
+      ],
+      pageLength: 50, // Default rows per page
+      // order: [[1, 'desc']] // Order by 2nd column (ID) descending
+      // select: true,
     });
 
     // toggle select recipients
@@ -128,16 +145,17 @@
 
     // Handle "Send Data" button click event to send selected column data to backend
     $('#send-data').on('click', function() {
-      const selectedRecipientsCategoriesId = table.rows('.selected').data().pluck(0).toArray();  // Extract data from the first column (Name)
+      const selectedRecipientIds = table.rows('.selected').data().pluck(1).toArray();  // Extract data from the first column (Name)
       const emailContent = {{email_content.id}}
       
-      if (selectedRecipientsCategoriesId.length === 0){
+      if (selectedRecipientIds.length === 0){
         Swal.fire({
           icon: 'info',
           text: "Please select desired recipients first!"
         });
       }else{
-        
+        console.log(selectedRecipientIds)
+        console.log(emailContent)
         Swal.fire({
           title: "Do you want to send this email to the selected users?",
           showDenyButton: true,
@@ -150,7 +168,7 @@
               url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",  // Replace with your backend endpoint
               type: 'POST',
               data: {
-                selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
+                selectedRecipientIds: selectedRecipientIds,
                 csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
               },
               success: function(response) {

@@ -31,7 +31,10 @@ from fabric_expo_management_system.info import PROJECT_NAME
 def send_mail_queue(**kwargs):
     User = get_user_model()
     email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
-    recipients = EmailRecipient.objects.filter(id__in=kwargs['recipient_ids'])
+    recipient_category_ids = kwargs.get('recipient_category_ids', [])
+    recipients = EmailRecipient.objects.filter(
+        category_id__in=recipient_category_ids
+    )
     sender = User.objects.get(id=kwargs.get('sender_id'))
 
     # Open a single SMTP connection for efficiency

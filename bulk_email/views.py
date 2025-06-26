@@ -419,7 +419,7 @@ class SendEmailView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         draft_id = kwargs.get('draft_id')
         recipient_category_ids = request.POST.getlist('selectedRecipientsCategoriesId[]')
-        
+        selectedCompanyId = request.POST.get('selectedCompanyId')
         session_id = str(uuid.uuid4())
         sender_id = request.user.id
 
@@ -435,7 +435,8 @@ class SendEmailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             draft_id=draft_id, 
             sender_id = sender_id,
             session_id = session_id,
-            )
+            company = selectedCompanyId,
+        )
 
         # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Email has been sent with {success_count} success and {failure_count} failed attempts."})
         return JsonResponse({'message': "Email sending is processing. We will notify you after completion."})

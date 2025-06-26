@@ -3,6 +3,8 @@ import mimetypes
 from premailer import transform
 from bulk_core.utils import replace_hsl_with_rgb
 from django.core.mail import EmailMultiAlternatives, get_connection
+
+from business_data.models import CompanyProfile
 from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, EmailTemplate
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -35,6 +37,10 @@ def send_mail_queue(**kwargs):
     recipients = EmailRecipient.objects.filter(
         category_id__in=recipient_category_ids
     )
+    # company = CompanyProfile.ojects.get(company_name=kwargs.get('company')) 
+    company_info = CompanyProfile.objects.filter(company_name=kwargs.get('company')).first()
+    company_name = company_info.get_company_name_display()
+    # print(company)
     sender = User.objects.get(id=kwargs.get('sender_id'))
 
     # Open a single SMTP connection for efficiency
@@ -53,7 +59,7 @@ def send_mail_queue(**kwargs):
                         {email_content.body}\n\n
 
                         Best Regards,\n
-                        {PROJECT_NAME}\n
+                        {company_name}\n
                     """
 
         # HTML Email (Better Formatting)
@@ -63,7 +69,7 @@ def send_mail_queue(**kwargs):
                             Dear {recipient.name},
                             <p>{email_content.body}</p>
                             <p style="margin-top: 20px;">Best Regards,<br>
-                            <strong>{PROJECT_NAME}</strong></p>
+                            <strong>{company_name}</strong></p>
                         </body>
                         </html>
                     """

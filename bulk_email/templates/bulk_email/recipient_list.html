@@ -134,49 +134,74 @@
       if (selectedRecipientsCategoriesId.length === 0){
         Swal.fire({
           icon: 'info',
-          text: "Please select desired recipients first!"
+          text: "Please select desired recipient's category first!"
         });
       }else{
-        
-        Swal.fire({
-          title: "Do you want to send this email to the selected users?",
-          showDenyButton: true,
-          showCancelButton: true,
-          confirmButtonText: "Send",
-        }).then((result) => {
-          /* Read more about isConfirmed, isDenied below */
-          if (result.isConfirmed) {
-            $.ajax({
-              url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",  // Replace with your backend endpoint
-              type: 'POST',
-              data: {
-                selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
-                csrfmiddlewaretoken: '{{ csrf_token }}'  // Include CSRF token for security
-              },
-              success: function(response) {
-                window.location.href = "{% url 'bulk_email:email_queue' %}";
-                Swal.fire({
-                  position: "top-end",
-                  icon: "success",
-                  title: "Email has been sent",
-                  text: response.message,
-                  showConfirmButton: false,
-                  timer: 5000,
-                });
-              },
-              error: function(xhr, status, error) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong!",
-                });
-              }
-            });
+        const selectedRecipientsCategoriesId = table.rows('.selected').data().pluck(0).toArray();
+        // Prepare company options for the select input
+        const companyOptions = {
+          {% for business_info in business_infos %}
+            '{{ business_info.company_name }}': '{{ business_info.get_company_name_display }}',
+          {% endfor %}
+        };
 
-          } else if (result.isDenied) {
-            Swal.fire("Canceled", "", "info"); 
+        Swal.fire({
+  title: "Select Company",
+  text: "Choose a company before sending.",
+  input: 'select',
+  inputOptions: companyOptions,
+  inputPlaceholder: 'Select a company',
+  showCancelButton: true,
+  confirmButtonText: "Next",
+  preConfirm: (selectedCompanyId) => {
+    if (!selectedCompanyId) {
+      Swal.showValidationMessage('You must select a company!');
+    }
+    return selectedCompanyId;
+  }
+}).then((result) => {
+  if (result.isConfirmed && result.value) {
+    // Second confirmation
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to send this email to the selected users?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Send",
+      cancelButtonText: "Cancel"
+    }).then((confirmResult) => {
+      if (confirmResult.isConfirmed) {
+        $.ajax({
+          url: "{% url 'bulk_email:send_email' draft_id=email_content.id %}",
+          type: 'POST',
+          data: {
+            selectedRecipientsCategoriesId: selectedRecipientsCategoriesId,
+            selectedCompanyId: result.value,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function(response) {
+            window.location.href = "{% url 'bulk_email:email_queue' %}";
+            Swal.fire({
+              position: "top-end",
+              icon: "success",
+              title: "Email has been sent",
+              text: response.message,
+              showConfirmButton: false,
+              timer: 5000,
+            });
+          },
+          error: function(xhr, status, error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
           }
         });
+      }
+    });
+  }
+});
         
       }
       

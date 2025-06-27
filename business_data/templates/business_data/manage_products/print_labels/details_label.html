@@ -33,7 +33,7 @@
     
     .barcode {
       width: auto;
-      height: 38px;
+      height: 50px;
     }
     .sticker-header {
       text-align: center;
@@ -64,7 +64,7 @@
       height: auto;
       position:absolute;
       left: -40px;
-      top: 35px;
+      top: 33px;
     }
     .qr-img{
       width: 100%;
@@ -103,14 +103,20 @@
           <td class="label">GSM</td>
           <td>{{ product.weight|truncatechars:22 }}</td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td class="label">Finish Type</td>
           <td> SOFT</td>
-        </tr>
+        </tr> -->
+        
         <tr>
           <td class="label">Remarks</td>
+          <td> {{ product.remarks|truncatechars:22 }}</td>
+        </tr>
+        <tr>
+          <td class="label"></td>
           <td> </td>
         </tr>
+        <tr>
         <tr>
           <td class="label" style="padding-top: 8px;">Barcode</td>
           <td> <img class="barcode" src="{{ product.barcode.url }}" alt="Barcode" /></td>

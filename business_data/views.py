@@ -406,7 +406,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # ])
             data.append({
                 'id': obj.id,
-                'date': obj.date,
+                'date': obj.date.strftime("%B %d, %Y") if obj.date else "",
                 'company_name': getattr(obj, 'company_name', ''),
                 'organization_type': getattr(obj, 'organization_type', ''),
                 'brand': getattr(obj, 'brand', ''),
@@ -415,7 +415,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'buyer_name': getattr(obj, 'buyer_name', ''),
                 'designation': getattr(obj, 'designation', ''),
                 'country_of_origin': getattr(obj, 'country_of_origin', ''),
-                'website': getattr(obj, 'website', ''),
+                'website': f'<a href="{obj.website}" target="_blank">{obj.website}</a>' if getattr(obj, 'website', '') else '',
                 'emails': ', '.join([email.email for email in obj.emails.all()]),
                 'phones': ', '.join([phone.phone for phone in obj.phones.all() if not phone.is_whatsapp]),
                 'whatsapp_numbers': ', '.join([phone.phone for phone in obj.phones.all() if phone.is_whatsapp]),
@@ -423,7 +423,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'fabric_reference': getattr(obj, 'fabric_reference', ''),
                 'mailing_address': getattr(obj, 'mailing_address', ''),
                 'visiting_address': getattr(obj, 'visiting_address', ''),
-                'linkedin_profile': getattr(obj, 'linkedin_profile', ''),
+                'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
                 'tag': getattr(obj, 'tag', ''),
@@ -814,7 +814,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         for obj in qs:
             data.append({
                 'id': obj.id,
-                'date': obj.date,
+                'date': obj.date.strftime("%B %d, %Y") if obj.date else "",
                 'company_name': getattr(obj, 'company_name', ''),
                 'organization_type': getattr(obj, 'organization_type', ''),
                 'brand': getattr(obj, 'brand', ''),
@@ -823,7 +823,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'customer_name': getattr(obj, 'customer_name', ''),
                 'designation': getattr(obj, 'designation', ''),
                 'country_of_origin': getattr(obj, 'country_of_origin', ''),
-                'website': getattr(obj, 'website', ''),
+                'website': f'<a href="{obj.website}" target="_blank">{obj.website}</a>' if getattr(obj, 'website', '') else '',
                 'emails': ', '.join([p.email for p in obj.emails.all()]),
                 'phones': ', '.join([p.phone for p in obj.phones.all() if not p.is_whatsapp]),
                 'whatsapp_numbers': ', '.join([p.phone for p in obj.phones.all() if p.is_whatsapp]),
@@ -831,7 +831,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'fabric_reference': getattr(obj, 'fabric_reference', ''),
                 'mailing_address': getattr(obj, 'mailing_address', ''),
                 'visiting_address': getattr(obj, 'visiting_address', ''),
-                'linkedin_profile': getattr(obj, 'linkedin_profile', ''),
+                'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
                 'tag': getattr(obj, 'tag', ''),
@@ -1287,7 +1287,7 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         for obj in qs:
             data.append({
                 'id': obj.id,
-                'date': obj.date,
+                'date':obj.date.strftime("%B %d, %Y") if obj.date else "",
                 'mill_name': getattr(obj, 'mill_name', ''),
                 'supplier_name': getattr(obj, 'supplier_name', ''),
                 'concern_person': getattr(obj, 'concern_person', ''),
@@ -1307,7 +1307,7 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'fabric_reference': getattr(obj, 'fabric_reference', ''),
                 'mailing_address': getattr(obj, 'mailing_address', ''),
                 'visiting_address': getattr(obj, 'visiting_address', ''),
-                'linkedin_profile': getattr(obj, 'linkedin_profile', ''),
+                'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
                 'tag': getattr(obj, 'tag', ''),
@@ -1717,11 +1717,11 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             data.append([
                 # idx,  # For Count column (can be filled on client side)
                 obj.id,
-                obj.date,
+                obj.date.strftime("%B %d, %Y") if obj.date else "",
                 obj.fabric_article_supplier,
                 obj.fabric_article_fexpo,
                 obj.fabric_mill_supplier,
-                obj.rd_generated_date,
+                obj.rd_generated_date.strftime("%B %d, %Y") if obj.rd_generated_date else "",
                 obj.fabric_mill_source,
                 obj.coo,
                 obj.product_category,

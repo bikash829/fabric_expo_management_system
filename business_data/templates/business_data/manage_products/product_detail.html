@@ -79,6 +79,12 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Rd Generated Date</label>
+                                    <p class="mb-0" id="date">{{ product.rd_generated_date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
                                     <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Supplier</label>
                                     <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_mill_supplier }}</p>
                                 </div>
@@ -157,6 +163,12 @@
                                 <div class="mb-3">
                                     <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Concern Person</label>
                                     <p class="mb-0" id="concern-person">{{ product.concern_person }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1"></label>
+                                    <p class="mb-0" id="concern-person"></p>
                                 </div>
                             </div>
                         </div>

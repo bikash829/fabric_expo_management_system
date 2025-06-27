@@ -451,7 +451,7 @@ class CommunicationTrackerDataView(View):
         # Prepare data lists aligned with labels
         email_data = [email_data_map.get(label, 0) for label in labels]
         whatsapp_data = [whatsapp_data_map.get(label, 0) for label in labels]
-
+    
         return JsonResponse({
             'labels': labels,
             'email_data': email_data,

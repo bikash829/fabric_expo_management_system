@@ -29,6 +29,7 @@ class FileUploadForm(forms.Form):
 class ProductUpdateForm(forms.ModelForm):
 
     date = forms.DateField(widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}))
+    article_no = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     fabric_article_supplier = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
     fabric_article_fexpo = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
     fabric_mill_supplier = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -58,7 +59,7 @@ class ProductUpdateForm(forms.ModelForm):
     class Meta:
         model =Product
         fields = [
-            'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+            'date','article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
             'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',

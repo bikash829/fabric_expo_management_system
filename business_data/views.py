@@ -1354,7 +1354,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         writer = csv.writer(response)
         writer.writerow([
-            "date", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
+            "date", "article_no", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
             "construction", "weight", "color", "cut_width",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
@@ -1370,8 +1370,11 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         # images = ["image1.png", "image2.jpg", "image2.png"]
 
         for _ in range(50):  # Change to any number you want
+            # Generate a unique article number (e.g., ART-YYYYMMDD-XXXXX)
+            article_no = f"ART-{fake.date_this_decade().strftime('%Y%m%d')}-{randint(10000, 99999)}"
             writer.writerow([
                 fake.date_this_decade().strftime("%d/%m/%Y"),
+                article_no,
                 fake.company(),
                 fake.company(),
                 fake.company(),
@@ -1402,30 +1405,6 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
             ])
 
         """end::faker"""
-        # writer.writerow([
-        #     "2025-05-16", "ABC Textiles Ltd", "ExpoTex 2025", "Global Mills Co.", "2025-04-01", "China",
-        #     "CN", "Denim", "GM1234", "ETX-567", "Spring/Summer", "ST-001", "PO12345", "Levi's", "98% Cotton, 2% Spandex",
-        #     "3x1 Right Hand Twill", "12 oz", "Indigo Blue", "58 in",
-        #     "Enzyme Wash", "7.50", "2.5", "1200",
-        #     "image1.png", "123456789012", "https://example.com/qrcode1", "John Doe"
-        # ])
-
-        # writer.writerow([
-        #     "2025-05-16", "XYZ Fabrics", "Global Fabric Expo", "TexSource India", "2025-03-20", "India",
-        #     "IN", "Twill", "TX5678", "GFE-789", "Fall/Winter", "ST-002", "PO67890", "Zara", "100% Cotton",
-        #     "2x2 Twill", "10 oz", "Charcoal Grey", "56 in",
-        #     "Stone Wash", "6.80", "3.0", "850",
-        #     "image2.jpg", "987654321098", "https://example.com/qrcode2", "Jane Smith"
-        # ])
-
-        # writer.writerow([
-        #     "2025-05-16", "Elite Textiles", "AsiaTex Show", "Premium Mills", "2025-02-15", "Bangladesh",
-        #     "BD", "Chino", "PM7890", "ATS-234", "Resort", "ST-003", "PO11223", "H&M", "97% Cotton, 3% Elastane",
-        #     "Fine Chino Weave", "8 oz", "Khaki", "60 in",
-        #     "No Wash", "5.95", "1.8", "500",
-        #     "image2.png", "456789123456", "https://example.com/qrcode3", "Alex Lee"
-        # ])
-
 
         return response
  
@@ -1479,7 +1458,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         # List all fields you want to check for duplicates
         fields_to_check = [
-            "date", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
+            "date","article_no", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
             "construction", "weight", "color", "cut_width",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
@@ -1493,46 +1472,6 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if field in [f.name for f in Product._meta.get_fields() if not f.is_relation]:
                  
                 existing_values[field] = set(Product.objects.values_list(field, flat=True))
-            
-            # # Related email field
-            # elif field == 'email_id1':
-            #     existing_values[field] = set(
-            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
-            #     )
-            # # Related email field
-            # elif field == 'email_id2':
-            #     existing_values[field] = set(
-            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
-            #     )
-            # # Related email field
-            # elif field == 'email_id3':
-            #     existing_values[field] = set(
-            #         PersonEmail.objects.filter(contact_info_id__in=Product.objects.values('id')).values_list('email', flat=True)
-            #     )
-
-            # elif field == 'phone_number1':
-            #     existing_values[field] = set(
-            #         PersonPhone.objects.filter(
-            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
-            #             is_whatsapp=False
-            #         ).values_list('phone', flat=True)
-            #     )
-            # elif field == 'phone_number2':
-            #     existing_values[field] = set(
-            #         PersonPhone.objects.filter(
-            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
-            #             is_whatsapp=False
-            #         ).values_list('phone', flat=True)
-            #     )
-
-            # elif field == 'whatsapp_number':
-            #     existing_values[field] = set(
-            #         PersonPhone.objects.filter(
-            #             contact_info_id__in=Product.objects.values_list('id', flat=True),
-            #             is_whatsapp=True
-            #         ).values_list('phone', flat=True)
-            #     )
-
 
         # Mark duplicates for each cell
         for row in preview_data:
@@ -1549,7 +1488,6 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     value = round(Decimal(value), 2)
                 
                 row['duplicates'][field] = value in existing_values[field] if value else False
-
         context = {
             'products': preview_data,
             'file_info': file_info,
@@ -1580,35 +1518,69 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 with transaction.atomic():
                     for _, row in df.iterrows():
                         try:
-                            Product.objects.create(
-                                date=datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
-                                fabric_article_supplier=row.get('fabric_article_supplier', ''),
-                                fabric_article_fexpo=row.get('fabric_article_fexpo', ''),
-                                fabric_mill_supplier=row.get('fabric_mill_supplier', ''),
-                                rd_generated_date=datetime.strptime(row.get('rd_generated_date', ''), "%d/%m/%Y").date(),
-                                fabric_mill_source=row.get('fabric_mill_source', ''),
-                                coo=row.get('coo', ''),
-                                product_category=row.get('product_category', ''),
-                                mill_reference=row.get('mill_reference', ''),
-                                fabricexpo_reference=row.get('fabricexpo_reference', ''),
-                                season=row.get('season', ''),
-                                style=row.get('style', ''),
-                                po=row.get('po', ''),
-                                customer_name=row.get('customer_name', ''),
-                                composition=row.get('composition', ''),
-                                construction=row.get('construction', ''),
-                                weight=row.get('weight', ''),
-                                color=row.get('color', ''),
-                                cut_width=row.get('cut_width', ''),
-                                wash=row.get('wash', ''),
-                                price_per_yard=row.get('price_per_yard', 0),
-                                shrinkage_percent=row.get('shrinkage_percent', 0),
-                                stock_qty=row.get('stock_qty', 0),
-                                # barcode=row.get('barcode', ''),
-                                # qr_code=row.get('qr_code', ''),
-                                concern_person=row.get('concern_person', ''),
-                                tag=tag,
-                                remarks=row.get('remarks', '')
+                            # Product.objects.create(
+                            #     date=datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
+                            #     article_no=row.get('article_no', ''),
+                            #     fabric_article_supplier=row.get('fabric_article_supplier', ''),
+                            #     fabric_article_fexpo=row.get('fabric_article_fexpo', ''),
+                            #     fabric_mill_supplier=row.get('fabric_mill_supplier', ''),
+                            #     rd_generated_date=datetime.strptime(row.get('rd_generated_date', ''), "%d/%m/%Y").date(),
+                            #     fabric_mill_source=row.get('fabric_mill_source', ''),
+                            #     coo=row.get('coo', ''),
+                            #     product_category=row.get('product_category', ''),
+                            #     mill_reference=row.get('mill_reference', ''),
+                            #     fabricexpo_reference=row.get('fabricexpo_reference', ''),
+                            #     season=row.get('season', ''),
+                            #     style=row.get('style', ''),
+                            #     po=row.get('po', ''),
+                            #     customer_name=row.get('customer_name', ''),
+                            #     composition=row.get('composition', ''),
+                            #     construction=row.get('construction', ''),
+                            #     weight=row.get('weight', ''),
+                            #     color=row.get('color', ''),
+                            #     cut_width=row.get('cut_width', ''),
+                            #     wash=row.get('wash', ''),
+                            #     price_per_yard=row.get('price_per_yard', 0),
+                            #     shrinkage_percent=row.get('shrinkage_percent', 0),
+                            #     stock_qty=row.get('stock_qty', 0),
+                            #     # barcode=row.get('barcode', ''),
+                            #     # qr_code=row.get('qr_code', ''),
+                            #     concern_person=row.get('concern_person', ''),
+                            #     tag=tag,
+                            #     remarks=row.get('remarks', '')
+                            # )
+                            Product.objects.update_or_create(
+                                article_no=row.get('article_no', ''),
+                                defaults={
+                                    'date': datetime.strptime(row.get('date'), "%d/%m/%Y").date(),
+                                    'fabric_article_supplier': row.get('fabric_article_supplier', ''),
+                                    'fabric_article_fexpo': row.get('fabric_article_fexpo', ''),
+                                    'fabric_mill_supplier': row.get('fabric_mill_supplier', ''),
+                                    'rd_generated_date': datetime.strptime(row.get('rd_generated_date', ''), "%d/%m/%Y").date() if row.get('rd_generated_date', '') else None,
+                                    'fabric_mill_source': row.get('fabric_mill_source', ''),
+                                    'coo': row.get('coo', ''),
+                                    'product_category': row.get('product_category', ''),
+                                    'mill_reference': row.get('mill_reference', ''),
+                                    'fabricexpo_reference': row.get('fabricexpo_reference', ''),
+                                    'season': row.get('season', ''),
+                                    'style': row.get('style', ''),
+                                    'po': row.get('po', ''),
+                                    'customer_name': row.get('customer_name', ''),
+                                    'composition': row.get('composition', ''),
+                                    'construction': row.get('construction', ''),
+                                    'weight': row.get('weight', ''),
+                                    'color': row.get('color', ''),
+                                    'cut_width': row.get('cut_width', ''),
+                                    'wash': row.get('wash', ''),
+                                    'price_per_yard': row.get('price_per_yard', 0),
+                                    'shrinkage_percent': row.get('shrinkage_percent', 0),
+                                    'stock_qty': row.get('stock_qty', 0),
+                                    # 'barcode': row.get('barcode', ''),
+                                    # 'qr_code': row.get('qr_code', ''),
+                                    'concern_person': row.get('concern_person', ''),
+                                    'tag': tag,
+                                    'remarks': row.get('remarks', ''),
+                                }
                             )
                         except Exception as row_e:
                             logger.error("Row import failed: %s", row_e)
@@ -1655,7 +1627,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
 
         columns = [
-            'id', 'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+            'id', 'date', 'article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
             'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
@@ -1676,6 +1648,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             search_fields = [
             'id',
             'date',
+            'article_no',
             'fabric_article_supplier',
             'fabric_article_fexpo',
             'fabric_mill_supplier',
@@ -1718,6 +1691,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 # idx,  # For Count column (can be filled on client side)
                 obj.id,
                 obj.date.strftime("%B %d, %Y") if obj.date else "",
+                obj.article_no,
                 obj.fabric_article_supplier,
                 obj.fabric_article_fexpo,
                 obj.fabric_mill_supplier,

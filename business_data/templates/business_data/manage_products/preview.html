@@ -45,6 +45,7 @@
                       <tr>
                           <th>Count</th>
                           <th>{{'date'|pretty_label}}</th>
+                          <th>{{'article_no'|pretty_label}}</th>
                           <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
                           <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
                           <th>{{'fabric_mill (supplier)'|pretty_label}}</th>
@@ -78,12 +79,21 @@
                   <tbody>
                       {% for item in products %}
                       <tr>
-                          <td>{{forloop.counter}}</td>
+                          <td>
+                            {{forloop.counter}}
+                          </td>
                             <td>
                             {% if item.duplicates.date %}
                               <mark>{{ item.date }}</mark>
                             {% else %}
                               {{ item.date }}
+                            {% endif %}
+                            </td>
+                            <td>
+                            {% if item.duplicates.article_no %}
+                              <mark>{{ item.article_no }}</mark>
+                            {% else %}
+                              {{ item.article_no }}
                             {% endif %}
                             </td>
                             <td>
@@ -262,6 +272,7 @@
                       <tr>
                           <th>Count</th>
                           <th>{{'date'|pretty_label}}</th>
+                          <th>{{'article_no'|pretty_label}}</th>
                           <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
                           <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
                           <th>{{'fabric_mill (supplier)'|pretty_label}}</th>

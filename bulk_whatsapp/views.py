@@ -35,6 +35,7 @@ from django.db.models import F
 
 # forms
 from bulk_whatsapp.forms import  MessageDraftUpdateForm, TempRecipientImportForm, MessageCreationForm
+from django.db.models import Count
 
 
 """begin:: Utility functions """
@@ -433,7 +434,9 @@ class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         whatsapp_content = get_object_or_404(WhatsappTemplate,id=kwargs.get('draft_id'))
         recipients = WhatsappRecipient.objects.all()
-        recipients_category = RecipientCategory.objects.all()
+        recipients_category = RecipientCategory.objects.annotate(
+            whatsapp_count=Count('whatsapprecipient')
+        )
 
         return render(request, self.template_name, {
             'recipients': recipients,

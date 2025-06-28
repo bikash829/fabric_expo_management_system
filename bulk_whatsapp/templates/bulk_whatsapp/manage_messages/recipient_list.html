@@ -37,6 +37,7 @@
               <tr>
                   <th>#ID</th>
                   <th>Category Name</th>
+                  <th>Total Recipients</th>
               </tr>
           </thead>
           <tbody>
@@ -44,6 +45,8 @@
               <tr>
                   <td>{{item.pk}}</td>
                   <td>{{item.name}}</td>
+                  <td>{{ item.whatsapp_count }} recipient{{ item.whatsapp_count|pluralize }}</td>
+                  <!-- <td>{{item.whatsapp_count}}</td> -->
               </tr>
               {% endfor %}
           </tbody>

@@ -393,7 +393,7 @@ class DeleteEmailDraftView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVi
         return redirect(self.success_url)
      
 """end::writing email"""
-    
+from django.db.models import Count
 
 """begin::sending email"""
 class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -402,10 +402,13 @@ class SelectRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         email_content = get_object_or_404(EmailTemplate,id=kwargs.get('draft_id'))
-        recipients = EmailRecipient.objects.all()
-        recipients_category = RecipientCategory.objects.all()
+        # recipients = EmailRecipient.objects.all()
+        # recipients_category = RecipientCategory.objects.all()
+        recipients_category = RecipientCategory.objects.annotate(
+            email_count=Count('emailrecipient')
+        )
         return render(request, self.template_name, {
-            'recipients': recipients,
+            # 'recipients': recipients,
             'email_content': email_content,
             'recipients_category': recipients_category,
         })

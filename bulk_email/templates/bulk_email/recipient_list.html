@@ -37,6 +37,7 @@
               <tr>
                   <th>#ID</th>                  
                   <th>Recipient's Category</th>
+                  <th>Total Recipeints</th>
               </tr>
           </thead>
           <tbody>
@@ -44,6 +45,7 @@
               <tr>
                   <td>{{item.pk}}</td>                  
                   <td>{{item.name}}</td>
+                  <td>{{item.email_count}} recipient{{item.email_count|pluralize}}</td>
               </tr>
               {% endfor %}
           </tbody>

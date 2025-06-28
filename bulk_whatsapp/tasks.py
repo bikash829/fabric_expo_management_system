@@ -51,7 +51,7 @@ def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id,
     # Loop through each recipient
     for recipient in recipients:
         # Plain text fallback
-        text_body = f"Hello {recipient.name},\n{whatsapp_content.message_content}\nBest Regards,\n{company_name}\n"
+        text_body = f"Hello {recipient.name},\n\n{whatsapp_content.message_content}\n\nBest Regards,\n{company_name}\n"
         # Send the message
         try:
             message = client.messages.create(

@@ -1356,7 +1356,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         writer.writerow([
             "date", "article_no", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
-            "construction", "weight", "color", "cut_width",
+            "construction", "weight", "color", "cut_width", "weave",
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
             "concern_person","remarks"
         ])
@@ -1389,10 +1389,11 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
                 fake.bothify(text="PO#####"),
                 fake.company(),
                 f"{randint(90, 100)}% Cotton, {randint(0, 10)}% Spandex",
-                fake.word().capitalize() + " Weave",
+                fake.word().capitalize(),
                 f"{randint(7, 14)} oz",
                 choice(colors),
                 f"{randint(50, 65)} in",
+                "3/1 Z twill",
                 choice(washes),
                 round(uniform(3.0, 15.0), 2),
                 round(uniform(1.0, 5.0), 2),
@@ -1460,7 +1461,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         fields_to_check = [
             "date","article_no", "fabric_article_supplier", "fabric_article_fexpo", "fabric_mill_supplier", "rd_generated_date", "fabric_mill_source",
             "coo", "product_category", "mill_reference", "fabricexpo_reference","season","style",  "po","customer_name","composition",
-            "construction", "weight", "color", "cut_width",
+            "construction", "weight", "color", "cut_width", 'weave',
             "wash", "price_per_yard", "shrinkage_percent", "stock_qty",
             "concern_person", "remarks"
         ]
@@ -1492,7 +1493,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'products': preview_data,
             'file_info': file_info,
         }
-
+        print(preview_data)
         return render(request, 'business_data/manage_products/preview.html', context)
 
     def post(self, request):
@@ -1571,6 +1572,7 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                                     'weight': row.get('weight', ''),
                                     'color': row.get('color', ''),
                                     'cut_width': row.get('cut_width', ''),
+                                    'weave': row.get('weave', ''),
                                     'wash': row.get('wash', ''),
                                     'price_per_yard': row.get('price_per_yard', 0),
                                     'shrinkage_percent': row.get('shrinkage_percent', 0),
@@ -1630,7 +1632,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'id', 'date', 'article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
-            'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
+            'construction', 'weight', 'color', 'cut_width', 'weave' ,'wash', 'price_per_yard',
             'shrinkage_percent', 'stock_qty', 'concern_person','remarks'
         ]
 
@@ -1667,6 +1669,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'weight',
             'color',
             'cut_width',
+            'weave',
             'wash',
             'price_per_yard',
             'shrinkage_percent',
@@ -1710,6 +1713,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 obj.weight,
                 obj.color,
                 obj.cut_width,
+                obj.weave,
                 obj.wash,
                 obj.price_per_yard,
                 obj.shrinkage_percent,

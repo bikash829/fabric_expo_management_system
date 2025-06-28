@@ -64,6 +64,7 @@
                           <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
                           <th>{{'color'|pretty_label}}</th>
                           <th>{{'cut_width (inch)'|pretty_label}}</th>
+                          <th>{{'weave'|pretty_label}}</th>
                           <th>{{'wash'|pretty_label}}</th>
                           <th>{{'price (yards)'|pretty_label}}</th>
                           <th>{{'shrinkage%'|pretty_label}}</th>
@@ -223,6 +224,13 @@
                             {% endif %}
                             </td>
                             <td>
+                            {% if item.duplicates.weave %}
+                              <mark>{{ item.weave }}</mark>
+                            {% else %}
+                              {{ item.weave }}
+                            {% endif %}
+                            </td>
+                            <td>
                             {% if item.duplicates.wash %}
                               <mark>{{ item.wash }}</mark>
                             {% else %}
@@ -291,6 +299,7 @@
                           <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
                           <th>{{'color'|pretty_label}}</th>
                           <th>{{'cut_width (inch)'|pretty_label}}</th>
+                          <th>{{'weave'|pretty_label}}</th>
                           <th>{{'wash'|pretty_label}}</th>
                           <th>{{'price (yards)'|pretty_label}}</th>
                           <th>{{'shrinkage%'|pretty_label}}</th>

@@ -48,6 +48,7 @@ class ProductUpdateForm(forms.ModelForm):
     weight = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
     color = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     cut_width = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    weave = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control'}))
     wash = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}))
     price_per_yard = forms.DecimalField(max_digits=10, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control'}))
     shrinkage_percent = forms.DecimalField(max_digits=5, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control'}))
@@ -62,6 +63,6 @@ class ProductUpdateForm(forms.ModelForm):
             'date','article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
-            'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
+            'construction', 'weight', 'color', 'cut_width','weave', 'wash', 'price_per_yard',
             'shrinkage_percent', 'stock_qty', 'concern_person','remarks'
         ]

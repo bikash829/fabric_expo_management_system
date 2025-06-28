@@ -14,60 +14,76 @@
       
     }
     .sticker-container {
-      display: grid;
-      grid-template-columns: 80% 20%;
+      position: relative;
       border: 1px solid #000;
-      margin: 2px 2px 2px 2px;
+      margin: 2px 2px 0 2px;
+      padding: 2px 0 2px 2px;
     }
     .sticker {
-      
       box-sizing: border-box;
-      
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-      overflow: hidden;
+      font-family: 'Century Gothic', sans-serif; 
+      font-size: 12px;
     }
-    .sticker-right {
-      position: relative
-    }
-    
     .barcode {
       width: auto;
       height: 50px;
     }
     .sticker-header {
       text-align: center;
-      font-size: 12px;
       font-weight: bold;
-      margin-bottom: 2px;
       word-break: break-word;
+      font-size: 16px;
+      padding-bottom: 6px;
     }
     
     .sticker-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 10px;
+      font-size:10px;
+      margin-bottom: 19px;
     }
     .sticker-table td {
-      /* border: 1px solid #000;*/
-      padding: 1px 2px;
+      border-width: 0.5px 0 0.5px 0.5px; /* top, right, bottom, left */
+      border-style: solid;
+      border-color: #000;
       vertical-align: top;
       word-break: break-word;
+      padding: 0 2px 0 2px;
+      margin: 0;
     }
     .label {
-      width: 38%;
+      width: 22%;
       font-weight: bold;
       
     }
-    .qr-code{
-      width: 100px;
+    .sticker-right {
+      position: absolute;
+      top: 2px;
+      right: .1px;
+      /*width: 55px;*/
+      width: 41px;
       height: auto;
-      position:absolute;
-      left: -40px;
-      top: 33px;
+    }
+    .qr-code{
+      width: 100%;
+      height: auto;
+      
     }
     .qr-img{
       width: 100%;
+    }
+
+    .barcode_container{
+      height: 20px;
+      position: absolute;
+      bottom: .5px;
+      left: 46%;
+    }
+    .barcode{
+      height: 100%;
+    }
+    .small-font{
+      font-size:8px !important;
     }
   </style>
 </head>
@@ -78,12 +94,14 @@
       <!-- <div class="sticker-subheader">{{product.mill_reference}}</div> -->
       <table class="sticker-table">
         <tr>
-          <td class="label">Article No</td>
-          <td>{{ product.fabric_article_supplier }}</td>
+          <td class="label">Article No.</td>
+          <td>{{ product.article_no }}</td>
         </tr>
         <tr>
-          <td class="label">Composition</td>
-            <td> {{ product.composition|truncatechars:20 }}</td>
+          <td class="label ">Composition</td>
+            <td 
+            class="{% if product.composition|length  > 50 %}small-font{% endif %}">
+            {{ product.composition }}</td>
         </tr>
         <tr>
           <td class="label">Construction</td>
@@ -91,38 +109,32 @@
         </tr>
       
         <tr>
-          <td class="label">Weave Type</td>
-          <td> 2/2 MATT</td>
+          <td class="label">Weave</td>
+          <td> {{ product.weave}}</td>
         </tr>
       
         <tr>
-          <td class="label">Finish Width (In)</td>
-          <td> {{ product.cut_width|truncatechars:22 }}"</td>
+          <td class="label">Width (inch) </td>
+          <td> {{ product.cut_width|truncatechars:40 }}"</td>
         </tr>
         <tr>
-          <td class="label">GSM</td>
+          <td class="label">Weight (GMS)</td>
           <td>{{ product.weight|truncatechars:22 }}</td>
         </tr>
-        <!-- <tr>
-          <td class="label">Finish Type</td>
-          <td> SOFT</td>
-        </tr> -->
-        
+        <tr>
+          <td class="label">COO</td>
+          <td>{{ product.coo|truncatechars:35}}</td>
+        </tr>
         <tr>
           <td class="label">Remarks</td>
           <td> {{ product.remarks|truncatechars:22 }}</td>
         </tr>
-        <tr>
-          <td class="label"></td>
-          <td> </td>
-        </tr>
-        <tr>
-        <tr>
-          <td class="label" style="padding-top: 8px;">Barcode</td>
-          <td> <img class="barcode" src="{{ product.barcode.url }}" alt="Barcode" /></td>
-        </tr>
       </table>
-      
+    </div>
+
+
+    <div class="barcode_container">
+       <img class="barcode" src="{{ product.barcode.url }}" alt="Barcode" />
     </div>
     <div class="sticker-right">
       <div class="qr-code">

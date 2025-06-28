@@ -133,6 +133,7 @@ class Product(SoftDeleteModel):
     weight = models.CharField(max_length=50,blank=True,null=True)  # e.g., "220 GSM"
     color = models.CharField(max_length=100,blank=True,null=True)
     cut_width = models.CharField(max_length=50,blank=True,null=True)
+    weave = models.CharField(max_length=100,blank=True,null=True)
     wash = models.CharField(max_length=100,blank=True,null=True)
     price_per_yard = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     shrinkage_percent  = models.DecimalField(max_digits=5, decimal_places=2,blank=True,null=True)

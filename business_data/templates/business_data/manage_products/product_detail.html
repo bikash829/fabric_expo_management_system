@@ -372,12 +372,14 @@
                                     <i class="fas fa-plus me-1"></i> Add Sample
                                 </button>
                             </div>
-                            
+
                             <div class="sample-gallery">
                                 {% for sample in product.images.all %}
                                 <div class="sample-card">
                                     <div class="sample-img-container">
-                                        <img src="{{ sample.image.url }}" alt="{{ sample.alt_text }}">
+                                        <a href="{{ sample.image.url }}" target="_blank">
+                                            <img src="{{ sample.image.url }}" alt="{{ sample.alt_text }}" class="img-thumbnail sample-thumbnail">
+                                        </a>
                                         <div class="sample-actions">
                                             <button class="btn btn-danger btn-sm delete-sample" data-sample-id="{{ sample.id }}" title="Delete Sample">
                                                 <i class="fas fa-trash"></i>
@@ -386,9 +388,7 @@
                                     </div>
                                     <div class="sample-title">
                                         <h6 class="mb-0">{{ sample.get_sample_type_display }}</h6>
-                                        <!-- {% if sample.alt_text %}
-                                        <p class="small text-muted mb-0 mt-1">{{ sample.alt_text|truncatechars:50 }}</p>
-                                        {% endif %} -->
+                                        <!-- <p class="small text-muted mb-0 mt-1">{{ sample.alt_text|truncatechars:50 }}</p> -->
                                     </div>
                                 </div>
                                 {% empty %}
@@ -398,7 +398,52 @@
                                 </div>
                                 {% endfor %}
                             </div>
+
+                            
+                            {%comment%} 
+                            <div class="sample-gallery">
+                                {% for sample in product.images.all %}
+                                <div class="sample-card">
+                                    <div class="sample-img-container">
+                                        <img src="{{ sample.image.url }}" alt="{{ sample.alt_text }}"
+                                            class="img-thumbnail sample-thumbnail"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#imageModal"
+                                            data-image="{{ sample.image.url }}"
+                                            data-alt="{{ sample.alt_text }}">
+                                        <div class="sample-actions">
+                                            <button class="btn btn-danger btn-sm delete-sample" data-sample-id="{{ sample.id }}" title="Delete Sample">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="sample-title">
+                                        <h6 class="mb-0">{{ sample.get_sample_type_display }}</h6>
+                                        <!-- <p class="small text-muted mb-0 mt-1">{{ sample.alt_text|truncatechars:50 }}</p> -->
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center py-4">
+                                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No samples available for this product</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {%endcomment%}
+
                         </div>
+
+                        <!-- View sample image modal -->
+                        <!-- Shared Fullscreen Image Modal -->
+                        <!-- <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content bg-dark border-0">
+                            <div class="modal-body text-center p-0">
+                                <img id="modalImage" src="" alt="" class="img-fluid mh-100">
+                            </div>
+                            </div>
+                        </div>
+                        </div> -->
 
                         <!-- Upload Sample Modal -->
                         <div class="modal fade" id="uploadSampleModal" tabindex="-1" aria-labelledby="uploadSampleModalLabel" aria-hidden="true">
@@ -580,7 +625,15 @@
         
     });
 </script>
-
+<script>
+    $(document).ready(function() {
+        $('.sample-thumbnail').on('click', function() {
+            var imgSrc = $(this).data('image');
+            var altText = $(this).data('alt') || 'Sample Image';
+            $('#modalImage').attr('src', imgSrc).attr('alt', altText);
+        });
+    });
+</script>
 
 <script>
     $(function() {
@@ -672,8 +725,10 @@
                             icon: 'success',
                             title: 'Sample Uploaded',
                             text: response.message || 'Sample uploaded successfully',
-                            timer: 1500,
-                            showConfirmButton: false
+                            // timer: 1500,
+                            // showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
                         });
                     } else {
                         resetFormImage();

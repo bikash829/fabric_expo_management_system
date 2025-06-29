@@ -358,67 +358,67 @@ class QrCodeActivityDataView(View):
         period = request.GET.get('period', 'week')  # Default to weekly
         end_date = timezone.now().date()
 
-        # if period == 'month':
-        #     # Monthly data for last 12 months
-        #     start_date = end_date - timedelta(days=365)
-        #     data = (
-        #         Product.objects
-        #         .filter(date__gte=start_date)
-        #         .annotate(period=TruncMonth('date'))
-        #         .values('period')
-        #         .annotate(count=Count('id'))
-        #         .order_by('period')
-        #     )
+        if period == 'month':
+            # Monthly data for last 12 months
+            start_date = end_date - timedelta(days=365)
+            data = (
+                Product.objects
+                .filter(date__gte=start_date)
+                .annotate(period=TruncMonth('date'))
+                .values('period')
+                .annotate(count=Count('id'))
+                .order_by('period')
+            )
             
-        #     # Generate all months in range (including empty ones)
-        #     labels = []
-        #     data_points = []
-        #     current_month = end_date.replace(day=1)
+            # Generate all months in range (including empty ones)
+            labels = []
+            data_points = []
+            current_month = end_date.replace(day=1)
             
-        #     for i in range(12):
-        #         month = current_month - timedelta(days=30*i)
-        #         month = month.replace(day=1)
-        #         labels.insert(0, month.strftime('%b %Y'))
-        #         count = next(
-        #             (item['count'] for item in data 
-        #             if item['period'].replace(day=1) == month),  # Removed .date()
-        #             0
-        #         )
-        #         data_points.insert(0, count)
+            for i in range(12):
+                month = current_month - timedelta(days=30*i)
+                month = month.replace(day=1)
+                labels.insert(0, month.strftime('%b %Y'))
+                count = next(
+                    (item['count'] for item in data 
+                    if item['period'].replace(day=1) == month),  # Removed .date()
+                    0
+                )
+                data_points.insert(0, count)
                 
-        # else:
-        #     # Weekly data for last 12 weeks
-        #     start_date = end_date - timedelta(weeks=24)
-        #     data = (
-        #         Product.objects
-        #         .filter(created_at__gte=start_date)
-        #         .annotate(period=TruncWeek('created_at'))
-        #         .values('period')
-        #         .annotate(count=Count('id'))
-        #         .order_by('period')
-        #     )
+        else:
+            # Weekly data for last 12 weeks
+            start_date = end_date - timedelta(weeks=24)
+            data = (
+                Product.objects
+                .filter(created_date__gte=start_date)
+                .annotate(period=TruncWeek('created_date'))
+                .values('period')
+                .annotate(count=Count('id'))
+                .order_by('period')
+            )
             
-        #     # Generate all weeks in range (including empty ones)
-            # labels = []
-            # data_points = []
+            # Generate all weeks in range (including empty ones)
+            labels = []
+            data_points = []
             
-        #     for i in range(24):
-        #         week_start = end_date - timedelta(weeks=(23-i))
-        #         week_start = week_start - timedelta(days=week_start.weekday())  # Start of week (Monday)
-        #         labels.append(f"Week {week_start.isocalendar()[1]} ({week_start.strftime('%Y-%m-%d')})")
-        #         count = next(
-        #             (item['count'] for item in data 
-        #             if item['period'] == week_start),  # Removed .date()
-        #             0
-        #         )
-        #         data_points.append(count)
-        labels = []
-        data_points = []
+            for i in range(24):
+                week_start = end_date - timedelta(weeks=(23-i))
+                week_start = week_start - timedelta(days=week_start.weekday())  # Start of week (Monday)
+                labels.append(f"Week {week_start.isocalendar()[1]} ({week_start.strftime('%Y-%m-%d')})")
+                count = next(
+                    (item['count'] for item in data 
+                    if item['period'] == week_start),  # Removed .date()
+                    0
+                )
+                data_points.append(count)
+        
         return JsonResponse({
             'labels': labels,
             'data': data_points,
             'period': period
         })
+    
 
 # communication tracker 
 class CommunicationTrackerDataView(View):
@@ -461,7 +461,7 @@ class CommunicationTrackerDataView(View):
         # Prepare data lists aligned with labels
         email_data = [email_data_map.get(label, 0) for label in labels]
         whatsapp_data = [whatsapp_data_map.get(label, 0) for label in labels]
-        print(f"labels: {labels}\n email_data: {email_data}\n whatsapp_data: {whatsapp_data} \n email_data_map: {email_data_map} \n whatsapp_data_map: {whatsapp_data_map}")
+        # print(f"labels: {labels}\n email_data: {email_data}\n whatsapp_data: {whatsapp_data} \n email_data_map: {email_data_map} \n whatsapp_data_map: {whatsapp_data_map}")
         return JsonResponse({
             'labels': labels,
             'email_data': email_data,

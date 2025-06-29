@@ -10,6 +10,7 @@ from io import BytesIO
 from barcode.writer import ImageWriter
 from django.core.files import File
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 
 # Contact info 
@@ -157,11 +158,9 @@ class Product(SoftDeleteModel):
             return self.price_per_yard * self.stock_qty
         return 0
  
-
     def __str__(self):
-        return f"{self.fabric_article_supplier} - {self.style}"
+        return f"{self.article_no} | {self.date}"
     
-
     def get_absolute_url(self):
         return reverse('business_data:product-detail', kwargs={'pk': self.pk})
 
@@ -173,9 +172,6 @@ class Product(SoftDeleteModel):
         file_name = f"barcode_{self.id}.png"
         self.barcode.save(file_name, File(buffer), save=False)
         
-    
-    
-
     def generate_qr_code_image(self,request):
         # full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
         # full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail', kwargs={'pk': self.pk})}"
@@ -197,13 +193,35 @@ class Product(SoftDeleteModel):
             super().save(update_fields=['barcode', 'qr_code'])
 
 
+# Add sample type choices for ProductImage using a base choice class
+class SampleTypeChoices(models.TextChoices):
+    FABRIC = 'FABRIC', 'Fabric Sample'
+    GARMENT = 'GARMENT', 'Garment View'
+    MODEL = 'MODEL', 'Model View'
 
 class ProductImage(models.Model):
     image = models.ImageField(upload_to='product_images/')
     alt_text = models.CharField(max_length=255, blank=True, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    sample_type = models.CharField(
+        max_length=20,
+        choices=SampleTypeChoices.choices,
+        default=SampleTypeChoices.FABRIC,
+        help_text="Type of sample shown in the image"
+    )
     uploaded_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return f"Sample of: {self.product.article_no} | {self.product.date}"
+    
+    def clean(self):
+        # Check if this is a new image being added (not an update to existing)
+        if not self.pk and self.product.images.count() >= 3:
+            raise ValidationError("A product cannot have more than 3 images.")
+        super().clean()
+
+    
+
 class CompanyProfile(models.Model):
     COMPANY_CHOICES = [
         ('FABRIC_EXPO', 'Fabric Expo'),

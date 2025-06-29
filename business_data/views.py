@@ -25,7 +25,7 @@ from django.views.generic import DetailView
 from django.views.generic.edit import UpdateView
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, Supplier, Customer, Product
+from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, ProductImage, SampleTypeChoices, Supplier, Customer, Product
 
 from .forms import BuyerUploadForm, FileUploadForm, ProductUpdateForm
 
@@ -1773,7 +1773,11 @@ class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView)
     
     def get_login_url(self):
         return reverse_lazy('business_data:product-detail-public', kwargs={'pk': self.kwargs['pk']})
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sample_type_choices = SampleTypeChoices.choices
+        context['sample_type_choices'] = sample_type_choices
+        return context
 
 # product deatails view sticker 
 class ProductDetailViewSticker(DetailView):
@@ -1845,7 +1849,6 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
         company_info = CompanyProfile.objects.filter(company_name=label_type).first()
         template = 'business_data/manage_products/print_labels/details_label.html'
         if not request.GET:
-            messages.warning(request, "No product data provided for label printing.")
             return redirect('business_data:product-detail', pk=pk)
         context = {
             'form_product': request.GET,
@@ -1924,6 +1927,47 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
 
     def get_success_url(self):
         return reverse_lazy('business_data:product-detail', kwargs={'pk': self.object.pk})
+
+
+class ProductSampleUploadView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.change_product"
+    
+    def post(self, request, pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Product not found.'}, status=404)
+
+        image = request.FILES.get('image')
+        sample_type = request.POST.get('sample_type')
+        alt_text = request.POST.get('alt_text', '')
+        
+        # Limit to 3 images per product
+        if product.images.count() >= 3:
+            return JsonResponse({'success': False, 'message': 'A product cannot have more than 3 images.'})
+
+        if not image or not sample_type:
+            return JsonResponse({'success': False, 'message': 'Image and sample type are required.'})
+
+        sample = ProductImage.objects.create(
+            product=product,
+            image=image,
+            sample_type=sample_type,
+            alt_text=alt_text
+        )
+
+        # Prepare response data for gallery update
+        return JsonResponse({
+            'success': True,
+            'sample': {
+                'id': sample.id,
+                'image': sample.image.url,
+                'alt_text': sample.alt_text,
+                'sample_type_display': sample.get_sample_type_display(),
+            }
+        })
+
+
 """End::Product Details"""
 
 class SaveProductLabelDataView(LoginRequiredMixin, PermissionRequiredMixin, View):

@@ -330,6 +330,61 @@
                             
                     </select>
                 </div>
+                <div class="mb-3">
+                    <form id="dynamicLabelInputForm">
+                        {% csrf_token %}
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_article_no" value="Article No.">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="article_no" value="{{ product.article_no }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_composition" value="Composition">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="composition" value="{{ product.composition }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_construction" value="Construction">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="construction" value="{{ product.construction }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_weave" value="Weave">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="weave" value="{{ product.weave }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_cut_width" value="Width (inch)">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="cut_width" value="{{ product.cut_width }}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_weight" value="Weight (GMS)">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="weight" value="{{ product.weight}}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_coo" value="COO">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="coo" value="{{ product.coo}}">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="label_remarks" value="Remarks">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control mb-2" name="remarks" value="{{ product.remarks}}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 
             </div>
             <div class="modal-footer">
@@ -339,35 +394,6 @@
         </div>
     </div>
 </div>
-    <!-- Print Label Modal -->
-    {% comment %} <div class="modal fade" id="printLabelModal" tabindex="-1" aria-labelledby="printLabelModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="printLabelModalLabel">Print Options</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Select Label Type</label>
-                        <select class="form-select">
-                            <option value="barcode">Barcode Label</option>
-                            <option value="qrcode">QR Code Label</option>
-                            <option value="details">Product Details Label</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Quantity</label>
-                        <input type="number" class="form-control" value="1" min="1">
-                    </div> 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Print</button>
-                </div>
-            </div>
-        </div>
-    </div> {% endcomment %}
 {% endblock %}
 
 {% block push_scripts %}
@@ -380,15 +406,28 @@
         } else {
             $tag.addClass('bg-danger bg-opacity-10 text-danger');
         }
-
         // Print label functionality
         $('#printLabelBtn').on('click', function() {
             const labelType = $('#labelTypeSelect').val();
             const productId = "{{ product.id }}";
-            window.open(`/business_data/products/${productId}/print/${labelType}/`, '_blank');
-            // Close modal
-            $('#printLabelModal').modal('hide');
+            const formData = $('#dynamicLabelInputForm').serialize();
+            // Save label data via AJAX
+            $.ajax({
+                url: `/business_data/products/{{ product.id }}/save_label_data/`, // You need to create this view/URL
+                type: 'POST',
+                data: formData + '&labelType=' + encodeURIComponent(labelType) + '&csrfmiddlewaretoken={{ csrf_token }}',
+                success: function(response) {
+                    const params = new URLSearchParams(response.printable_data).toString();
+                    // On success, redirect to print page with labelType
+                    window.open(`/business_data/products/${productId}/print/${labelType}/?${params}`, '_blank');
+                    $('#printLabelModal').modal('hide');
+                },
+                error: function(xhr) {
+                    alert('Failed to save label data. Please try again.');
+                }
+            });
         });
+        
     });
 </script>
 

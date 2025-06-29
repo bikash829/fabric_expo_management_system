@@ -94,40 +94,47 @@
       <!-- <div class="sticker-subheader">{{product.mill_reference}}</div> -->
       <table class="sticker-table">
         <tr>
-          <td class="label">Article No.</td>
-          <td>{{ product.article_no }}</td>
+          <!-- <td class="label">Article No.</td> -->
+          <td class="label">{{ form_product.label_article_no }}</td>
+          <td>{{ form_product.article_no }}</td>
         </tr>
         <tr>
-          <td class="label ">Composition</td>
+          <!-- <td class="label ">Composition</td> -->
+          <td class="label ">{{ form_product.label_composition }}</td>
             <td 
             class="{% if product.composition|length  > 50 %}small-font{% endif %}">
-            {{ product.composition }}</td>
+            {{ form_product.composition }}</td>
         </tr>
         <tr>
-          <td class="label">Construction</td>
-          <td>{{ product.construction|truncatechars:22 }}</td>
-        </tr>
-      
-        <tr>
-          <td class="label">Weave</td>
-          <td> {{ product.weave}}</td>
+          <!-- <td class="label">Construction</td> -->
+          <td class="label">{{form_product.label_construction}}</td>
+          <td>{{ form_product.construction }}</td>
         </tr>
       
         <tr>
-          <td class="label">Width (inch) </td>
-          <td> {{ product.cut_width|truncatechars:40 }}"</td>
+          <!-- <td class="label">Weave</td> -->
+          <td class="label">{{ form_product.label_weave}}</td>
+          <td> {{ form_product.weave}}</td>
+        </tr>
+      
+        <tr>
+          <!-- <td class="label">Width (inch) </td> -->
+          <td class="label">{{ form_product.label_cut_width }} </td>
+          <td> {{ form_product.cut_width }}"</td>
         </tr>
         <tr>
-          <td class="label">Weight (GMS)</td>
-          <td>{{ product.weight|truncatechars:22 }}</td>
+          <!-- <td class="label">Weight (GMS)</td> -->
+          <td class="label">{{ form_product.label_weight }}</td>
+          <td>{{ form_product.weight }}</td>
         </tr>
         <tr>
-          <td class="label">COO</td>
-          <td>{{ product.coo|truncatechars:35}}</td>
+          <!-- <td class="label">COO</td> -->
+          <td class="label">{{ form_product.label_coo}}</td>
+          <td>{{ form_product.coo}}</td>
         </tr>
         <tr>
-          <td class="label">Remarks</td>
-          <td> {{ product.remarks|truncatechars:22 }}</td>
+          <td class="label">{{ form_product.label_remarks}}</td>
+          <td> {{ form_product.remarks|truncatechars:45 }}</td>
         </tr>
       </table>
     </div>

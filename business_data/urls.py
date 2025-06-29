@@ -52,7 +52,7 @@ urlpatterns = [
     
     path('products/<int:pk>/sticker/', views.ProductDetailViewSticker.as_view(), name='product-detail-sticker'),
     path('products/<int:pk>/print/<str:label_type>/', views.ProductLabelPrintView.as_view(), name='print-product-label'),
-
+    path('products/<int:pk>/save_label_data/', views.SaveProductLabelDataView.as_view(), name='save-product-label-data'),
 
 ]
 

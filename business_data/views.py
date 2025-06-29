@@ -35,6 +35,8 @@ from collections import defaultdict
 from pprint import pprint
 from weasyprint import HTML
 from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -1772,7 +1774,7 @@ class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView)
         return reverse_lazy('business_data:product-detail-sticker', kwargs={'pk': self.kwargs['pk']})
 
 
-     
+# product deatails view sticker 
 class ProductDetailViewSticker(DetailView):
     model = Product
     
@@ -1825,6 +1827,12 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_product"
     def get(self, request, pk, label_type):
         product = Product.objects.get(pk=pk)
+        
+        # for key, value in :
+        #     print(f"{key}: {value}")
+        #     product = {
+
+        #     }
        
         # Render different templates based on label type
         # if label_type == 'FABRIC_EXPO':
@@ -1835,7 +1843,9 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
         #     template = 'business_data/manage_products/print_labels/details_label.html'
         company_info = CompanyProfile.objects.filter(company_name=label_type).first()
         template = 'business_data/manage_products/print_labels/details_label.html'
+
         context = {
+            'form_product': request.GET,
             'product': product,
             'company_info': company_info,
             # 'base_url': base_url
@@ -1913,3 +1923,39 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
         return reverse_lazy('business_data:product-detail', kwargs={'pk': self.object.pk})
 """End::Product Details"""
 
+class SaveProductLabelDataView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.change_product"
+
+    # @method_decorator(csrf_exempt)
+    # def dispatch(self, *args, **kwargs):
+    #     return super().dispatch(*args, **kwargs)
+
+    def post(self, request, pk):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found.'}, status=404)
+
+        data = request.POST.dict()
+        
+        # Only update allowed fields (add/remove as needed)
+        allowed_fields = [
+            'article_no', 'composition', 'construction', 'weave', 'cut_width',
+            'weight', 'coo', 'remarks'
+        ]
+      
+        for field in allowed_fields:
+            if field in data:
+                setattr(product, field, data[field])
+        print(
+            "article_no:", product.article_no,
+            "composition:", product.composition,
+            "construction:", product.construction,
+            "weave:", product.weave,
+            "cut_width:", product.cut_width,
+            "weight:", product.weight,
+            "coo:", product.coo,
+            "remarks:", product.remarks
+        )
+        product.save()
+        return JsonResponse({'message': 'Product label data saved successfully.','printable_data':data})

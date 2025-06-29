@@ -1968,6 +1968,22 @@ class ProductSampleUploadView(LoginRequiredMixin, PermissionRequiredMixin, View)
         })
 
 
+
+class ProductSampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = "business_data.change_product"
+
+    def post(self, request,product_id ,sample_id):
+        print(f"sample id: {sample_id}")
+        print(f"pro id: {product_id}")
+        if not sample_id:
+            return JsonResponse({'success': False, 'message': 'Sample ID is required.'}, status=400)
+        try:
+            sample = ProductImage.objects.get(pk=sample_id, product_id=product_id)
+        except ProductImage.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Sample not found.'}, status=404)
+        sample.delete()
+        return JsonResponse({'success': True, 'message': 'Sample deleted successfully.'})
+
 """End::Product Details"""
 
 class SaveProductLabelDataView(LoginRequiredMixin, PermissionRequiredMixin, View):

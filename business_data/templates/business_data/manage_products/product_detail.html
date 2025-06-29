@@ -584,151 +584,158 @@
 
 <script>
     $(function() {
-        // ... your existing scripts ...
-    
-    $('#sampleDropZone').on('click', function(e) {
-    // Only trigger if the original click was not on the file input itself
-        if (e.target.id !== 'sampleImageInput') {
-            e.preventDefault();
-            $('#sampleImageInput').trigger('click');
-        }
-    });
+        $('#sampleDropZone').on('click', function(e) {
+        // Only trigger if the original click was not on the file input itself
+            if (e.target.id !== 'sampleImageInput') {
+                e.preventDefault();
+                $('#sampleImageInput').trigger('click');
+            }
+        });
 
-    $('#sampleImageInput').on('change', function() {
-        const file = this.files[0];
-        if (file) {
-            showSamplePreview(file);
-        }
-    });
-
-    $('#sampleDropZone').on('dragover', function(e) {
-        e.preventDefault();
-        $(this).addClass('border-primary bg-light');
-    });
-
-    $('#sampleDropZone').on('dragleave', function(e) {
-        e.preventDefault();
-        $(this).removeClass('border-primary bg-light');
-    });
-
-    $('#sampleDropZone').on('drop', function(e) {
-            e.preventDefault();
-            $(this).removeClass('border-primary bg-light');
-            const file = e.originalEvent.dataTransfer.files[0];
-            if (file && file.type.match('image.*')) {
-                $('#sampleImageInput')[0].files = e.originalEvent.dataTransfer.files;
+        $('#sampleImageInput').on('change', function() {
+            const file = this.files[0];
+            if (file) {
                 showSamplePreview(file);
             }
         });
 
-    function showSamplePreview(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            $('#samplePreview').html(`
-                <div class="d-flex align-items-center">
-                    <img src="${e.target.result}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
-                    <div>
-                        <p class="mb-1">${file.name}</p>
-                        <p class="small text-muted mb-0">${(file.size / 1024).toFixed(2)} KB</p>
-                    </div>
-                </div>
-            `);
-        };
-        reader.readAsDataURL(file);
-    }
-    
-    function resetFormImage(){
-        // Clear the form
-        $('#sampleImageInput').val('');
-        $('#samplePreview').empty();
-        $('#sampleUploadForm')[0].reset();
-        $('#uploadSampleModal').modal('hide');
-        $('#uploadSampleBtn').prop('disabled', false).html('Upload Sample');
-    }
-
-    // Handle sample form submission
-    $('#sampleUploadForm').on('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const productId = "{{ product.id }}";
-
-        // Print all form data key-value pairs in the console
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-        $('#uploadSampleBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Uploading...');
-
-        $.ajax({
-            url: `/business_data/products/{{product.id }}/upload_sample/`,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    resetFormImage();
-                    // Update the gallery
-                    updateSampleGallery(response.sample);
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sample Uploaded',
-                        text: response.message || 'Sample uploaded successfully',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } else {
-                    resetFormImage();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Upload Failed',
-                        text: response.message || 'Failed to upload sample',
-                    });
-                }
-            },
-            error: function(xhr) {
-                toastr.error('An error occurred while uploading the sample');
-            },
-            complete: function() {
-                $('#uploadSampleBtn').prop('disabled', false).html('Upload Sample');
-            }
+        $('#sampleDropZone').on('dragover', function(e) {
+            e.preventDefault();
+            $(this).addClass('border-primary bg-light');
         });
-    });
+
+        $('#sampleDropZone').on('dragleave', function(e) {
+            e.preventDefault();
+            $(this).removeClass('border-primary bg-light');
+        });
+
+        $('#sampleDropZone').on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-primary bg-light');
+                const file = e.originalEvent.dataTransfer.files[0];
+                if (file && file.type.match('image.*')) {
+                    $('#sampleImageInput')[0].files = e.originalEvent.dataTransfer.files;
+                    showSamplePreview(file);
+                }
+            });
+
+        function showSamplePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#samplePreview').html(`
+                    <div class="d-flex align-items-center">
+                        <img src="${e.target.result}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div>
+                            <p class="mb-1">${file.name}</p>
+                            <p class="small text-muted mb-0">${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                    </div>
+                `);
+            };
+            reader.readAsDataURL(file);
+        }
         
+        function resetFormImage(){
+            // Clear the form
+            $('#sampleImageInput').val('');
+            $('#samplePreview').empty();
+            $('#sampleUploadForm')[0].reset();
+            $('#uploadSampleModal').modal('hide');
+            $('#uploadSampleBtn').prop('disabled', false).html('Upload Sample');
+        }
+
+        // Handle sample form submission
+        $('#sampleUploadForm').on('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const productId = "{{ product.id }}";
+
+            // Print all form data key-value pairs in the console
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+            $('#uploadSampleBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Uploading...');
+
+            $.ajax({
+                url: `/business_data/products/{{product.id }}/upload_sample/`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        resetFormImage();
+                        // Update the gallery
+                        updateSampleGallery(response.sample);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sample Uploaded',
+                            text: response.message || 'Sample uploaded successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        resetFormImage();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Upload Failed',
+                            text: response.message || 'Failed to upload sample',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('An error occurred while uploading the sample');
+                },
+                complete: function() {
+                    $('#uploadSampleBtn').prop('disabled', false).html('Upload Sample');
+                }
+            });
+        });
+            
         // Delete sample functionality
         $(document).on('click', '.delete-sample', function() {
             const sampleId = $(this).data('sample-id');
-            
-            if (confirm('Are you sure you want to delete this sample?')) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you really want to delete this sample?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
                 $.ajax({
-                    url: `/business_data/products/samples/${sampleId}/delete/`,
+                    url: `/business_data/product/{{product.id}}/sample/${sampleId}/delete/`,
                     type: 'POST',
                     data: {
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
                     success: function(response) {
-                        if (response.success) {
-                            $(`[data-sample-id="${sampleId}"]`).closest('.sample-card').remove();
-                            toastr.success('Sample deleted successfully');
-                            
-                            // If no samples left, show empty state
-                            if ($('.sample-gallery .sample-card').length === 0) {
-                                $('.sample-gallery').html(`
-                                    <div class="col-12 text-center py-4">
-                                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted">No samples available for this product</p>
-                                    </div>
-                                `);
-                            }
-                        } else {
-                            toastr.error(response.message || 'Failed to delete sample');
-                        }
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sample Deleted',
+                            text: response.message || 'Sample deleted successfully',
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Delete Failed',
+                            text: response.message || 'Failed to delete sample',
+                        });
+                    }
                     },
                     error: function() {
-                        toastr.error('An error occurred while deleting the sample');
+                    toastr.error('An error occurred while deleting the sample');
                     }
                 });
-            }
+                }
+            });
         });
         
         function updateSampleGallery(sample) {
@@ -753,6 +760,7 @@
                 </div>
             `);
         }
+        
     });
 </script>
 

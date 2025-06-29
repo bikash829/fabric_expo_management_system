@@ -108,6 +108,7 @@ media/barcodes/
 media/qrcodes/
 media/temp/
 media/bulk_messages_data/bulk_recipients_data_sheet/
+media/product_images/
 
 .htaccess
 stderr.log

@@ -45,6 +45,7 @@ urlpatterns = [
     path('delete-products/',views.DeleteProductView.as_view(),name="delete-products"),
     path('products/<int:pk>/edit/', views.ProductUpdateView.as_view(), name='product-edit'),
     path('products/<int:pk>/upload_sample/', views.ProductSampleUploadView.as_view(), name='product-upload-sample'),
+    path('product/<int:product_id>/sample/<int:sample_id>/delete/', views.ProductSampleDeleteView.as_view(), name='product-sample-delete'),
     # End::Product details"""
 
     path('product-list/print-qr-codes/',views.ProductQRCodePDFView.as_view(), name='print_selected_qrcodes'),

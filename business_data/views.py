@@ -1372,7 +1372,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         # images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(50):  # Change to any number you want
+        for _ in range(3):  # Change to any number you want
             # Generate a unique article number (e.g., ART-YYYYMMDD-XXXXX)
             article_no = f"ART-{fake.date_this_decade().strftime('%Y%m%d')}-{randint(10000, 99999)}"
             writer.writerow([

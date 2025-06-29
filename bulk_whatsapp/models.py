@@ -73,6 +73,7 @@ class SentMessage(models.Model):
     recipient_to = models.ForeignKey(WhatsappRecipient,on_delete=models.CASCADE)
     sent_by = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     sent_at = models.DateTimeField(auto_now=True)
+    sent_date = models.DateField(auto_now=True)
     session_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True,null=True)
     status = models.BooleanField(default=False)

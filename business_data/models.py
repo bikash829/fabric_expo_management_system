@@ -11,6 +11,8 @@ from barcode.writer import ImageWriter
 from django.core.files import File
 from django.conf import settings
 from django.core.exceptions import ValidationError
+import random
+from barcode import EAN13
 
 
 # Contact info 
@@ -141,6 +143,7 @@ class Product(SoftDeleteModel):
     stock_qty = models.PositiveIntegerField(blank=True,null=True)
     # images = models.ImageField(upload_to='product_images/', blank=True, null=True)
     barcode = models.ImageField(upload_to='barcodes/', blank=True, null=True)
+    barcode_number = models.CharField(max_length=12, unique=True, null=True,blank=True)
     qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     concern_person = models.CharField(max_length=255,blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True,blank=True,null=True)
@@ -164,20 +167,40 @@ class Product(SoftDeleteModel):
     def get_absolute_url(self):
         return reverse('business_data:product-detail', kwargs={'pk': self.pk})
 
+    # def generate_barcode_image(self):
+    #     code_value = f"PROD-{self.id}"
+    #     ean = barcode.get('code128', code_value, writer=ImageWriter())
+    #     buffer = BytesIO()
+    #     ean.write(buffer)
+    #     file_name = f"barcode_{self.id}.png"
+    #     self.barcode.save(file_name, File(buffer), save=False)
+    
     def generate_barcode_image(self):
-        code_value = f"PROD-{self.id}"
-        ean = barcode.get('code128', code_value, writer=ImageWriter())
+        # Generate a unique 12-digit barcode number if not set
+        if not self.barcode_number:
+            while True:
+                code_value = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+                if not Product.objects.filter(barcode_number=code_value).exists():
+                    self.barcode_number = code_value
+                    break
+
+        # Generate EAN13 barcode (checksum auto-handled)
+        ean = EAN13(self.barcode_number, writer=ImageWriter())
         buffer = BytesIO()
-        ean.write(buffer)
-        file_name = f"barcode_{self.id}.png"
+            # Custom writer with reduced barcode height
+        writer_options = {
+            'module_height': 10.0,  # 🔽 Reduce height (default is 15.0)
+        }
+
+        ean.write(buffer, options=writer_options)
+
+        file_name = f"barcode_{self.pk or 'temp'}.png"
         self.barcode.save(file_name, File(buffer), save=False)
         
-    def generate_qr_code_image(self,request):
+    def generate_qr_code_image(self):
         # full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
-        # full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail', kwargs={'pk': self.pk})}"
-        full_url =  request.build_absolute_uri(
-                reverse('business_data:product-detail', kwargs={'pk': self.pk})
-            )
+        full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail', kwargs={'pk': self.pk})}"
+
         qr = qrcode.make(full_url)
         buffer = BytesIO()
         qr.save(buffer, format='PNG')

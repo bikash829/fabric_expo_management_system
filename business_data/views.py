@@ -37,6 +37,7 @@ from weasyprint import HTML
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import QueryDict
 
 # extract data from excel/csv
 def extract_data(request,form):
@@ -1843,7 +1844,9 @@ class ProductLabelPrintView(LoginRequiredMixin, PermissionRequiredMixin, View):
         #     template = 'business_data/manage_products/print_labels/details_label.html'
         company_info = CompanyProfile.objects.filter(company_name=label_type).first()
         template = 'business_data/manage_products/print_labels/details_label.html'
-
+        if not request.GET:
+            messages.warning(request, "No product data provided for label printing.")
+            return redirect('business_data:product-detail', pk=pk)
         context = {
             'form_product': request.GET,
             'product': product,

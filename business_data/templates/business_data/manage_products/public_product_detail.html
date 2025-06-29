@@ -88,157 +88,268 @@
       <main class="app-main">
         <!--begin::Content -->
         <div class="container py-4">
-            <div class="card shadow-sm border-0 overflow-hidden mb-4">
-                <div class="card-header product-header text-white position-relative">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h3 class="h5 mb-1">
-                                <span class="fw-semibold">Fabric Article:</span> 
-                                <span id="fabric-article-fexpo">{{ product.fabric_article_fexpo }}</span>
-                            </h3>
-                            <p class="small mb-0 opacity-75">
-                                <span class="fw-medium">Supplier:</span> 
-                                <span id="fabric-article-supplier">{{ product.fabric_article_supplier }}</span>
-                            </p>
+                <div class="card shadow-sm border-0 overflow-hidden mb-4">
+                    <div class="card-header product-header text-white position-relative">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h3 class="h5 mb-1">
+                                    <span class="fw-semibold">Article Number:</span> 
+                                    <span id="fabric-article-fexpo">{{ product.article_no }}</span>
+                                </h3>
+                                <p class="small mb-0 opacity-75">
+                                    <span class="fw-medium">Record created at:</span> 
+                                    <span id="fabric-article-supplier">{{ product.created_at }}</span>
+                                </p>
+                            </div>
+                            <span class="badge bg-white text-dark bg-opacity-25 rounded-pill product-tag" id="product-tag">
+                                {% if product.stock_qty > 0 %}In Stock{% else %}Out of Stock{% endif %}
+                            </span>
                         </div>
-                        <span class="badge bg-white text-dark bg-opacity-25 rounded-pill product-tag" id="product-tag">
-                            {% if product.stock_qty > 0 %}In Stock{% else %}Out of Stock{% endif %}
-                        </span>
                     </div>
-                </div>
-                
-                <div class="card-body">
-                    <div class="row g-4">
-                        <div class="col-lg-6">
-                            <h5 class="section-title fw-semibold mb-3">Basic Information</h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Date Added</label>
-                                        <p class="mb-0" id="date">{{ product.date|date:"F j, Y" }}</p>
+                    
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <h5 class="section-title fw-semibold mb-3">Basic Information</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Date</label>
+                                            <p class="mb-0" id="date">{{ product.date|date:"F j, Y" }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Rd Generated Date</label>
+                                            <p class="mb-0" id="date">{{ product.rd_generated_date|date:"F j, Y" }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Article (Supplier) </label>
+                                            <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_article_supplier }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Article (Fabric Expo) </label>
+                                            <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_article_fexpo }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Mill (Supplier)</label>
+                                            <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_mill_supplier }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Mill (Source)</label>
+                                            <p class="mb-0" id="fabric-mill-source">{{ product.fabric_mill_source }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Country of Origin</label>
+                                            <p class="mb-0" id="coo">{{ product.coo }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Reference/Article</label>
+                                            <p class="mb-0" id="coo">{{ product.mill_reference }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Expo Reference/Article</label>
+                                            <p class="mb-0" id="coo">{{ product.fabricexpo_reference }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Season</label>
+                                            <p class="mb-0" id="coo">{{ product.season }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Customer Name</label>
+                                            <p class="mb-0" id="coo">{{ product.customer_name }}</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Supplier</label>
-                                        <p class="mb-0" id="fabric-mill-supplier">{{ product.fabric_mill_supplier }}</p>
+                                
+                                <h5 class="section-title fw-semibold mt-4 mb-3">Product Specifications</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Product Category</label>
+                                            <p class="mb-0" id="composition">{{ product.product_category }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mill Source</label>
-                                        <p class="mb-0" id="fabric-mill-source">{{ product.fabric_mill_source }}</p>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Composition</label>
+                                            <p class="mb-0" id="composition">{{ product.composition }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Country of Origin</label>
-                                        <p class="mb-0" id="coo">{{ product.coo }}</p>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Construction</label>
+                                            <p class="mb-0" id="construction">{{ product.construction }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Weight (GSM/OZ)</label>
+                                            <p class="mb-0" id="weight">{{ product.weight }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Color</label>
+                                            <p class="mb-0" id="color">{{ product.color }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Cut Width (Inch)</label>
+                                            <p class="mb-0" id="color">{{ product.cut_width }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Weave</label>
+                                            <p class="mb-0" id="color">{{ product.weave }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Wash</label>
+                                            <p class="mb-0" id="color">{{ product.wash }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Shrinkage%</label>
+                                            <p class="mb-0" id="color">{{ product.shrinkage_percent }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Style</label>
+                                            <p class="mb-0" id="color">{{ product.style }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">PO</label>
+                                            <p class="mb-0" id="color">{{ product.po }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Remarks</label>
+                                            <p class="mb-0" id="color">{{ product.remarks }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <h5 class="section-title fw-semibold mt-4 mb-3">Product Specifications</h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Composition</label>
-                                        <p class="mb-0" id="composition">{{ product.composition }}</p>
+                            <div class="col-lg-12 row" >
+                                
+                                    <div class="col-6 mt-4">
+                                        <h5 class="section-title fw-semibold mb-3">Inventory Details</h5>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Stock Quantity</label>
+                                                    <p class="mb-0" id="stock-qty">{{ product.stock_qty }} yards</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Price (yards)</label>
+                                                    <p class="mb-0" id="price-per-yard">BDT {{ product.price_per_yard }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Total Value</label>
+                                                    <p class="mb-0" id="total-value">BDT {{ product.total_value|floatformat:2 }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Concern Person</label>
+                                                    <p class="mb-0" id="concern-person">{{ product.concern_person }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1"></label>
+                                                    <p class="mb-0" id="concern-person"></p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Construction</label>
-                                        <p class="mb-0" id="construction">{{ product.construction }}</p>
+                            
+                                
+                                    <div class="col-6 mt-4">
+                                        <h5 class="section-title fw-semibold mb-3">Identification</h5>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="card code-image h-100">
+                                                    <div class="card-body text-center">
+                                                        {% if product.barcode %}
+                                                        <img src="{{ product.barcode.url }}" alt="Barcode" class="img-fluid mb-2" style="max-height: 120px;">
+                                                        {% else %}
+                                                        <div class="bg-light p-4 mb-2">
+                                                            <i class="fas fa-barcode fa-4x text-muted"></i>
+                                                        </div>
+                                                        {% endif %}
+                                                        <p class="small text-muted mb-0">Barcode</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card code-image h-100">
+                                                    <div class="card-body text-center">
+                                                        {% if product.qr_code %}
+                                                        <img src="{{ product.qr_code.url }}" alt="QR Code" class="img-fluid mb-2" style="max-height: 120px;">
+                                                        {% else %}
+                                                        <div class="bg-light p-4 mb-2">
+                                                            <i class="fas fa-qrcode fa-4x text-muted"></i>
+                                                        </div>
+                                                        {% endif %}
+                                                        <p class="small text-muted mb-0">QR Code</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Weight</label>
-                                        <p class="mb-0" id="weight">{{ product.weight }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Color</label>
-                                        <p class="mb-0" id="color">{{ product.color }}</p>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>
                         
-                        <div class="col-lg-6">
-                            <h5 class="section-title fw-semibold mb-3">Inventory Details</h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Stock Quantity</label>
-                                        <p class="mb-0" id="stock-qty">{{ product.stock_qty }} yards</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Price per Yard</label>
-                                        <p class="mb-0" id="price-per-yard">BDT {{ product.price_per_yard }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Total Value</label>
-                                        <p class="mb-0" id="total-value">BDT {{ product.total_value|floatformat:2 }}</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Concern Person</label>
-                                        <p class="mb-0" id="concern-person">{{ product.concern_person }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <h5 class="section-title fw-semibold mb-3">Identification</h5>
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <div class="card code-image h-100">
-                                                <div class="card-body text-center">
-                                                    {% if product.barcode %}
-                                                    <img src="{{ product.barcode.url }}" alt="Barcode" class="img-fluid mb-2" style="max-height: 120px;">
-                                                    {% else %}
-                                                    <div class="bg-light p-4 mb-2">
-                                                        <i class="fas fa-barcode fa-4x text-muted"></i>
-                                                    </div>
-                                                    {% endif %}
-                                                    <p class="small text-muted mb-0">Barcode</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card code-image h-100">
-                                                <div class="card-body text-center">
-                                                    {% if product.qr_code %}
-                                                    <img src="{{ product.qr_code.url }}" alt="QR Code" class="img-fluid mb-2" style="max-height: 120px;">
-                                                    {% else %}
-                                                    <div class="bg-light p-4 mb-2">
-                                                        <i class="fas fa-qrcode fa-4x text-muted"></i>
-                                                    </div>
-                                                    {% endif %}
-                                                    <p class="small text-muted mb-0">QR Code</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
+                        <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                            <a href="{%url 'business_data:product-edit' product.pk %}" class="btn btn-primary px-4">
+                                <i class="fas fa-edit me-2"></i> Edit
+                            </a> 
+                            <button class="btn btn-success px-4" data-bs-toggle="modal" data-bs-target="#printLabelModal">
+                                <i class="fas fa-print me-2"></i> Print Label
+                            </button>
+                            {% comment %} <a href="#" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-history me-2"></i> History
+                            </a> {% endcomment %}
+                            <a href="{% url 'business_data:product-list' %}" class="btn btn-outline-dark ms-auto px-4">
+                                <i class="fas fa-arrow-left me-2"></i> Back to List
+                            </a>
                         </div>
                     </div>
-                    
-                    
                 </div>
             </div>
-        </div>
         <!--end::Content-->
       </main>
       <!--end::App Main-->
@@ -258,4 +369,6 @@
     </div>
     <!--end::App Wrapper-->
 </body>
+
+
 </html>

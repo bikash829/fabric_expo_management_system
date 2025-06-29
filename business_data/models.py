@@ -176,10 +176,12 @@ class Product(SoftDeleteModel):
     
     
 
-    def generate_qr_code_image(self):
+    def generate_qr_code_image(self,request):
         # full_url = f"{settings.SITE_BASE_URL}{self.get_absolute_url()}"
-        full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail', kwargs={'pk': self.pk})}"
-
+        # full_url = f"{settings.SITE_BASE_URL}{reverse('business_data:product-detail', kwargs={'pk': self.pk})}"
+        full_url =  request.build_absolute_uri(
+                reverse('business_data:product-detail', kwargs={'pk': self.pk})
+            )
         qr = qrcode.make(full_url)
         buffer = BytesIO()
         qr.save(buffer, format='PNG')

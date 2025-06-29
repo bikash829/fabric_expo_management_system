@@ -1771,7 +1771,7 @@ class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView)
     redirect_field_name = 'next'
     
     def get_login_url(self):
-        return reverse_lazy('business_data:product-detail-sticker', kwargs={'pk': self.kwargs['pk']})
+        return reverse_lazy('business_data:product-detail-public', kwargs={'pk': self.kwargs['pk']})
 
 
 # product deatails view sticker 

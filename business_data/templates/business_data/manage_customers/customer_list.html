@@ -58,46 +58,7 @@
                   
               </tr>
           </thead>
-          {% comment %} <tbody>
-              {% for item in object_list %}
-              <tr data-id="{{item.id}}">
-                  <td>{{forloop.counter}}</td>
-                  <td>{{item.id}}</td>
-                  <td>{{item.date}}</td>
-                  <td>{{item.company_name}}</td>
-                  <td>{{item.organization_type}}</td>
-                  <td>{{item.brand}}</td>
-                  <td>{{item.category}}</td>
-                  <td>{{item.department}}</td>
-                  <td>{{item.customer_name}}</td>
-                  <td>{{item.designation}}</td>
-                  <td>{{item.country_of_origin}}</td>
-                  <td>{{item.website}}</td>
-                  <td>{{ item.emails.all|join:", " }}</td>
-                  <td>
-                    {% for object in item.phones.all %}
-                      {% if  object.is_whatsapp  %}
-                      {{object}}
-                      {% endif %}
-                    {% endfor %}
-                  </td>
-                  <td>
-                    {% for object in item.phones.all %}
-                      {% if not object.is_whatsapp and not object.is_wechat %}
-                        {{object}}
-                      {% endif %} 
-                    {% endfor %}
-                  </td>
-                  <td>{{item.payment_term}}</td>
-                  <td>{{item.fabric_reference}}</td>
-                  <td>{{item.mailing_address}}</td>
-                  <td>{{item.visiting_address}}</td>
-                  <td>{{item.linkedin_profile}}</td>
-                  <td>{{item.remarks}}</td>
-                  <td>{{item.concern_fe_rep}}</td>
-              </tr>
-              {% endfor %}
-          </tbody> {% endcomment %}
+          
           <tfoot>
               <tr>
                 <th>#ID</th>
@@ -144,7 +105,13 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      ajax      : "{% url 'business_data:customer-data-source' %}",
+      ajax      : {
+        url:  "{% url 'business_data:customer-data-source' %}",
+        type : "POST",
+        headers: {
+              "X-CSRFToken": "{{csrf_token}}"
+        }
+      },
       columns   : [
         {data: 'id'},
         {data: 'date'},

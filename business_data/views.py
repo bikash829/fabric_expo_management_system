@@ -731,13 +731,13 @@ class CustomerListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView
 class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_customer"
 
-    def get(self, request, *args, **kwargs):
-        draw = int(request.GET.get('draw',1))
-        start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 10))
-        search_value = request.GET.get('search[value]', '')
-        order_col_index = request.GET.get('order[0][column]', 0)
-        order_dir = request.GET.get('order[0][dir]', 'asc')
+    def post(self, request, *args, **kwargs):
+        draw = int(request.POST.get('draw',1))
+        start = int(request.POST.get('start', 0))
+        length = int(request.POST.get('length', 10))
+        search_value = request.POST.get('search[value]', '')
+        order_col_index = request.POST.get('order[0][column]', 0)
+        order_dir = request.POST.get('order[0][dir]', 'asc')
 
 
         columns = [
@@ -1200,13 +1200,13 @@ class SupplierListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView
 class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_supplier"
 
-    def get(self, request, *args, **kwargs):
-        draw = int(request.GET.get('draw',1))
-        start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 10))
-        search_value = request.GET.get('search[value]', '')
-        order_col_index = request.GET.get('order[0][column]', 0)
-        order_dir = request.GET.get('order[0][dir]', 'asc')
+    def post(self, request, *args, **kwargs):
+        draw = int(request.POST.get('draw',1))
+        start = int(request.POST.get('start', 0))
+        length = int(request.POST.get('length', 10))
+        search_value = request.POST.get('search[value]', '')
+        order_col_index = request.POST.get('order[0][column]', 0)
+        order_dir = request.POST.get('order[0][dir]', 'asc')
        
 
         # sorting columns

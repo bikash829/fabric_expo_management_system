@@ -144,7 +144,13 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      ajax : "{% url 'business_data:supplier-data-source' %}",
+      ajax : {
+        url   : "{% url 'business_data:supplier-data-source' %}",
+        type  : "POST",
+        headers: {
+          "X-CSRFToken": "{{csrf_token}}",
+        } 
+      },
       columns:[
           { data: 'id' },
           { data: 'date' },

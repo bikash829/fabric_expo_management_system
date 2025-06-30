@@ -19,7 +19,7 @@
     <!--begin::Container-->
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <a  class="btn btn-success" href="
                 {% if source == 'bulk_email' %}
                     {% url 'bulk_email:import_recipients' %}
@@ -29,7 +29,14 @@
                     {% url 'bulk_wechat:import_recipients' %}
                 {% endif %}
                 " >Import Recipients</a>
-                <a class="btn btn-secondary" href="
+                
+                <button id="row_count" class="btn btn-info" disabled>Row count</button>
+                <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
+                <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
+                <label class="btn btn-outline-primary" for="select-all">Select All</label>
+                </div>
+
+                <!-- <a class="btn btn-secondary" href="
                 {% if source == 'bulk_email' %}
                     {% url 'bulk_email:export_recipient_list' %}
                 {% elif source == 'bulk_whatsapp' %}
@@ -37,12 +44,28 @@
                 {% elif source == 'bulk_wechat'%}
                     {% url 'bulk_wechat:export_recipient_list' %}
                 {% endif %}
-                ">Export Recipients</a>
+                ">Export Recipients</a> -->
 
+                <form 
+                id="export-form" 
+                method="POST" 
+                class="form-check form-check-inline" 
+                style="margin-right:0 !important; padding-left:0 !important;"
+                action="{% if source == 'bulk_email' %}
+                        {% url 'bulk_email:export_recipient_list' %}
+                        {% elif source == 'bulk_whatsapp' %}
+                            {% url 'bulk_whatsapp:export_recipient_list' %}
+                        {% elif source == 'bulk_wechat' %}
+                            {% url 'bulk_wechat:export_recipient_list' %}
+                {% endif %}"
+                >
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_ids" id="selected-ids">
+                    <button type="submit" class="btn btn-secondary">Export Selected</button>
+                </form>
             </div>
             <div class="col-md-6 text-end">
                 
-                {% comment %} <button class="btn btn-info" disabled>Row count</button> {% endcomment %}
             </div>
         </div>
       
@@ -60,7 +83,7 @@
           </thead>
           <tbody>
               {% for item in recipient_list %}
-              <tr>
+              <tr data-recipientId="{{item.id}}">
                   <td>{{forloop.counter}}</td>
                   <td>{{item.id}}</td>
                   <td>{{item.name}}</td>
@@ -114,7 +137,7 @@
     // Show row count 
     function updateRowCount() {
       const count = table.rows('.selected').data().length;
-      $('#button').text(count + ' row(s) selected');
+      $('#row_count').text(count + ' row(s) selected');
     }
     
     // Handle "Select All" checkbox click event
@@ -133,6 +156,29 @@
       var allChecked = table.rows({ 'search': 'applied' }).nodes().length === table.rows('.selected', { 'search': 'applied' }).nodes().length;
       $('#select-all').prop('checked', allChecked);
     });
-    
+</script>
+
+<script>
+  function getSelectedIds() {
+    const ids = [];
+    $('#recipients tbody tr.selected').each(function () {
+      const recipientId = $(this).data('recipientid');
+      if (recipientId) {
+        ids.push(recipientId);
+      }
+    });
+    return ids;
+  }
+
+  $('#export-form').on('submit', function (e) {
+    const selectedIds = getSelectedIds();
+    if (selectedIds.length === 0) {
+      e.preventDefault();
+      alert("Please select at least one recipient to export.");
+      return false;
+    }
+
+    $('#selected-ids').val(JSON.stringify(selectedIds));
+  });
 </script>
 {% endblock push_scripts %}

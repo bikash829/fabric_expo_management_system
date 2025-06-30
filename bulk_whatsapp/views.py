@@ -1,3 +1,4 @@
+import json
 import pprint
 from django.utils import timezone
 import uuid
@@ -276,18 +277,22 @@ class RecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class ExportRecipientToCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "bulk_whatsapp.view_whatsapprecipient"
 
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(
-            content_type="text/csv",
-            headers={"Content-Disposition": 'attachment; filename="whatsapp_recipients.csv"'},
-        )
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            selected_ids = json.loads(request.POST.get('selected_ids', '[]'))
+        if not selected_ids:
+            return HttpResponse("No recipients selected", status=400)
 
-        recipients = WhatsappRecipient.objects.all()
+        recipients = WhatsappRecipient.objects.filter(id__in=selected_ids)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="whatsapp_recipients.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(["name", "whatsapp_no","category","id"])
-        for item in recipients:
-            writer.writerow([item.name,item.recipient_number,item.category,item.pk, ])
+        writer.writerow(['ID', 'Recipient Name', 'Recipient ID', 'Category'])
+
+        for r in recipients:
+            writer.writerow([r.pk, r.name, r.recipient_number, r.category.name if r.category else ''])
 
         return response
 

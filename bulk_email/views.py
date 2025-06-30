@@ -1,3 +1,4 @@
+import json
 import uuid
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -242,18 +243,22 @@ class RecipientListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 class ExportRecipientToCSVView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'bulk_email.view_emailrecipient'
 
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(
-            content_type="text/csv",
-            headers={"Content-Disposition": 'attachment; filename="email_recipients.csv"'},
-        )
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            selected_ids = json.loads(request.POST.get('selected_ids', '[]'))
+        if not selected_ids:
+            return HttpResponse("No recipients selected", status=400)
 
-        recipients = EmailRecipient.objects.all()
+        recipients = EmailRecipient.objects.filter(id__in=selected_ids)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="recipients.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(["name", "email","category","id"])
-        for item in recipients:
-            writer.writerow([item.name,item.email,item.category,item.pk, ])
+        writer.writerow(['ID', 'Recipient Name', 'Recipient ID', 'Category'])
+
+        for r in recipients:
+            writer.writerow([r.pk, r.name, r.email, r.category.name if r.category else ''])
 
         return response
 

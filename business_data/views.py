@@ -348,92 +348,7 @@ class BuyerListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
 
 class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "business_data.view_buyer"
-    # def get(self, request, *args, **kwargs):
-    #     draw = int(request.GET.get('draw', 1))
-    #     start = int(request.GET.get('start', 0))
-    #     length = int(request.GET.get('length', 10))
-    #     search_value = request.GET.get('search[value]', '')
-    #     order_col_index = int(request.GET.get('order[0][column]', 0))
-    #     order_dir = request.GET.get('order[0][dir]', 'asc')
-
-    #     columns = [
-    #         'id',
-    #         'date',
-    #         'company_name',
-    #         'organization_type',
-    #         'brand',
-    #         'category',
-    #         'department',
-    #         'buyer_name',
-    #         'designation',
-    #         'country_of_origin',
-    #         'website',
-    #         'emails__email',
-    #         'phones__phone',
-    #         'phones__phone',
-    #         'payment_term',
-    #         'fabric_reference',
-    #         'mailing_address',
-    #         'visiting_address',
-    #         'linkedin_profile',
-    #         'remarks',
-    #         'concern_fe_rep',
-    #         'tag',
-    #     ]
-
-    #     order_column = columns[order_col_index] if 0 <= order_col_index < len(columns) else 'id'
-    #     if order_dir == 'asc':
-    #         order_column = '-' + order_column
-
-    #     qs = Buyer.objects.all().prefetch_related('emails', 'phones')
-
-    #     if search_value:
-    #         search_q = Q()
-    #         search_fields = columns[:-1]
-    #         for field in search_fields:
-    #             search_q |= Q(**{f"{field}__icontains": search_value})
-    #         qs = qs.filter(search_q)
-
-    #     total_count = Buyer.objects.count()
-    #     filtered_count = qs.count()
-
-    #     qs = qs.order_by(order_column)[start:start + length]
-
-    #     data = []
-    #     for obj in qs:
-    #         # emails = ', '.join([email.email for email in obj.emails.all()])
-    #         # whatsapp_numbers = ', '.join([phone.phone for phone in obj.phones.all() if getattr(phone, 'is_whatsapp', False)])
-    #         # phones = ', '.join([
-    #         # phone.phone for phone in obj.phones.all()
-    #         # if not getattr(phone, 'is_whatsapp', False) and not getattr(phone, 'is_wechat', False)
-    #         # ])
-    #         data.append({
-    #             'id': obj.id,
-    #             'date': obj.date.strftime("%B %d, %Y") if obj.date else "",
-    #             'company_name': getattr(obj, 'company_name', ''),
-    #             'organization_type': getattr(obj, 'organization_type', ''),
-    #             'brand': getattr(obj, 'brand', ''),
-    #             'category': getattr(obj, 'category', ''),
-    #             'department': getattr(obj, 'department', ''),
-    #             'buyer_name': getattr(obj, 'buyer_name', ''),
-    #             'designation': getattr(obj, 'designation', ''),
-    #             'country_of_origin': getattr(obj, 'country_of_origin', ''),
-    #             'website': f'<a href="{obj.website}" target="_blank">{obj.website}</a>' if getattr(obj, 'website', '') else '',
-    #             'emails': ', '.join([email.email for email in obj.emails.all()]),
-    #             'phones': ', '.join([phone.phone for phone in obj.phones.all() if not phone.is_whatsapp]),
-    #             'whatsapp_numbers': ', '.join([phone.phone for phone in obj.phones.all() if phone.is_whatsapp]),
-    #             'payment_term': getattr(obj, 'payment_term', ''),
-    #             'fabric_reference': getattr(obj, 'fabric_reference', ''),
-    #             'mailing_address': getattr(obj, 'mailing_address', ''),
-    #             'visiting_address': getattr(obj, 'visiting_address', ''),
-    #             'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
-    #             'remarks': getattr(obj, 'remarks', ''),
-    #             'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
-    #             'tag': getattr(obj, 'tag', ''),
-    #             'DT_RowAttr': {
-    #                 'data-id': obj.id,
-    #             }
-    #         })
+   
     def post(self, request, *args, **kwargs):
         draw = int(request.POST.get('draw', 1))
         start = int(request.POST.get('start', 0))
@@ -1703,13 +1618,14 @@ class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView)
 # product list 
 class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = 'business_data.view_product'
-    def get(self, request, *args, **kwargs):
-        draw = int(request.GET.get('draw', 1))
-        start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 10))
-        search_value = request.GET.get('search[value]', '')
-        order_column_index = int(request.GET.get('order[0][column]', 0))
-        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
+    
+    def post(self, request, *args, **kwargs):
+        draw = int(request.POST.get('draw', 1))
+        start = int(request.POST.get('start', 0))
+        length = int(request.POST.get('length', 10))
+        search_value = request.POST.get('search[value]', '')
+        order_column_index = int(request.POST.get('order[0][column]', 0))
+        order_dir = request.POST.get('order[0][dir]', 'asc')  # safer default
 
         columns = [
             'id', 'date', 'article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
@@ -1810,7 +1726,6 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 obj.remarks,
                 obj.get_absolute_url(),
             ])
-        print("Data:", data)
   
 
         return JsonResponse({

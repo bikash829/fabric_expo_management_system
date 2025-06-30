@@ -20,14 +20,7 @@ from django.db.models import F
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
-import humanize
-from datetime import datetime
-
-import mimetypes
-from premailer import transform
-from bulk_core.utils import replace_hsl_with_rgb
 from .tasks import send_mail_queue
-from django.core.exceptions import PermissionDenied
 """begin::manage email recipients """
 ### Generate demo csv file 
 class GenerateCSV(LoginRequiredMixin, View):

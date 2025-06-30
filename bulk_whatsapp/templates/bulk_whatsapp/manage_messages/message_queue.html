@@ -41,7 +41,13 @@
       responsive: true,
       // processing: true,
       serverSide: true,
-      ajax      : "{% url 'bulk_whatsapp:sent_message_queue_ajax' %}",
+      ajax      : {
+          url: "{% url 'bulk_whatsapp:sent_message_queue_ajax' %}",
+          type: "POST",
+          headers: {
+              "X-CSRFToken": "{{csrf_token}}"
+          }
+      },
       columns   :[
         { data: 'id', title: '#ID' },
         { data: 'session_id', title: 'Session ID' },

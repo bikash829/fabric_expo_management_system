@@ -39,7 +39,6 @@
     // Datatable 
     const table = $('#data_list').DataTable({
       responsive: true,
-      // processing: true,
       serverSide: true,
       ajax      : {
           url: "{% url 'bulk_email:email_session_ajax_data' %}",

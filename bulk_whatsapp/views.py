@@ -488,13 +488,13 @@ class SendMessageQueueListView(LoginRequiredMixin, PermissionRequiredMixin, Temp
 
 class SendMessageQueueAjaxListView(LoginRequiredMixin, PermissionRequiredMixin, View):
     permission_required = "bulk_whatsapp.view_whatsappsession"
-    def get(self, request, *args, **kwargs):
-        draw = int(request.GET.get('draw', 1))
-        start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 10))
-        search_value = request.GET.get('search[value]', '')
-        order_column_index = int(request.GET.get('order[0][column]', 0))
-        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
+    def post(self, request, *args, **kwargs):
+        draw = int(request.POST.get('draw', 1))
+        start = int(request.POST.get('start', 0))
+        length = int(request.POST.get('length', 10))
+        search_value = request.POST.get('search[value]', '')
+        order_column_index = int(request.POST.get('order[0][column]', 0))
+        order_dir = request.POST.get('order[0][dir]', 'asc')  # safer default
 
 
         columns = [
@@ -524,16 +524,27 @@ class SendMessageQueueAjaxListView(LoginRequiredMixin, PermissionRequiredMixin, 
 
         data = []
         for obj in qs:
+            # Determine icon based on status
+            status_display = obj.get_status_display()
+            if status_display.lower() == 'done':
+                status_html = '<i class="fas fa-check-circle text-success"></i> Done'
+            elif status_display.lower() == 'processing':
+                status_html = '<i class="fas fa-spinner fa-spin text-primary"></i> Processing'
+            elif status_display.lower() == 'failed':
+                status_html = '<i class="fas fa-times-circle text-danger"></i> Failed'
+            else:
+                status_html = f'<i class="fas fa-info-circle text-info"></i> {status_display}'
+            
             # Convert UTC time to local time for display
             local_created_at = timezone.localtime(obj.created_at)
             data.append({
                 'id': obj.id,
                 'session_id': obj.session_id,
-                'created_at': local_created_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at': local_created_at.strftime('%B %d, %Y at %I:%M %p'),
                 'subject': obj.draft.name,
                 'success': obj.success_count,
                 'failed': obj.failure_count,
-                'status': obj.get_status_display(),
+                'status': status_html,
             })
 
   

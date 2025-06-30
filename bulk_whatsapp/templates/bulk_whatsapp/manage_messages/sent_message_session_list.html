@@ -36,7 +36,13 @@
               <tr>
                   <td>{{item.id}}</td>
                   <td>{{item.session_id}}</td>
-                  <td>{% if item.status %}<span class='text-success'>success</span> {% else %}<span class='text-danger'>failed</span>{% endif %}</td>
+                  <td>
+                    {% if item.status %}
+                      <i class="fas fa-check-circle text-success"></i>Sent
+                    {% else %}
+                      <i class="fas fa-times-circle text-danger"></i>Failed
+                    {% endif %}
+                  </td>
                   <td>{{item.message_template}}</td>
                   <td>{{item.recipient_to.recipient_number}}</td>
                   <td>{{item.sent_by}}</td>

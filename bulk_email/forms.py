@@ -7,7 +7,11 @@ from bulk_core.utils import MultipleFileField,MultipleFileInput
     
 class TempEmailRecipientImportForm(ModelForm):
     template_name = "form_template/full_width_form.html"
-
+    category = forms.ModelChoiceField(
+            queryset=RecipientCategory.objects.all(),
+            empty_label="Select Category",  # 👈 your custom label here
+            widget=forms.Select(attrs={'class': 'form-select'}),
+        )
     class Meta:
         model = TempRecipientDataSheet
         fields= ['data_sheet','category','description','platform',]
@@ -15,7 +19,7 @@ class TempEmailRecipientImportForm(ModelForm):
         widgets = {
                 'data_sheet': forms.FileInput(attrs={'class': 'form-control'}),
                 'platform': forms.HiddenInput(),
-                'category': forms.Select(attrs={'class':'form-select'}),
+                # 'category': forms.Select(attrs={'class':'form-select'}),
                 'description': forms.TextInput(attrs={'class':'form-control'}),
         }
     # field_order = ['data_sheet','category','description','platform',]

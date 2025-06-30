@@ -473,7 +473,6 @@ class SendMessageView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         
         # Add success message
-        # return JsonResponse({"success_count": success_count, "failure_count": failure_count,'message':f"Message has been sent with {success_count} success and {failure_count} failed attempts."})
         return JsonResponse({'message': "Messages sending are processing. Check queued message status."})
 
 

@@ -12,12 +12,12 @@ from django.contrib.auth import get_user_model
 # from time import sleep
 from business_data.models import CompanyProfile
 from fabric_expo_management_system.settings import (
+    SITE_BASE_URL,
     TWILIO_ACCOUNT_SID, 
     TWILIO_AUTH_TOKEN, 
     TWILIO_WHATSAPP_NUMBER
 )
 from twilio.rest import Client
-from fabric_expo_management_system.info import PROJECT_NAME
 
 @shared_task
 def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id, company_id):
@@ -29,16 +29,12 @@ def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id,
     company_name = company_info.get_company_name_display()
 
     # retrieving attachments
-    attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
-    # media_urls = [request.build_absolute_uri(attachment.attachment.url) for attachment in attachments]
-    media_urls = [
-        "https://drive.usercontent.google.com/download?id=1LGCyQ0N6SQ2lnEhBwq7cRb9b2FQodpwA&export=download&authuser=0&confirm=t&uuid=74c94d9d-213e-479e-8910-87b7bb9904bb&at=AN8xHoor1FHt-w8dp38gq0bIcVP_:1750933676487",
-        # "https://demo.twilio.com/owl.png",
-        # "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
-        # "https://drive.usercontent.google.com/download?id=0B-olApIC0u0QVjBUY1ctbUsxZjA&export=download&resourcekey=0-5Aqjxlnya5FowVUM8nTr0Q",
-    ]
+    # attachments = WhatsappAttachment.objects.filter(template=whatsapp_content)
+    attachment = WhatsappAttachment.objects.filter(template=whatsapp_content).first()
+    media_url = None
+    if attachment:
+        media_url = f"{SITE_BASE_URL}{attachment.attachment.url}"
     
-
     account_sid = TWILIO_ACCOUNT_SID
     auth_token = TWILIO_AUTH_TOKEN
     client = Client(account_sid, auth_token)
@@ -58,7 +54,7 @@ def send_whatsapp_message(user_id, draft_id, recipient_category_ids, session_id,
                 from_= TWILIO_WHATSAPP_NUMBER,
                 body=text_body,
                 to=f"whatsapp:{recipient.recipient_number}",
-                media_url=media_urls # doesn't support direct file path
+                media_url=media_url # doesn't support direct file path
             )
             success_count += 1
 

@@ -1,18 +1,21 @@
 from business_data.models import CompanyProfile
 
+business_info = CompanyProfile.objects.first()
 
+PROJECT_NAME = (
+    business_info.get_company_name_display()
+    if business_info else "ExpoSync"
+)
 
-business_infos =  CompanyProfile.objects.all() 
+COMPANY_LOGO = (
+    getattr(business_info, 'logo', None).url
+    if business_info and getattr(business_info, 'logo', None)
+    else "/static/images/logo.png"
+)
 
-business_info = business_infos.first() if business_infos.exists() else None
-
-
-PROJECT_NAME = business_info.get_company_name_display() if business_info else "ExpoSync"
-COMPANY_LOGO = "/static/images/logo.png"
-COMPANY_LOGO = business_info.logo.url if business_info and business_info.logo else "/static/images/logo.png"
-ADDRESS = business_info.address if business_info and business_info.address else ""
-PHONE_NUMBER = str(business_info.phone_number) if business_info and business_info.phone_number else ""
-EMAIL = business_info.email if business_info and business_info.email else ""
-WEBSITE = business_info.website if business_info and business_info.website else ""
-ESTABLISHED_DATE = business_info.established_date if business_info and business_info.established_date else None
-DESCRIPTION = business_info.description if business_info and business_info.description else ""
+ADDRESS = getattr(business_info, 'address', "")
+PHONE_NUMBER = str(getattr(business_info, 'phone_number', "")) or ""
+EMAIL = getattr(business_info, 'email', "")
+WEBSITE = getattr(business_info, 'website', "")
+ESTABLISHED_DATE = getattr(business_info, 'established_date', None)
+DESCRIPTION = getattr(business_info, 'description', "")

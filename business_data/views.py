@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 from django.core.validators import validate_email
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic import DetailView
@@ -32,12 +32,8 @@ from .forms import BuyerUploadForm, FileUploadForm, ProductUpdateForm
 from faker import Faker
 from random import randint, choice, uniform
 from collections import defaultdict
-from pprint import pprint
 from weasyprint import HTML
 from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.http import QueryDict
 
 # extract data from excel/csv
 def extract_data(request,form):

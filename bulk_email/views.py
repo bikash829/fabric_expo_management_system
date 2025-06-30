@@ -20,7 +20,8 @@ from django.db.models import F
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ValidationError
-
+import humanize
+from datetime import datetime
 
 import mimetypes
 from premailer import transform
@@ -354,7 +355,7 @@ class AddAttachmentView(LoginRequiredMixin, View):
         # Ensure the total size does not exceed the 20MB limit
         if total_size_mb > 20:
             response = JsonResponse({'success': False, 'error': 'Total file size exceeds the 20MB limit.'}, status=400)
-            print(f"Returning response: {response.content}, status: {response.status_code}")
+            
             return response
         else:
             try:
@@ -456,13 +457,13 @@ class EmailSessionListView(LoginRequiredMixin, PermissionRequiredMixin, Template
     template_name = 'bulk_email/email_queue.html'
 
 class EmailSessionAjaxData(View):
-    def get(self, request, *args, **kwargs):
-        draw = int(request.GET.get('draw', 1))
-        start = int(request.GET.get('start', 0))
-        length = int(request.GET.get('length', 10))
-        search_value = request.GET.get('search[value]', '')
-        order_column_index = int(request.GET.get('order[0][column]', 0))
-        order_dir = request.GET.get('order[0][dir]', 'asc')  # safer default
+    def post(self, request, *args, **kwargs):
+        draw = int(request.POST.get('draw', 1))
+        start = int(request.POST.get('start', 0))
+        length = int(request.POST.get('length', 10))
+        search_value = request.POST.get('search[value]', '')
+        order_column_index = int(request.POST.get('order[0][column]', 0))
+        order_dir = request.POST.get('order[0][dir]', 'asc')  # safer default
 
 
         columns = [
@@ -492,14 +493,24 @@ class EmailSessionAjaxData(View):
 
         data = []
         for obj in qs:
+            # Determine icon based on status
+            status_display = obj.get_status_display()
+            if status_display.lower() == 'done':
+                status_html = '<i class="fas fa-check-circle text-success"></i> Done'
+            elif status_display.lower() == 'processing':
+                status_html = '<i class="fas fa-spinner fa-spin text-primary"></i> Processing'
+            elif status_display.lower() == 'failed':
+                status_html = '<i class="fas fa-times-circle text-danger"></i> Failed'
+            else:
+                status_html = f'<i class="fas fa-info-circle text-info"></i> {status_display}'
             data.append({
                 # idx,  # For Count column (can be filled on client side)
                 'id' : obj.id,
-                'created_at' : obj.created_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at' : obj.created_at.strftime('%B %d, %Y at %I:%M %p'),
                 'subject': obj.draft.subject,
                 'success': obj.success_count,
                 'failed': obj.failure_count,
-                'status': obj.get_status_display(),
+                'status': status_html,
             })
 
   

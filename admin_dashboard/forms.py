@@ -17,7 +17,7 @@ class StaffUserCreationForm(UserCreationForm):
                 # forms.Select(choices=PrefixChoiceField().choices),
                 # forms.TextInput()
                 forms.Select(attrs={'class': 'form-select w-25'},
-                             choices=[('', 'Select Code')] + [
+                             choices=[('', 'Select')] + [
                                 choice for choice in PrefixChoiceField().choices if choice[0] != ''
                             ]),
                 forms.TextInput(attrs={'class': 'form-control w-75'})
@@ -31,7 +31,7 @@ class StaffUserCreationForm(UserCreationForm):
                 # forms.Select(choices=PrefixChoiceField().choices),
                 # forms.TextInput()
                 forms.Select(attrs={'class': 'form-select w-25'},
-                                choices=[('', 'Select Code')] + [
+                                choices=[('', 'Select')] + [
                                 choice for choice in PrefixChoiceField().choices if choice[0] != ''
                             ]),
                 forms.TextInput(attrs={'class': 'form-control w-75'})

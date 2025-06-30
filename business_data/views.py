@@ -285,7 +285,6 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                                 tag=tag
                             )
                         except Exception as e:
-                            print(f"Row import failed: {e}")
                             messages.error(request, "Invalid data upload. Please check your file and try again.")
                             if default_storage.exists(file_path):
                                 default_storage.delete(file_path)
@@ -675,7 +674,6 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         # insert emails and other relational data
                         if customer:
                             if row['customer_email_id']:
-                                print(row.get('customer_email_id'))
                                 email = row.get('customer_email_id')
                                 try:
                                     validate_email(email)
@@ -851,7 +849,6 @@ class DeleteCustomerView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
 
     def post(self, request, *args, **kwargs):
         ids = request.POST.getlist('selectedIds[]')
-        print(ids)
         if not ids:
             return JsonResponse({'error': 'No IDs provided.'}, status=400)
         Customer.objects.filter(id__in=ids).soft_delete()
@@ -1487,7 +1484,6 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'products': preview_data,
             'file_info': file_info,
         }
-        print(preview_data)
         return render(request, 'business_data/manage_products/preview.html', context)
 
     def post(self, request):
@@ -1964,8 +1960,6 @@ class ProductSampleDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View)
     permission_required = "business_data.change_product"
 
     def post(self, request,product_id ,sample_id):
-        print(f"sample id: {sample_id}")
-        print(f"pro id: {product_id}")
         if not sample_id:
             return JsonResponse({'success': False, 'message': 'Sample ID is required.'}, status=400)
         try:
@@ -2001,15 +1995,5 @@ class SaveProductLabelDataView(LoginRequiredMixin, PermissionRequiredMixin, View
         for field in allowed_fields:
             if field in data:
                 setattr(product, field, data[field])
-        print(
-            "article_no:", product.article_no,
-            "composition:", product.composition,
-            "construction:", product.construction,
-            "weave:", product.weave,
-            "cut_width:", product.cut_width,
-            "weight:", product.weight,
-            "coo:", product.coo,
-            "remarks:", product.remarks
-        )
         product.save()
         return JsonResponse({'message': 'Product label data saved successfully.','printable_data':data})

@@ -1,4 +1,3 @@
-import pprint
 from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import TemplateView,FormView, ListView, DetailView
@@ -6,9 +5,9 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin,PermissionRequiredMixin
 from django.urls import reverse_lazy
 
-from bulk_email.models import EmailSession, SentMail
+from bulk_email.models import  SentMail
 from bulk_whatsapp.models import SentMessage
-from business_data.models import Buyer, CompanyProfile, Product, Supplier
+from business_data.models import Buyer, Product, Supplier
 from .forms import GroupForm, StaffUserCreationForm,StaffChangeForm, UserPermissionForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model

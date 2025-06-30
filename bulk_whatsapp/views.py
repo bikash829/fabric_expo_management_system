@@ -1,5 +1,4 @@
 import json
-import pprint
 from django.utils import timezone
 import uuid
 
@@ -16,14 +15,11 @@ import csv
 from django.views import View
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic import ListView, TemplateView
-from django.utils.decorators import method_decorator
-from django_twilio.decorators import twilio_view
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
 from django.utils import timezone
 
 # validators 
-from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from phonenumber_field.validators import validate_international_phonenumber
@@ -161,7 +157,8 @@ class ConfirmWhatsappRecipientsView(LoginRequiredMixin, PermissionRequiredMixin,
         # Normalize phone numbers and filter out None values
         normalized_numbers = [normalize_phone_number(tr.recipient_id) for tr in temp_recipients]
         normalized_numbers = [num for num in normalized_numbers if num is not None]
-        print(normalized_numbers)
+
+        
         # array of all duplicate recipients 
         existing_recipients = {
             recipient.recipient_number: recipient for recipient in WhatsappRecipient.objects.filter(

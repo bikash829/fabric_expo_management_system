@@ -124,7 +124,7 @@ class ConfirmWeChatRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, V
     def post(self, request, datasheet_id):
         temp_data_sheet = get_object_or_404(TempRecipientDataSheet, id=datasheet_id)
         temp_ids = request.POST.getlist('recipient_ids[]')
-        # print(temp_ids)
+        
 
         # check if exist temporary data 
         if not temp_ids:
@@ -140,8 +140,7 @@ class ConfirmWeChatRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, V
         
         # Normalize phone numbers and filter out None values
         normalized_wc_ids = [tr.recipient_id for tr in temp_recipients]
-        # normalized_numbers = [num for num in normalized_numbers if num is not None]
-        # print(normalized_numbers)
+        
         # array of all duplicate recipients 
         existing_recipients = {
             recipient.recipient_id: recipient for recipient in WeChatRecipient.objects.filter(
@@ -152,8 +151,6 @@ class ConfirmWeChatRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, V
         # create new list for new recipients and update existed recipients if need any
         new_recipients = []
         update_recipients = []
-        print(new_recipients)
-        print(update_recipients)
 
         for tr in temp_recipients:
             # check if exist but update category 
@@ -282,7 +279,6 @@ class CreateMessageView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
         
         # Handle file attachments
         for file in self.request.FILES.getlist('attachment'):
-            print(file.name)
             WeChatAttachment.objects.create(attachment=file,template=wc_template)
 
         

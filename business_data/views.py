@@ -89,7 +89,7 @@ class GenerateCSVBuyer(LoginRequiredMixin, PermissionRequiredMixin, View):
         remarks_list = [
             "Top buyer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
         ]
-        for _ in range(10):
+        for _ in range(2):
             writer.writerow([
                 # fake.date_this_decade().strftime("%Y-%m-%d"),
                 fake.date_this_decade().strftime("%d/%m/%Y"),
@@ -481,7 +481,7 @@ class GenerateCSVCustomer(LoginRequiredMixin, PermissionRequiredMixin, View):
         remarks_list = [
             "Top customer", "Prefers organic", "Bulk buyer", "Fast payment", "Long-term client"
         ]
-        for _ in range(20):
+        for _ in range(2):
             writer.writerow([
             # fake.date_this_decade().strftime("%Y-%m-%d"),
             fake.date_this_decade().strftime("%d/%m/%Y"),
@@ -896,7 +896,7 @@ class GenerateCSVSupplier(LoginRequiredMixin, PermissionRequiredMixin, View):
             "Flexible payment terms",
             "Fast response time"
         ]
-        for _ in range(10):
+        for _ in range(2):
             name1 = fake.name()
             name2 = fake.name()
             email1 = fake.email()
@@ -1367,7 +1367,7 @@ class GenerateCSVProduct(LoginRequiredMixin, PermissionRequiredMixin, View):
         colors = ["Indigo Blue", "Charcoal Grey", "Khaki", "Black", "White"]
         # images = ["image1.png", "image2.jpg", "image2.png"]
 
-        for _ in range(3):  # Change to any number you want
+        for _ in range(2):  # Change to any number you want
             # Generate a unique article number (e.g., ART-YYYYMMDD-XXXXX)
             article_no = f"ART-{fake.date_this_decade().strftime('%Y%m%d')}-{randint(10000, 99999)}"
             writer.writerow([

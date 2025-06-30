@@ -48,6 +48,8 @@
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="{% static 'css/adminlte.css' %}" />
     <!--end::Required Plugin(AdminLTE)-->
+    <!-- custom css -->
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}" /> 
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -115,7 +117,9 @@
 
             <div class="col-6">
               <div class="text-end">
-                <span style="font-size:.7rem;">Powered by BinaryByte</span>
+                <a class="powred_by" href="https://binarytobyte.com/">
+                  <span style="font-size:.7rem;">Powered by BinaryByte</span>
+                </a>
               </div>
             </div>
           </div>

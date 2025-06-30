@@ -38,3 +38,9 @@
   border-radius: 3px;
   padding: 2px 4px;
 }
+
+.powred_by {
+    text-decoration: none;
+    outline: none;
+    color: #757575; /* light gray */
+}

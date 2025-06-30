@@ -146,7 +146,14 @@
       responsive: true,
       processing: true,
       serverSide: true,
-      ajax      : "{% url 'business_data:buyer-data-source' %}",
+      // ajax      : "{% url 'business_data:buyer-data-source' %}",
+      ajax      : {
+          url: "{% url 'business_data:buyer-data-source' %}",
+          type: "POST",
+          headers: {
+              "X-CSRFToken": "{{csrf_token}}"
+          }
+      },
       columns   :[
         { data: 'id', title: '#ID' },
         { data: 'date', title: 'Date' },

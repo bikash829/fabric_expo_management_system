@@ -24,6 +24,8 @@ urlpatterns = [
     path('customer-preview/', views.CustomerPreviewView.as_view(), name='customer-preview'),
     path('customer-list/',views.CustomerListView.as_view(),name='customer-list'),
     path('customer/data-source/',views.CustomerDataSourceView.as_view(),name="customer-data-source"),
+    path('customers/<int:pk>/customer-detail/', views.CustomerDetailView.as_view(), name='customer-detail'),
+    path('customer/<int:pk>/edit/', views.CustomerUpdateView.as_view(), name='customer-edit'),
     path('delete-customers/',views.DeleteCustomerView.as_view(),name="delete-customers"),
     # End::Customer details"""
 

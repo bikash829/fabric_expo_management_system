@@ -1,0 +1,224 @@
+{% extends "core/_base.html" %}
+{% load static %}
+
+
+{% block title %}
+    Customer Detail
+{% endblock title %}
+    
+
+{% block push_css %}
+ <link rel="stylesheet" href="{% static 'business_data/css/style.css' %}">
+{% endblock push_css %}
+{% block content %}
+    <div class="container py-4">
+        <div class="card shadow-sm border-0 overflow-hidden mb-4">
+            <div class="card-header product-header text-white position-relative">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3 class="h5 mb-1">
+                            <span class="fw-semibold">Company:</span> 
+                            <span id="company-name">{{ customer.company_name }}</span>
+                        </h3>
+                        <p class="small mb-0 opacity-75">
+                            <span class="fw-medium">Record created on:</span> 
+                            <span>{{ customer.created_at|date:"F j, Y" }}</span>
+                        </p>
+                    </div>
+                    <span class="badge bg-white text-dark bg-opacity-25 rounded-pill product-tag">
+                        Organization Type: {{ customer.organization_type }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <h5 class="section-title fw-semibold mb-3">Basic Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Date</label>
+                                    <p class="mb-0">{{ customer.date|date:"F j, Y" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Organization Type</label>
+                                    <p class="mb-0">{{ customer.organization_type }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Brand</label>
+                                    <p class="mb-0">{{ customer.brand }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Category</label>
+                                    <p class="mb-0">{{ customer.category }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Department</label>
+                                    <p class="mb-0">{{ customer.department }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Country of Origin</label>
+                                    <p class="mb-0">{{ customer.country_of_origin }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="section-title fw-semibold mt-4 mb-3">Contact Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">customer Name</label>
+                                    <p class="mb-0">{{ customer.customer_name }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Designation</label>
+                                    <p class="mb-0">{{ customer.designation }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Website</label>
+                                    <p class="mb-0">
+                                        {% if customer.website %}
+                                        <a href="{{ customer.website }}" target="_blank">{{ customer.website }}</a>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Emails</label>
+                                    <p class="mb-0">
+                                        {% if customer.emails.all %}
+                                            {{ customer.emails.all|join:", " }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Phone Numbers</label>
+                                    <p class="mb-0">
+                                        {% if customer.phones.all %}
+                                            {% for phone in customer.phones.all %}
+                                                {% if not phone.is_whatsapp  %}
+                                                    {{ phone.phone }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">WhatsApp Numbers</label>
+                                    <p class="mb-0">
+                                        {% if customer.phones.all %}
+                                            {% for phone in customer.phones.all %}
+                                                {% if phone.is_whatsapp %}
+                                                    {{ phone.phone }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Mailing Address</label>
+                                    <address class="mb-0">{{ customer.mailing_address|default:"-" }}</address>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Visiting Address</label>
+                                    <address class="mb-0">{{ customer.visiting_address|default:"-" }}</address>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">LinkedIn Profile</label>
+                                    <p class="mb-0">
+                                        {% if customer.linkedin_profile %}
+                                        <a href="{{ customer.linkedin_profile }}" target="_blank">{{ customer.linkedin_profile }}</a>
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="section-title fw-semibold mt-4 mb-3">Additional Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Payment Term</label>
+                                    <p class="mb-0">{{ customer.payment_term|default:"-" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Fabric Reference</label>
+                                    <p class="mb-0">{{ customer.fabric_reference|default:"-" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Concern FE Rep</label>
+                                    <p class="mb-0">{{ customer.concern_fe_rep|default:"-" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label detail-label text-muted text-uppercase fw-semibold mb-1">Remarks</label>
+                                    <p class="mb-0">{{ customer.remarks|default:"-" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+                    <a href="{% url 'business_data:customer-edit' customer.pk %}" class="btn btn-primary px-4">
+                        <i class="fas fa-edit me-2"></i> Edit
+                    </a> 
+                    <a href="{% url 'business_data:customer-list' %}" class="btn btn-outline-dark ms-auto px-4">
+                        <i class="fas fa-arrow-left me-2"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block push_scripts %}
+<script>
+    $(function() {
+        // Dynamic tag styling
+        const $tag = $('.product-tag');
+        $tag.addClass('bg-primary bg-opacity-10 text-primary');
+    });
+</script>
+{% endblock push_scripts %}

@@ -374,6 +374,157 @@ class BuyerForm(ContactInfoForm):
         
         return instance
 # Customer Form with Bootstrap classes
+class CustomerUpdateForm(ContactInfoForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'customer@company.com'
+        }),
+        required=False
+    )
+    
+    phone = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '+8801XXXXXXXX'
+        }),
+        required=False
+    )
+    
+    whatsapp_number = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '+8801XXXXXXXX'
+        }),
+        required=False,
+        help_text="Must be a valid WhatsApp number"
+    )
+
+    class Meta(ContactInfoForm.Meta):
+        model = Customer
+        fields = [
+            'date',
+            'company_name',
+            'organization_type',
+            'brand',
+            'department',
+            'country_of_origin',
+            'website',
+            'mailing_address',
+            'visiting_address',
+            'linkedin_profile',
+            'remarks',
+            'concern_fe_rep',
+            # 'tag',
+            'customer_name',
+            'designation',
+            'category',
+            'payment_term',
+            'fabric_reference',
+            'email',
+            'phone',
+            'whatsapp_number',
+            # 'is_international',
+        ]
+        widgets = {
+            **ContactInfoForm.Meta.widgets,
+            'customer_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Customer Name'
+            }),
+            'designation': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Designation'
+            }),
+            'category': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            
+            'payment_term': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Payment Terms'
+            }),
+            'fabric_reference': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Fabric Reference'
+            }),
+            # 'is_international': forms.CheckboxInput(attrs={
+            #     'class': 'form-check-input'
+            # }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Remove the multiple emails/phones fields from parent
+        self.fields.pop('emails', None)
+        self.fields.pop('phones', None)
+        self.fields.pop('whatsapp_numbers', None)
+        
+        # Initialize with existing data if available
+        if self.instance.pk:
+            # Get first email
+            email = self.instance.emails.first()
+            if email:
+                self.fields['email'].initial = email.email
+            
+            # Get first regular phone
+            phone = self.instance.phones.filter(is_whatsapp=False).first()
+            if phone:
+                self.fields['phone'].initial = phone.phone
+            
+            # Get first whatsapp number
+            whatsapp = self.instance.phones.filter(is_whatsapp=True).first()
+            if whatsapp:
+                self.fields['whatsapp_number'].initial = whatsapp.phone
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if not phone:
+            raise ValidationError("Phone number is required")
+        # Add any phone validation logic here
+        return phone
+
+    def clean_whatsapp_number(self):
+        whatsapp = self.cleaned_data.get('whatsapp_number')
+        if not whatsapp:
+            raise ValidationError("WhatsApp number is required")
+        # Add any WhatsApp-specific validation here
+        return whatsapp
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        if commit:
+            instance.save()
+            
+            # Handle email (only keep one)
+            self.instance.emails.all().delete()
+            PersonEmail.objects.create(
+                contact_info=instance,
+                email=self.cleaned_data['email']
+            )
+            
+            # Handle phones (one regular, one whatsapp)
+            self.instance.phones.all().delete()
+            
+            # Regular phone
+            PersonPhone.objects.create(
+                contact_info=instance,
+                phone=self.cleaned_data['phone'],
+                is_whatsapp=False
+            )
+            
+            # WhatsApp number
+            PersonPhone.objects.create(
+                contact_info=instance,
+                phone=self.cleaned_data['whatsapp_number'],
+                is_whatsapp=True
+            )
+        
+        return instance
+        
+         
 # class CustomerForm(ContactInfoForm):
 #     class Meta(ContactInfoForm.Meta):
 #         model = Customer

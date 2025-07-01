@@ -27,7 +27,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, ProductImage, SampleTypeChoices, Supplier, Customer, Product
 
-from .forms import BuyerForm, BuyerUploadForm, FileUploadForm, ProductUpdateForm
+from .forms import BuyerForm, BuyerUploadForm, CustomerUpdateForm, FileUploadForm, ProductUpdateForm
 
 from faker import Faker
 from random import randint, choice, uniform
@@ -834,6 +834,8 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         data = []
         for obj in qs:
+            detail_url = reverse('business_data:customer-detail', kwargs={'pk': obj.pk})
+            
             data.append({
                 'id': obj.id,
                 'date': obj.date.strftime("%B %d, %Y") if obj.date else "",
@@ -856,6 +858,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
+                'action': f'<a href="{detail_url}" class="btn btn-link text-dark">View More</a>',
                 'tag': getattr(obj, 'tag', ''),
                 'DT_RowAttr': {
                     'data-id': obj.id,
@@ -868,6 +871,29 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'recordsFiltered': filtered_count,
             'data': data,
         })
+
+
+# customer detail view 
+class CustomerDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = "business_data.view_customer"
+
+    model = Customer
+    template_name = 'business_data/manage_customers/customer_detail.html'  # Customize the path if needed
+    context_object_name = 'customer'
+    redirect_field_name = 'next'
+
+
+# customer edit view 
+class CustomerUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "business_data.change_customer"
+    model = Customer
+    form_class = CustomerUpdateForm
+    
+    template_name = "business_data/manage_customers/customer_update_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy('business_data:customer-detail', kwargs={'pk': self.object.pk})
+
 
 
 # delete customers 

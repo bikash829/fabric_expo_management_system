@@ -9,7 +9,7 @@ from django.db import transaction
 
 from datetime import datetime
 
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 import pandas as pd
 from django.conf import settings
 from django.contrib import messages
@@ -27,7 +27,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, ProductImage, SampleTypeChoices, Supplier, Customer, Product
 
-from .forms import BuyerUploadForm, FileUploadForm, ProductUpdateForm
+from .forms import BuyerForm, BuyerUploadForm, FileUploadForm, ProductUpdateForm
 
 from faker import Faker
 from random import randint, choice, uniform
@@ -336,6 +336,34 @@ class BuyerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # return redirect('business_data:upload-success')
 
 
+# Buyer Detail 
+class BuyerDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = "business_data.view_buyer"
+
+    model = Buyer
+    template_name = 'business_data/manage_buyers/buyer_detail.html'  # Customize the path if needed
+    context_object_name = 'buyer'
+    redirect_field_name = 'next'
+
+# Buyer edit view 
+class BuyerUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "business_data.change_buyer"
+    model = Buyer
+    # fields = [
+    #     'date', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+    #     'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
+    #     'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
+    #     'construction', 'weight', 'color', 'cut_width', 'wash', 'price_per_yard',
+    #     'shrinkage_percent', 'stock_qty', 'concern_person','remarks'
+    # ]
+    form_class = BuyerForm
+    
+    template_name = "business_data/manage_buyers/buyer_update_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy('business_data:buyer-detail', kwargs={'pk': self.object.pk})
+
+    
 # Buyer list 
 class BuyerListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     permission_required = "business_data.view_buyer"
@@ -397,6 +425,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         data = []
         for obj in qs:
+            detail_url = reverse('business_data:buyer-detail', kwargs={'pk': obj.pk})
             data.append({
                 'id': obj.id,
                 'date': obj.date.strftime("%B %d, %Y") if obj.date else "",
@@ -420,6 +449,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
                 'tag': getattr(obj, 'tag', ''),
+                'action': f'<a href="{detail_url}" class="btn btn-link text-dark">View More</a>',
                 'DT_RowAttr': {
                     'data-id': obj.id,
                 }
@@ -432,7 +462,7 @@ class BuyerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'data': data,
         })
 
-# delete customers 
+# delete buyers 
 class DeleteBuyerView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = "business_data.delete_buyer"
     model = Buyer

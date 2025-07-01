@@ -177,6 +177,13 @@ EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 # password reset link will expire in 5 mins
 PASSWORD_RESET_TIMEOUT = 300
 
+# Session expires when browser closes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Auto logout after X seconds of inactivity (idle timeout)
+SESSION_COOKIE_AGE = 1800  # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 # twilio credentials
 TWILIO_ACCOUNT_SID=config('TWILIO_ACCOUNT_SID')

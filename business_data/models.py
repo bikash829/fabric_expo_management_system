@@ -100,12 +100,12 @@ class Supplier(SoftDeleteModel,ContactInfo):
     product_category = models.CharField(max_length=100)
     product_range = models.CharField(max_length=100)
     speciality = models.CharField(max_length=255, blank=True)
-    # email_2 = models.EmailField(blank=True, null=True)
-    # email_3 = models.EmailField(blank=True, null=True)
-    # phone_2 = models.CharField(max_length=50, blank=True, null=True)
     wechat_id = models.CharField(max_length=50, blank=True, null=True)
     payment_term = models.CharField(max_length=100)
     fabric_reference = models.CharField(max_length=255, blank=True)
+    # email_2 = models.EmailField(blank=True, null=True)
+    # email_3 = models.EmailField(blank=True, null=True)
+    # phone_2 = models.CharField(max_length=50, blank=True, null=True)
     # is_deleted = models.BooleanField(default=False,blank=True,editable=False)
 
 

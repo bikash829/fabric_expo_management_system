@@ -1,0 +1,110 @@
+{% extends "core/_base.html" %}
+
+{% block title %}Edit Supplier Detail{% endblock title %}
+
+{% block content %}
+  <!--begin::Header-->
+  {% include 'core/layouts/content_header.html' with page_name="Edit Supplier Detail" only%}
+  <!--end::Header-->
+  <!--begin::App Content-->
+  <div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <!--begin::Row-->
+      <div class="">
+        <!--begin::Col-->
+        <!--begin::Form Validation-->
+        <div class="card card-info card-outline mb-4">
+          <!--begin::Header-->
+          <div class="card-header">
+            <div class="card-title">Edit Supplier Detail Form</div>
+          </div>
+          <!--end::Header-->
+
+          <!--begin::Form-->
+          <form method="POST" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <!--begin::Body-->
+            <div class="card-body">
+                {{form}}
+            </div>  
+            <!--end::Body-->
+            <!--begin::Footer-->
+            <div class="card-footer">
+              <button class="btn btn-info" type="submit">Update Supplier Detail</button>
+              <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
+            </div>
+            <!--end::Footer-->
+          </form>
+          <!--end::Form-->
+          
+        </div>
+        <!--end::Form Validation-->
+
+        <!--end::Col-->
+      </div>
+      
+      <!-- /.row (main row) -->
+    </div>
+    <!--end::Container-->
+  </div>
+  <!--end::App Content-->
+
+  <!-- Toaster alert-->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  {% if messages %}
+  {% for message in messages %}
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header ">
+        {% comment %} <img src="..." class="rounded me-2" alt="..."> {% endcomment %}
+        <strong class="me-auto text-{{message.tags}}">{{message.tags}}</strong>
+        {% comment %} <small>11 mins ago</small> {% endcomment %}
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {{ message }}
+      </div>
+    </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+
+{% endblock content %}
+
+{% block push_scripts %}
+<!--begin::JavaScript-->
+<script>
+  // starter JavaScript for disabling form submissions if there are invalid fields
+  (() => {
+    'use strict';
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation');
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        'submit',
+        (event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          form.classList.add('was-validated');
+        },
+        false,
+      );
+    });
+  })();
+</script>
+<script>
+  $(document).ready(function () {
+    $('.toast').toast({
+        delay: 1000*20,
+    }).toast('show')
+});
+</script>
+<!--end::JavaScript-->
+{% endblock push_scripts %}

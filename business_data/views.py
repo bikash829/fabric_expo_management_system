@@ -27,7 +27,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from business_data.models import Buyer, CompanyProfile, PersonEmail, PersonPhone, ProductImage, SampleTypeChoices, Supplier, Customer, Product
 
-from .forms import BuyerForm, BuyerUploadForm, CustomerUpdateForm, FileUploadForm, ProductUpdateForm
+from .forms import BuyerForm, BuyerUploadForm, CustomerUpdateForm, FileUploadForm, ProductUpdateForm, SupplierUpdateForm
 
 from faker import Faker
 from random import randint, choice, uniform
@@ -1333,6 +1333,8 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         data = []
         for obj in qs:
+            detail_url = reverse('business_data:supplier-detail', kwargs={'pk': obj.pk})
+            
             data.append({
                 'id': obj.id,
                 'date':obj.date.strftime("%B %d, %Y") if obj.date else "",
@@ -1358,6 +1360,7 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'linkedin_profile': f'<a href="{obj.linkedin_profile}" target="_blank">{obj.linkedin_profile}</a>' if getattr(obj, 'linkedin_profile', '') else '',
                 'remarks': getattr(obj, 'remarks', ''),
                 'concern_fe_rep': getattr(obj, 'concern_fe_rep', ''),
+                'action': f'<a href="{detail_url}" class="btn btn-link text-dark">View More</a>',
                 'tag': getattr(obj, 'tag', ''),
                 # Add custom row attributes:
                 'DT_RowAttr': {
@@ -1374,6 +1377,46 @@ class SupplierDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'data': data,
         })
 
+
+
+# Supplier Detail 
+class SupplierDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = "business_data.view_supplier"
+
+    model = Supplier
+    template_name = 'business_data/manage_suppliers/supplier_detail.html'  # Customize the path if needed
+    context_object_name = 'supplier'
+    redirect_field_name = 'next'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        supplier = self.object
+
+        # Get WhatsApp phones queryset first, then slice
+        whatsapp_phones_qs = supplier.phones.filter(is_whatsapp=True).order_by('pk')
+        whatsapp_phone = whatsapp_phones_qs.first()  # get first item or None
+
+        # Get up to two regular phones (non-whatsapp)
+        regular_phones = supplier.phones.filter(is_whatsapp=False).order_by('pk')[:2]
+
+        context['regular_phones'] = list(regular_phones)
+        context['whatsapp_phone'] = whatsapp_phone
+
+        return context
+
+
+# Update Supplier 
+class SupplierUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = "business_data.change_supplier"
+    model = Supplier
+    form_class = SupplierUpdateForm
+    
+    template_name = "business_data/manage_suppliers/supplier_update_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy('business_data:supplier-detail', kwargs={'pk': self.object.pk})
+
+ 
 
 # soft delete supplier 
 class DeleteSupplierView(LoginRequiredMixin, PermissionRequiredMixin,UpdateView):

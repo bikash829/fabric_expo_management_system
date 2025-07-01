@@ -639,7 +639,7 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 else:
                     row['duplicates'][field] = value in existing_values[field] if value else False
 
-        
+       
         context = {
             'customers': preview_data,
             'file_info': file_info,
@@ -669,6 +669,7 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             try:
                 with transaction.atomic():
+                    
                     for _, row in df.iterrows():
                         try:
                             customer = Customer.objects.create(
@@ -676,7 +677,7 @@ class CustomerPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
                                 company_name=row.get('company_name'),
                                 organization_type=row.get('organization_type'),
                                 brand=row.get('brand'),
-                                # category=row['category'],
+                                category=row.get('category'),
                                 department=row.get('department'),
                                 customer_name=row.get('customer_name'),
                                 designation=row.get('designation'),
@@ -770,7 +771,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'company_name',
             'organization_type',
             'brand',
-            # 'category',  # commented out in model creation
+            'category',  # commented out in model creation
             'department',
             'customer_name',
             'designation',
@@ -805,7 +806,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'company_name',
                 'organization_type',
                 'brand',
-                # 'category',
+                'category',
                 'department',
                 'customer_name',
                 'designation',
@@ -842,7 +843,7 @@ class CustomerDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 'company_name': getattr(obj, 'company_name', ''),
                 'organization_type': getattr(obj, 'organization_type', ''),
                 'brand': getattr(obj, 'brand', ''),
-                # 'category': getattr(obj, 'category', ''),
+                'category': getattr(obj, 'category', ''),
                 'department': getattr(obj, 'department', ''),
                 'customer_name': getattr(obj, 'customer_name', ''),
                 'designation': getattr(obj, 'designation', ''),

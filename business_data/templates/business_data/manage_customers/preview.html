@@ -47,7 +47,7 @@
                           <th>Company Name</th>
                           <th>Organization Type</th>
                           <th>Brand</th>
-                          {% comment %} <th>Category (Apparel or Textile) </th> {% endcomment %}
+                          <th>Category (Apparel or Textile) </th>
                           <th>Department </th>
                           <th>Customer Name </th>
                           <th>Designation</th>
@@ -99,13 +99,13 @@
                               {{ item.brand }}
                               {% endif %}
                             </td>
-                            {% comment %} <td>
+                            <td>
                               {% if item.duplicates.category %}
                               <mark>{{ item.category }}</mark>
                               {% else %}
                               {{ item.category }}
                               {% endif %}
-                            </td> {% endcomment %}
+                            </td> 
                             <td>
                               {% if item.duplicates.department %}
                               <mark>{{ item.department }}</mark>
@@ -222,7 +222,7 @@
                           <th>Company Name</th>
                           <th>Organization Type</th>
                           <th>Brand</th>
-                          {% comment %} <th>Category (Apparel or Textile) </th> {% endcomment %}
+                          <th>Category (Apparel or Textile) </th>
                           <th>Department </th>
                           <th>Customer Name </th>
                           <th>Designation</th>

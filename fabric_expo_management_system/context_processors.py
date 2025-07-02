@@ -3,7 +3,9 @@ from decouple import config
 # from admin_dashboard import nav_data
 from admin_dashboard import nav_data
 from fabric_expo_management_system.info import PROJECT_NAME,COMPANY_LOGO,business_infos
-from  fabric_expo_management_system.settings import APP_VERSION
+from fabric_expo_management_system.version import __version__ as APP_VERSION
+
+
 def sidebar_items(request):
     
     # if request.user.is_superuser:

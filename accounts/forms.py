@@ -70,7 +70,7 @@ class CustomUserChangeForm(UserChangeForm):
             ],
         )
     )
-
+    
     class Meta:
         model = get_user_model()
         fields = [ 'first_name', 'last_name', 'gender', 'date_of_birth', 'phone', 'additional_phone', 'nationality']

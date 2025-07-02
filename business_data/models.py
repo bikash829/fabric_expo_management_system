@@ -169,33 +169,38 @@ class Product(SoftDeleteModel):
         return reverse('business_data:product-detail', kwargs={'pk': self.pk})
 
     # def generate_barcode_image(self):
-    #     code_value = f"PROD-{self.id}"
-    #     ean = barcode.get('code128', code_value, writer=ImageWriter())
-    #     buffer = BytesIO()
-    #     ean.write(buffer)
-    #     file_name = f"barcode_{self.id}.png"
-    #     self.barcode.save(file_name, File(buffer), save=False)
-    
-    def generate_barcode_image(self):
-        # Generate a unique 12-digit barcode number if not set
-        if not self.barcode_number:
-            while True:
-                code_value = ''.join([str(random.randint(0, 9)) for _ in range(12)])
-                if not Product.objects.filter(barcode_number=code_value).exists():
-                    self.barcode_number = code_value
-                    break
+    #     # Generate a unique 12-digit barcode number if not set
+    #     if not self.barcode_number:
+    #         while True:
+    #             code_value = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+    #             if not Product.objects.filter(barcode_number=code_value).exists():
+    #                 self.barcode_number = code_value
+    #                 break
 
-        # Generate EAN13 barcode (checksum auto-handled)
+    #     # Generate EAN13 barcode (checksum auto-handled)
+    #     ean = EAN13(self.barcode_number, writer=ImageWriter())
+    #     buffer = BytesIO()
+    #         # Custom writer with reduced barcode height
+    #     writer_options = {
+    #         'module_height': 10.0,  # 🔽 Reduce height (default is 15.0)
+    #     }
+
+    #     ean.write(buffer, options=writer_options)
+
+    #     file_name = f"barcode_{self.pk or 'temp'}.png"
+    #     self.barcode.save(file_name, File(buffer), save=False)
+    def generate_barcode_image(self):
+        # Generate EAN13 barcode image using self.barcode_number
         ean = EAN13(self.barcode_number, writer=ImageWriter())
         buffer = BytesIO()
-            # Custom writer with reduced barcode height
+
         writer_options = {
-            'module_height': 10.0,  # 🔽 Reduce height (default is 15.0)
+            'module_height': 10.0,  # Reduce image height
         }
 
         ean.write(buffer, options=writer_options)
 
-        file_name = f"barcode_{self.pk or 'temp'}.png"
+        file_name = f"barcode_{self.pk}.png"
         self.barcode.save(file_name, File(buffer), save=False)
         
     def generate_qr_code_image(self):
@@ -208,13 +213,30 @@ class Product(SoftDeleteModel):
         file_name = f"qrcode_{self.id}.png"
         self.qr_code.save(file_name, File(buffer), save=False)
 
+    # def save(self, *args, **kwargs):
+    #     is_new = self.pk is None
+    #     super().save(*args, **kwargs)
+    #     if is_new:
+    #         self.generate_barcode_image()
+    #         self.generate_qr_code_image()
+    #         super().save(update_fields=['barcode', 'qr_code'])
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+
+        if is_new and not self.barcode_number:
+            # Generate a unique 12-digit barcode number
+            while True:
+                code_value = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+                if not Product.objects.filter(barcode_number=code_value).exists():
+                    self.barcode_number = code_value
+                    break
+
         super().save(*args, **kwargs)
+
         if is_new:
             self.generate_barcode_image()
             self.generate_qr_code_image()
-            super().save(update_fields=['barcode', 'qr_code'])
+            super().save(update_fields=['barcode', 'barcode_number', 'qr_code'])
 
 
 # Add sample type choices for ProductImage using a base choice class

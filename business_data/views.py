@@ -1720,7 +1720,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         order_dir = request.POST.get('order[0][dir]', 'asc')  # safer default
 
         columns = [
-            'id', 'date', 'article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
+            'barcode_number', 'date', 'article_no', 'fabric_article_supplier', 'fabric_article_fexpo', 'fabric_mill_supplier',
             'rd_generated_date', 'fabric_mill_source', 'coo', 'product_category', 'mill_reference',
             'fabricexpo_reference', 'season', 'style', 'po', 'customer_name', 'composition',
             'construction', 'weight', 'color', 'cut_width', 'weave' ,'wash', 'price_per_yard',
@@ -1739,7 +1739,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
             search_q = Q()
             # List of fields to search (including id and all relevant fields)
             search_fields = [
-            'id',
+            'barcode_number',
             'date',
             'article_no',
             'fabric_article_supplier',
@@ -1783,7 +1783,7 @@ class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):
         
             data.append([
                 # idx,  # For Count column (can be filled on client side)
-                obj.id,
+                obj.barcode_number,
                 obj.date.strftime("%B %d, %Y") if obj.date else "",
                 obj.article_no,
                 obj.fabric_article_supplier,

@@ -59,9 +59,9 @@
             <div class="card-footer">
               {% comment %} <button class="btn btn-warning" type="submit">Save Email</button> {% endcomment %}
               
-                <button {% if not perms.bulk_email.sendmail_emailtemplate %}disabled{% endif %} class="btn btn-success" onclick="window.location.href='{% url 'bulk_email:select_recipients' draft_id=form.instance.id %}'" type="button">Select Recipients</button>
+                <button {% if not perms.bulk_email.sendmail_emailtemplate %}disabled{% endif %} class="btn btn-success" onclick="window.location.href='{% url 'bulk_email:select_recipients' draft_id=form.instance.id %}'" type="button"><i class="fa-solid fa-list-check"></i> Select Recipients</button>
               
-              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'">Back</button>
+              <button class="btn btn-secondary" type="button" onclick="window.location.href='{% url 'bulk_email:draft_list' %}'"><i class="fa-solid fa-arrow-left-long"></i> Back</button>
             </div>
             <!--end::Footer-->
           </form>

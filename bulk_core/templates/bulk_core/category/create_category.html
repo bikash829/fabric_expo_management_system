@@ -1,10 +1,10 @@
 {% extends "core/_base.html" %}
 
-{% block title %}Create Recipient's Category{% endblock title %}
+{% block title %}{{page_title}}{% endblock title %}
 
 {% block content %}
   <!--begin::Header-->
-  {% include 'core/layouts/content_header.html' with page_name="Create Recipient's Category" only%}
+  {% include 'core/layouts/content_header.html' with page_name=header_title only%}
   <!--end::Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -34,7 +34,7 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info" type="submit">Create Category</button>
+              <button class="btn btn-primary" type="submit">{{submit_button_icon|safe}} {{submit_button_name}}</button>
               <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
             </div>
             <!--end::Footer-->

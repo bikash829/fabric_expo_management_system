@@ -22,11 +22,11 @@
       <div>
         <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
           <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
-          <label class="btn btn-outline-primary" for="select-all">Select All</label>
+          <label class="btn btn-outline-primary" for="select-all"><i class="fa-solid fa-list-check"></i> Select All</label>
         </div>
         <button id="row_count" class="btn btn-info" disabled>Row count</button>
         {% if perms.business_data.delete_supplier %}
-        <button id="delete-data" class="btn btn-danger">Delete</button>
+        <button id="delete-data" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Delete</button>
         {% endif %}
       </div>
 
@@ -59,46 +59,6 @@
                   
               </tr>
           </thead>
-          {% comment %} <tbody>
-              {% for item in object_list %}
-              <tr  data-id="{{item.id}}">
-                  <td>{{forloop.counter}}</td>
-                  <td>{{item.id}}</td>
-                  <td>{{item.date}}</td>
-                  <td>{{item.mill_name}}</td>
-                  <td>{{item.supplier_name}}</td>
-                  <td>{{item.concern_person}}</td>
-                  <td>{{item.concern_person_designation}}</td>
-                  <td>{{item.product_category}}</td>
-                  <td>{{item.product_range}}</td>
-                  <td>{{item.speciality}}</td>
-                  <td>{{item.country_of_origin}}</td>
-                  <td>{{ item.emails.all|join:", " }}</td>
-                  <td>
-                    {% for object in item.phones.all %}
-                      {% if not object.is_whatsapp and not object.is_wechat %}
-                        {{object|join:','}}
-                      {% endif %} 
-                    {% endfor %}
-                  </td>
-                  <td>
-                    {% for object in item.phones.all %}
-                      {% if  object.is_whatsapp  %}
-                      {{object}}
-                      {% endif %}
-                    {% endfor %}
-                  </td>
-                  <td>{{item.wechat_id}}</td>
-                  <td>{{item.payment_term}}</td>
-                  <td>{{item.fabric_reference}}</td>
-                  <td>{{item.mailing_address}}</td>
-                  <td>{{item.visiting_address}}</td>
-                  <td>{{item.linkedin_profile}}</td>
-                  <td>{{item.remarks}}</td>
-                  <td>{{item.concern_fe_rep}}</td>
-              </tr>
-              {% endfor %}
-          </tbody> {% endcomment %}
           <tfoot>
               <tr>
                 <th>#ID</th>

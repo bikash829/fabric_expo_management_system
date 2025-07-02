@@ -22,7 +22,7 @@
                 <div class="card-title">Import Recipients From CSV Form</div>
               </div>
               <div class="col-6 text-end">
-                <a href="{% url 'bulk_email:generate_csv' %}" class="btn btn-success"> Download Demo File</a>
+                <a href="{% url 'bulk_email:generate_csv' %}" class="btn btn-info text-white"><i class="fa-solid fa-file-arrow-down"></i> Download Demo File</a>
               </div>
             </div>
 
@@ -42,7 +42,7 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info text-white" type="submit">Import Recipients</button>
+              <button class="btn btn-primary" type="submit"><i class="fa-solid fa-file-arrow-up"></i> Import Recipients</button>
               {% comment %} <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button> {% endcomment %}
             </div>
             <!--end::Footer-->

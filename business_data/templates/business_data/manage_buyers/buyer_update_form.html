@@ -1,10 +1,10 @@
 {% extends "core/_base.html" %}
 
-{% block title %}Edit Product Detail{% endblock title %}
+{% block title %}Edit Buyer Detail{% endblock title %}
 
 {% block content %}
   <!--begin::Header-->
-  {% include 'core/layouts/content_header.html' with page_name="Edit Product Detail" only%}
+  {% include 'core/layouts/content_header.html' with page_name="Edit Buyer Detail" only%}
   <!--end::Header-->
   <!--begin::App Content-->
   <div class="app-content">
@@ -17,7 +17,7 @@
         <div class="card card-info card-outline mb-4">
           <!--begin::Header-->
           <div class="card-header">
-            <div class="card-title">Edit Product Detail Form</div>
+            <div class="card-title">Buyer Detail Form</div>
           </div>
           <!--end::Header-->
 
@@ -31,7 +31,7 @@
             <!--end::Body-->
             <!--begin::Footer-->
             <div class="card-footer">
-              <button class="btn btn-info" type="submit">Update Product</button>
+              <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Update Buyer Detail</button>
               <button class="btn btn-secondary" type="button" onclick="window.history.back();">Cancel</button>
             </div>
             <!--end::Footer-->

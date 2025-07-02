@@ -20,6 +20,16 @@ class CategoryCreateView(LoginRequiredMixin,PermissionRequiredMixin, CreateView)
         new_name = form.cleaned_data.get('name')
         messages.success(self.request,f'Category "{new_name}" has been created')
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "Create Recipient Category" 
+        context['header_title'] = "Create Recipient's Category" 
+        context['submit_button_name'] = "Create Category" 
+        context['submit_button_icon'] = "<i class='fa-solid fa-plus'></i>"
+        context['form_purpose'] = "create" 
+        
+        return context
 
 # category details
 # class CategoryDetailView(DetailView,LoginRequiredMixin,PermissionRequiredMixin):
@@ -51,6 +61,15 @@ class CategoryUpdateView(LoginRequiredMixin,PermissionRequiredMixin, UpdateView)
         messages.success(self.request,f'Category updated from {old_name} to {new_name}')
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "Update Recipient Category" 
+        context['header_title'] = "Update Recipient's Category" 
+        context['submit_button_name'] = "Update Category" 
+        context['submit_button_icon'] = '<i class="fa-solid fa-floppy-disk"></i>'
+        context['form_purpose'] = "update" 
+        
+        return context
     
 # delete category
 class CategoryDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):

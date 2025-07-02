@@ -3,7 +3,7 @@ from decouple import config
 # from admin_dashboard import nav_data
 from admin_dashboard import nav_data
 from fabric_expo_management_system.info import PROJECT_NAME,COMPANY_LOGO,business_infos
-
+from  fabric_expo_management_system.settings import APP_VERSION
 def sidebar_items(request):
     
     # if request.user.is_superuser:
@@ -31,7 +31,7 @@ def system_info(request):
     data = {
         'PROJECT_NAME': PROJECT_NAME,
         'COMPANY_LOGO': COMPANY_LOGO,
-        'APP_VERSION': config("APP_VERSION", default="1.0.0"),
+        'APP_VERSION': f"{APP_VERSION}",
         'business_infos': business_infos,
     }
 

@@ -5,6 +5,9 @@ from fabric_expo_management_system.ckeditor_conf import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from fabric_expo_management_system.version import __version__ as APP_VERSION
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

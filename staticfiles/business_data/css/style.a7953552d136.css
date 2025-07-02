@@ -1,0 +1,118 @@
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+}
+
+.product-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.product-tag {
+    top: 1rem;
+    right: 1rem;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+}
+
+.section-title {
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3rem;
+    height: 2px;
+    background: var(--primary-color);
+}
+
+.code-image {
+    transition: transform 0.3s ease;
+}
+
+.code-image:hover {
+    transform: scale(1.03);
+}
+
+    
+/* Sample Gallery Styles */
+.sample-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.sample-card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.sample-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.sample-img-container {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
+.sample-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.sample-card:hover .sample-img-container img {
+    transform: scale(1.05);
+}
+
+.sample-title {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.sample-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sample-card:hover .sample-actions {
+    opacity: 1;
+}
+
+/* Upload Modal Styles */
+.upload-sample-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.upload-sample-area:hover {
+    border-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.upload-sample-area i {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+}

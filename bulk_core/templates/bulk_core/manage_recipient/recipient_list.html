@@ -28,12 +28,12 @@
                 {% elif source == 'bulk_wechat'%}
                     {% url 'bulk_wechat:import_recipients' %}
                 {% endif %}
-                " >Import Recipients</a>
+                " ><i class="fa-solid fa-file-arrow-up"></i> Import Recipients</a>
                 
                 <button id="row_count" class="btn btn-info" disabled>Row count</button>
                 <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
                 <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
-                <label class="btn btn-outline-primary" for="select-all">Select All</label>
+                <label class="btn btn-outline-primary" for="select-all"><i class="fa-solid fa-list-check"></i> Select All</label>
                 </div>
 
                 <!-- <a class="btn btn-secondary" href="
@@ -61,7 +61,7 @@
                 >
                     {% csrf_token %}
                     <input type="hidden" name="selected_ids" id="selected-ids">
-                    <button type="submit" class="btn btn-secondary">Export Selected</button>
+                    <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-file-arrow-down"></i> Export Selected</button>
                 </form>
             </div>
             <div class="col-md-6 text-end">

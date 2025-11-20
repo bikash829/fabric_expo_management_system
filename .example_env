@@ -1,0 +1,24 @@
+# # system info 
+# PROJECT_NAME=ExpoSync
+# SECRET_KEY=fd54a56730e138081dde0d3336cb074a
+# DEBUG=False
+
+# # host 
+# ALLOWED_HOSTS=binarysync360.binarytobyte.com,www.binarysync360.binarytobyte.com
+
+# # database assets 
+# DATABASE_URL=127.0.0.1
+# DB_HOST="127.0.0.1"
+# DB_NAME=binaryto_expo_sync
+# DB_USER=binaryto_expo_sync
+# DB_PASS=k887ZEVpUBqZ
+
+
+# # email info
+# EMAIL=chowdhurybikash747@gmail.com
+# EMAIL_PASS=hzpwwhouabfylbqn
+
+# # twilio
+# TWILIO_ACCOUNT_SID=ACc14f18f51c7683f52e00ea4966c241a8
+# TWILIO_AUTH_TOKEN=ce68bf8f63392b48df845c05a8090cd1
+

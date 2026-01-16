@@ -207,7 +207,7 @@ CELERY_BEAT_SCHEDULE = {
     'cleanup-temp-email-recipients-every-5-minutes': {
         'task': 'bulk_email.tasks.cleanup_expired_temp_recipients',
         # 'schedule': crontab(minute='*/1'),  # every 5 minutes
-        'schedule': crontab(hour=24),  # every 24 hours
+        'schedule': crontab(minute=0, hour=0),  # run everyday at 00:00 O'clock
         'args': (24,),  # TTL = 24 hours
     },
 }

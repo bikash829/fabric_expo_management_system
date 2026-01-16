@@ -180,9 +180,10 @@ class DataSheetDeleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             # Delete selected recipients
             if recipients_temp_id:
-                TempEmailRecipient.objects.filter(temp_id__in=recipients_temp_id).delete()
-            # Delete datasheet
-            datasheet.delete()
+                with transaction.atomic():
+                    TempEmailRecipient.objects.filter(temp_id__in=recipients_temp_id).delete()
+                    # Delete datasheet
+                    datasheet.delete()
 
             return JsonResponse({'success': True, 'message': 'Data sheet deleted successfully',},status=200)
         except Exception as e:

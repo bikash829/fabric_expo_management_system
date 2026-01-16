@@ -1,11 +1,13 @@
+from datetime import timedelta
 from celery import shared_task
 import mimetypes
 from premailer import transform
+from bulk_core.models import TempRecipientDataSheet
 from bulk_core.utils import replace_hsl_with_rgb
 from django.core.mail import EmailMultiAlternatives, get_connection
 
 from business_data.models import CompanyProfile
-from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, EmailTemplate
+from .models import EmailAttachment, EmailSession, SentMail, EmailRecipient, EmailTemplate, TempEmailRecipient
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -39,8 +41,7 @@ def send_mail_queue(**kwargs):
     )
     # company = CompanyProfile.ojects.get(company_name=kwargs.get('company')) 
     company_info = CompanyProfile.objects.filter(company_name=kwargs.get('company')).first()
-    company_name = company_info.get_company_name_display()
-    # print(company)
+    company_name = company_info.get_company_name_display() if company_info else PROJECT_NAME
     sender = User.objects.get(id=kwargs.get('sender_id'))
 
     # Open a single SMTP connection for efficiency
@@ -137,3 +138,37 @@ def send_mail_queue(**kwargs):
         }
     )
     # print(f"Email has been sent with {success_count} success and {failure_count} failed attempts.")
+    
+import logging
+logger = logging.getLogger(__name__)
+from django.db import transaction
+@shared_task(
+    bind=True, 
+    autoretry_for=(Exception,), 
+    retry_kwargs={'max_retries': 3}
+    )
+def cleanup_expired_temp_recipients(self, ttl_hours=24):
+# def cleanup_expired_temp_recipients(self, ttl_minutes=5):
+    try:
+        # expiry_time = timezone.now() - timedelta(minutes=ttl_minutes)
+        expiry_time = timezone.now() - timedelta(hours=ttl_hours)
+
+        logger.info(f"Cleanup task started. Expiry time: {expiry_time}")
+
+        # check expired temporary recipient data sheet 
+        expired_sheets = TempRecipientDataSheet.objects.filter(
+            uploaded_at__lt=expiry_time
+        )
+        # check expired email recipient 
+        expired_temp_email_recipients = TempEmailRecipient.objects.filter(
+            created_at__lt=expiry_time
+        )
+
+        # delete data 
+        with transaction.atomic():
+            count_sheet, _ = expired_sheets.delete()
+            count_emails,_ = expired_temp_email_recipients.delete()
+        return f"Deleted expired temp sheet:{count_sheet}, emails: {count_emails}"
+    except Exception as exc:
+        logger.exception("Cleanup task failed")
+        raise exc

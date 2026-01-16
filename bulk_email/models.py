@@ -24,6 +24,7 @@ class TempEmailRecipient(models.Model):
     email = models.EmailField()
     category = models.ForeignKey(RecipientCategory,on_delete=models.CASCADE)
     temp_id = models.CharField(max_length=36,unique=True,default=uuid.uuid4)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Email: {self.email}, Category: {self.category}"

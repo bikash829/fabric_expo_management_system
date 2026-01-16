@@ -199,3 +199,15 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = "redis://localhost:6379"
 # CELERY_RESULT_BACKEND = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = 'django-db'
+
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-temp-email-recipients-every-5-minutes': {
+        'task': 'bulk_email.tasks.cleanup_expired_temp_recipients',
+        # 'schedule': crontab(minute='*/1'),  # every 5 minutes
+        'schedule': crontab(hour=24),  # every 24 hours
+        'args': (24,),  # TTL = 24 hours
+    },
+}

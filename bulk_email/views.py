@@ -53,7 +53,7 @@ class EmailRecipientCreateView(LoginRequiredMixin, PermissionRequiredMixin, Crea
 
 ### Preview recipient list imported from csv file 
 class PreviewEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'bulk_email:add_emailrecipient'
+    permission_required = 'bulk_email.add_emailrecipient'
     template_name = "bulk_email/preview_recipients.html"
 
     def get(self, request, datasheet_id):
@@ -100,7 +100,7 @@ class PreviewEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, Vi
 
 
 class ConfirmEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'bulk_email:add_emailrecipient'
+    permission_required = 'bulk_email.add_emailrecipient'
 
     @transaction.atomic
     def post(self, request, datasheet_id):

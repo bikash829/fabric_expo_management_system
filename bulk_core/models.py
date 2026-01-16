@@ -57,6 +57,13 @@ class TempRecipientDataSheet(models.Model):
     def __str__(self):
         return f"Platform: {self.platform}|Upload date: {self.uploaded_at}|sheet name: {self.data_sheet}"
     
+    def delete(self, *args, **kwargs):
+        # Delete the file from storage first
+        if self.data_sheet:
+            self.data_sheet.delete(save=False)
+        # Then delete the DB record
+        super().delete(*args, **kwargs)
+    
 
     @classmethod
     def cleanup_old_entries(cls,category=None):

@@ -2,8 +2,10 @@ from admin_dashboard.aside_items import get_sidebar_items
 from decouple import config
 # from admin_dashboard import nav_data
 from admin_dashboard import nav_data
-from fabric_expo_management_system.info import PROJECT_NAME,COMPANY_LOGO,business_infos
+# from fabric_expo_management_system.info import PROJECT_NAME,COMPANY_LOGO,business_infos
+from fabric_expo_management_system.info import get_project_settings, get_business_info
 from fabric_expo_management_system.version import __version__ as APP_VERSION
+
 
 
 def sidebar_items(request):
@@ -29,12 +31,14 @@ def sidebar_items(request):
     
 
 def system_info(request):
-
+    # business info 
+    business_info = get_business_info()
+    project_settings = get_project_settings()
     data = {
-        'PROJECT_NAME': PROJECT_NAME,
-        'COMPANY_LOGO': COMPANY_LOGO,
+        'PROJECT_NAME': project_settings["PROJECT_NAME"],
+        'COMPANY_LOGO': project_settings["COMPANY_LOGO"],
         'APP_VERSION': f"{APP_VERSION}",
-        'business_infos': business_infos,
+        'business_infos': business_info,
     }
 
     return data

@@ -12,7 +12,9 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from fabric_expo_management_system.settings import  EMAIL_HOST_USER
-from fabric_expo_management_system.info import PROJECT_NAME
+from fabric_expo_management_system.info import get_project_settings
+
+project_settings = get_project_settings()
 
 
 # def parse_csv(file):
@@ -41,7 +43,7 @@ def send_mail_queue(**kwargs):
     )
     # company = CompanyProfile.ojects.get(company_name=kwargs.get('company')) 
     company_info = CompanyProfile.objects.filter(company_name=kwargs.get('company')).first()
-    company_name = company_info.get_company_name_display() if company_info else PROJECT_NAME
+    company_name = company_info.get_company_name_display() if company_info else project_settings["PROJECT_NAME"]
     sender = User.objects.get(id=kwargs.get('sender_id'))
 
     # Open a single SMTP connection for efficiency

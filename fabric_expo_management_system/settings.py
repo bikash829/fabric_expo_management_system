@@ -18,8 +18,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # SITE_BASE_URL = 'http://127.0.0.1:8000'
-# SITE_BASE_URL = "https://fabricexpo.co"
-SITE_BASE_URL = "http://fabricexpo.co"
+SITE_BASE_URL = "https://fabricexpo.co"
+# SITE_BASE_URL = "http://fabricexpo.co"
 
 
 # Application definition
@@ -195,7 +195,8 @@ TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"
 # Celery Configuration Options
 CELERY_TIMEZONE = "Asia/Dhaka"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60 # gives task warning to stop gracefully
+CELERY_TASK_TIME_LIMIT = 30 * 60 # kills it completely 
 
 CELERY_BROKER_URL = "redis://localhost:6379"
 # CELERY_RESULT_BACKEND = "redis://localhost:6379"

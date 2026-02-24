@@ -162,13 +162,5 @@
 <!-- Datatable-->
 <script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
 <script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
-<script>
-    const dataSourceUrl = "{% url 'business_data:product_data_source' %}";
-    const deleteUrl = "{% url 'business_data:delete-products' %}";
-    const printQRCodesUrl = "{% url 'business_data:print_selected_qrcodes' %}";
-    const printBarcodesUrl = "{% url 'business_data:print_selected_barcodes' %}";
-    const printProductDetailsUrl = "{% url 'business_data:print-product-list-details' %}"
-    const csrfToken = "{{ csrf_token }}";
-</script>
-<script src="{% static 'business_data/product-list.js' %}"></script>
+
 {% endblock push_scripts %}

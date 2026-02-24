@@ -1702,10 +1702,22 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect('business_data:product-upload') 
 
 # Product list 
+import logging
+logger = logging.getLogger(__name__)
 class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
     permission_required = "business_data.view_product"
     # model = Product
     template_name = "business_data/manage_products/product_list.html"
+    # context_object_name = "object_list"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from business_data.models import Product
+            context['object_list'] = Product.objects.all()
+        except Exception as e:
+            logger.exception("Error in ProductListView")  # logs full traceback
+            raise
+        return context
 
 # product list 
 class ProductDataSourceView(LoginRequiredMixin, PermissionRequiredMixin, View):

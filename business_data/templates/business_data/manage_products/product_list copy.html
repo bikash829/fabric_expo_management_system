@@ -1,0 +1,174 @@
+{% extends "core/_base.html" %}
+{% load static %}
+{% load custom_filtertags %}
+
+{% block title %}Product List{% endblock title %}
+
+{% block push_css %}
+    <!-- Datatable -->
+    <link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/select/3.0.0/css/select.dataTables.min.css" ref="stylesheet">
+{% endblock push_css %}
+      
+{% block content %}
+
+<!--begin::header-->
+{% include 'core/layouts/content_header.html' with page_name="Product List"  only%}
+<!--end::header-->
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+      <div>
+        <div class="form-check form-check-inline" style="margin-right:0 !important; padding-left:0 !important;">
+          <input type="checkbox" class="btn-check" id="select-all" autocomplete="off">
+          <label class="btn btn-outline-primary mt-2" for="select-all"><i class="fa-solid fa-list-check"></i>  Select All</label>
+        </div>
+        <button id="row_count" class="btn btn-info mt-2"  disabled>Row count</button>
+        <!-- <button id="print_qr_codes" class="btn btn-secondary mt-2" disabled>Print QR Codes</button>
+        <button id="print_barcodes" class="btn btn-secondary mt-2" disabled>Print Barcodes</button>
+        <button id="print_product_details" class="btn btn-secondary mt-2" disabled>Print Product Details</button> -->
+        {% if perms.business_data.delete_product %}
+        <button id="delete-data" class="btn btn-danger mt-2"><i class="fa-solid fa-trash"></i> Delete</button>
+        {% endif %}
+      </div>
+
+      <div>
+        <table id="data_list" class="table table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  {% comment %} <th>Count</th> {% endcomment %}
+                  <th>Product #ID</th>
+                  <th>{{'date'|pretty_label}}</th>
+                  <th>{{'article_no'|pretty_label}}</th>
+                  <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
+                  <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
+                  <th>{{'fabric_mill (supplier)'|pretty_label}}</th>
+                  <th>{{'rd_generated_date'|pretty_label}}</th>
+                  <th>{{'fabric_mill (source)'|pretty_label}}</th>
+                  <th>{{'coo'|pretty_label}}</th>
+                  <th>{{'product_category'|pretty_label}}</th>
+                  <th>{{'mill_reference/article'|pretty_label}}</th>
+                  <th>{{'fabric_expo_reference/article'|pretty_label}}</th>
+                  <th>{{'season'|pretty_label}}</th>
+                  <th>{{'style'|pretty_label}}</th>
+                  <th>{{'po'|pretty_label}}</th>
+                  <th>{{'customer_name'|pretty_label}}</th>
+                  <th>{{'composition'|pretty_label}}</th>
+                  <th>{{'construction'|pretty_label}}</th>
+                  <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
+                  <th>{{'color'|pretty_label}}</th>
+                  <th>{{'cut_width (inch)'|pretty_label}}</th>
+                  <th>{{'weave'|pretty_label}}</th>
+                  <th>{{'wash'|pretty_label}}</th>
+                  <th>{{'price (yards)'|pretty_label}}</th>
+                  <th>{{'shrinkage%'|pretty_label}}</th>
+                  <th>{{'available/ stock_qty'|pretty_label}}</th>
+                  {% comment %} <th>{{'images'|pretty_label}}</th>
+                  <th>{{'barcode'|pretty_label}}</th>
+                  <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
+                  <th>{{'concern_person'|pretty_label}}</th>
+                  <th>{{'remarks'|pretty_label}}</th>
+                  <th>Action</th>
+                  
+              </tr>
+          </thead>
+          {% comment %} <tbody>
+              {% for item in object_list %}
+              <tr data-id="{{item.id}}">
+                  <td>{{forloop.counter}}</td>
+                  <td>{{item.id}}</td>
+                  <td>{{item.date}}</td>
+                  <td>{{item.fabric_article_supplier}}</td>
+                  <td>{{item.fabric_article_fexpo}}</td>
+                  <td>{{item.fabric_mill_supplier}}</td>
+                  <td>{{ item.rd_generated_date|date:"F j, Y" }}</td>
+                  <td>{{item.fabric_mill_source}}</td>
+                  <td>{{item.coo}}</td>
+                  <td>{{item.product_category}}</td>
+                  <td>{{item.mill_reference}}</td>
+                  <td>{{item.fabricexpo_reference}}</td>
+                  <td>{{item.season}}</td>
+                  <td>{{item.style}}</td>
+                  <td>{{item.po}}</td>
+                  <td>{{item.customer_name}}</td>
+                  <td>{{item.composition}}</td>
+                  <td>{{item.construction}}</td>
+                  <td>{{item.weight}}</td>
+                  <td>{{item.color}}</td>
+                  <td>{{item.cut_width}}</td>
+                  <td>{{item.wash}}</td>
+                  <td>{{item.price_per_yard}}</td>
+                  <td>{{item.shrinkage_percent}}</td>
+                  <td>{{item.stock_qty}}</td>
+                  <!-- <td>{{'item.images'}}</td>
+                  <td>{{item.barcode}}</td>
+                  <td>{{item.qr_code}}</td> -->
+                  <td>{{item.concern_person}}</td>
+                <th>{{item.remarks}}</th>
+
+              </tr>
+              {% endfor %}
+          </tbody> {% endcomment %}
+          <tfoot>
+              <tr>
+                 {% comment %} <th>Count</th> {% endcomment %}
+                <th>Product #ID</th>
+                <th>{{'date'|pretty_label}}</th>
+                <th>{{'article_no'|pretty_label}}</th>
+                <th>{{'fabric_article (Supplier)'|pretty_label}}</th>
+                <th>{{'fabric_article (Fabric Expo)'|pretty_label}}</th>
+                <th>{{'fabric_mill (supplier)'|pretty_label}}</th>
+                <th>{{'rd_generated_date'|pretty_label}}</th>
+                <th>{{'fabric_mill (source)'|pretty_label}}</th>
+                <th>{{'coo'|pretty_label}}</th>
+                <th>{{'product_category'|pretty_label}}</th>
+                <th>{{'mill_reference/article'|pretty_label}}</th>
+                <th>{{'fabric_expo_reference/article'|pretty_label}}</th>
+                <th>{{'season'|pretty_label}}</th>
+                <th>{{'style'|pretty_label}}</th>
+                <th>{{'po'|pretty_label}}</th>
+                <th>{{'customer_name'|pretty_label}}</th>
+                <th>{{'composition'|pretty_label}}</th>
+                <th>{{'construction'|pretty_label}}</th>
+                <th>{{'weight'|pretty_label}}(GSM/OZ)</th>
+                <th>{{'color'|pretty_label}}</th>
+                <th>{{'cut_width (inch)'|pretty_label}}</th>
+                <th>{{'weave'|pretty_label}}</th>
+                <th>{{'wash'|pretty_label}}</th>
+                <th>{{'price (yards)'|pretty_label}}</th>
+                <th>{{'shrinkage%'|pretty_label}}</th>
+                <th>{{'available/ stock_qty'|pretty_label}}</th>
+                {% comment %} <th>{{'images'|pretty_label}}</th>
+                <th>{{'barcode'|pretty_label}}</th>
+                <th>{{'qr_code'|pretty_label}}</th> {% endcomment %}
+                <th>{{'concern_person'|pretty_label}}</th>
+                <th>{{'remarks'|pretty_label}}</th>
+                <th>Action</th>
+                
+              </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock content %}
+
+
+
+{% block push_scripts %}
+<!-- Datatable-->
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/r-3.0.3/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.min.js"></script>
+<script>
+    const dataSourceUrl = "{% url 'business_data:product_data_source' %}";
+    const deleteUrl = "{% url 'business_data:delete-products' %}";
+    const printQRCodesUrl = "{% url 'business_data:print_selected_qrcodes' %}";
+    const printBarcodesUrl = "{% url 'business_data:print_selected_barcodes' %}";
+    const printProductDetailsUrl = "{% url 'business_data:print-product-list-details' %}"
+    const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'business_data/product-list.js' %}"></script>
+{% endblock push_scripts %}

@@ -206,10 +206,10 @@ CELERY_RESULT_BACKEND = 'django-db'
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'cleanup-temp-email-recipients-every-5-minutes': {
+    'cleanup-temp-email-recipients-everyday': {
         'task': 'bulk_email.tasks.cleanup_expired_temp_recipients',
-        # 'schedule': crontab(minute='*/1'),  # every 5 minutes
-        'schedule': crontab(minute=0, hour=0),  # run everyday at 00:00 O'clock
+        'schedule': crontab(minute='*/10'),  # every 5 minutes
+        # 'schedule': crontab(minute=0, hour=0),  # run everyday at 00:00 O'clock
         'args': (24,),  # TTL = 24 hours
     },
 }

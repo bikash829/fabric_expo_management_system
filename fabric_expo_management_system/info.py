@@ -24,7 +24,7 @@ def get_business_info():
     This prevents database queries at import time.
     """
     try:
-        return CompanyProfile.objects.first()
+        return CompanyProfile.objects.all()
     except Exception:
         # In case migrations are not applied yet
         return None
@@ -34,7 +34,7 @@ def get_project_settings():
     """
     Returns a dictionary of project-related dynamic settings.
     """
-    business_info = get_business_info()
+    business_info = get_business_info().first() if get_business_info() else None
 
     return {
         "PROJECT_NAME": business_info.get_company_name_display() if business_info else "ExpoSync",

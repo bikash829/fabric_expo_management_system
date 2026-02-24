@@ -537,11 +537,6 @@ def get_sidebar_items(request):
                     'name': 'View Suppliers',
                     'url': reverse('business_data:supplier-list'),
                     'icon': 'fa-solid fa-eye',
-                }),
-                ('business_data.view_supplierss',{
-                    'name': 'View Suppliers',
-                    'url': reverse('business_data:product-list'),
-                    'icon': 'fa-solid fa-eye',
                 })
             ]
         },

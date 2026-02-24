@@ -1702,8 +1702,8 @@ class ProductPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect('business_data:product-upload') 
 
 # Product list 
-class ProductListView(LoginRequiredMixin,  TemplateView):
-    # permission_required = "business_data.view_product"
+class ProductListView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = "business_data.view_product"
     # model = Product
     template_name = "business_data/manage_products/product_list.html"
 

@@ -17,8 +17,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
-# SITE_BASE_URL = 'http://127.0.0.1:8000'
-SITE_BASE_URL = "https://fabricexpo.co"
+SITE_BASE_URL = 'http://127.0.0.1:8000'
+# SITE_BASE_URL = "https://fabricexpo.co"
 # SITE_BASE_URL = "http://fabricexpo.co"
 
 
@@ -80,15 +80,22 @@ WSGI_APPLICATION = 'fabric_expo_management_system.wsgi.application'
 
 
 # Database
+# DATABASES = {
+#     "default": {
+#         "ENGINE": 'django.db.backends.mysql',
+#         "NAME": config("DB_NAME"),
+#         "USER": config("DB_USER"),
+#         "PASSWORD": config("DB_PASS"),
+#         "HOST": config("DB_HOST"),
+#         # "HOST": config("DATABASE_URL"),
+#         "PORT": "3306",
+#     }
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": 'django.db.backends.mysql',
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASS"),
-        "HOST": config("DB_HOST"),
-        # "HOST": config("DATABASE_URL"),
-        "PORT": "3306",
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "mydatabase",
     }
 }
 

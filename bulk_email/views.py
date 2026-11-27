@@ -68,19 +68,30 @@ class PreviewEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, Vi
 
         reader = csv.reader(decoded_file)
         next(reader,None)  # Skip header row
+ 
         
         temp_recipients = []
         # checking valid data 
+        print(render)
         for row in reader:
+            print(row)
+            print(row.count)
+            print(len(row))
+            
+            
+        
             if len(row) < 2 or not row[0].strip() or not row[1].strip():  
                 continue  # Skip invalid rows
-            name, email = row[0].strip(), row[1].strip()
-
+            
+            name, email = row[1].strip(), row[2].strip()
+            
             # check if the email is valid
             try:
                 validate_email(email) 
             except ValidationError:
                 continue
+            
+          
             # create a list for temporary email recipient object 
             temp_recipients.append(TempEmailRecipient(
                 name=name, 
@@ -88,8 +99,10 @@ class PreviewEmailRecipientsView(LoginRequiredMixin, PermissionRequiredMixin, Vi
                 category=data_sheet.category, 
                 temp_id=uuid.uuid4()
             ))
+        print(temp_recipients)
         # save list into temporary data table 
         temporary_recipients = TempEmailRecipient.objects.bulk_create(temp_recipients)
+   
         recipient_ids = [str(item.temp_id) for item in temporary_recipients]
 
         return render(request, self.template_name, {
